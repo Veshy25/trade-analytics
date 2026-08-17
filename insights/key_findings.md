@@ -1,0 +1,1 @@
+# Trade Analytics — Key Findings
