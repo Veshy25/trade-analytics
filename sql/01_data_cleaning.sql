@@ -9,8 +9,11 @@
 --     only), customsCode/customsDesc, mosCode, motCode/motDesc,
 --     partner2Code/partner2Iso/partner2Desc (not split out), refPeriodId,
 --     refMonth, period (redundant with refYear), isOriginalClassification.
---   - cifValue: always null/0 for an exports-only pull (exports are valued
---     FOB, not CIF) — dropped after confirming that below, not assumed.
+--   - cifValue: dropped even though not always blank in this exports-only
+--     pull (873 of 3282 raw rows carry a populated cifValue — see validation
+--     query 2). Still safe to drop: exports are valued FOB, not CIF, and
+--     validation query 3 confirms primary_value equals fob_value in every
+--     row, so cifValue is never the field analysis actually reads from.
 --
 -- Run the validation block at the end after each CREATE TABLE to confirm
 -- row counts match the raw staging tables and no values were silently
@@ -109,8 +112,10 @@ SELECT 'B clean', COUNT(*) FROM clean_track_b_india_sector_detail
 UNION ALL
 SELECT 'C clean', COUNT(*) FROM clean_track_c_india_partner_view;
 
--- 2. Confirm cifValue really was always empty for this exports-only pull
---    (justifies dropping it above rather than just assuming it)
+-- 2. cifValue is NOT always blank in this exports-only pull — expect 873,
+--    not 0. That's fine: it doesn't affect analysis, since query 3 below
+--    confirms primary_value (what clean_* actually carries forward) equals
+--    fob_value in every row regardless of what's in cifValue.
 SELECT COUNT(*) AS non_blank_cif_rows
 FROM raw_track_a_country_benchmark
 WHERE NULLIF(cifvalue, '') IS NOT NULL;
