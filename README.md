@@ -42,10 +42,13 @@ trade-analytics/
 │       ├── track_b_india_sector_detail_hs6.csv
 │       └── track_c_india_partner_view_hs2.csv
 ├── sql/
-│   ├── 00_create_staging_tables.sql   # Raw (all-TEXT) staging tables
-│   └── ...                             # Numbered analysis queries, one per question
+│   ├── 00_create_staging_tables.sql        # Raw (all-TEXT) staging tables
+│   ├── 01_data_cleaning.sql                # Cast + clean into analysis-ready tables
+│   ├── 02_track_a_export_value_trend.sql   # Track A — value trend, YoY growth, top HS2 categories
+│   ├── 03_track_b_sector_analysis.sql      # Track B — 5-sector HS6 deep dive
+│   └── 04_track_c_partner_analysis.sql     # Track C — 20-partner market view
 ├── insights/
-│   └── key_findings.md         # Plain-English findings, separate from raw SQL
+│   └── key_findings.md         # Plain-English findings, separate from raw SQL (stub — in progress)
 └── README.md
 ```
 
@@ -55,10 +58,17 @@ The API pull script itself isn't included in this repo; the three CSVs it produc
 
 1. Load the CSVs in `data/raw/` into PostgreSQL via `sql/00_create_staging_tables.sql` (raw, all-TEXT staging tables), one `COPY`/import per table.
 2. Run `sql/01_data_cleaning.sql` to cast and clean into analysis-ready tables.
+3. Run the numbered track queries — `02` (Track A), `03` (Track B), `04` (Track C). Each file opens with its assumptions and ends with a validation block to run first.
 
 ## Analysis & findings
 
-*In progress.* SQL cleaning and analysis queries live in `sql/`, numbered by question. Findings, once written up, will be summarised in plain English in `insights/key_findings.md`.
+Analysis SQL is in place for all three tracks:
+
+- **Track A** (`sql/02_track_a_export_value_trend.sql`) — total export value trend and year-on-year growth, India vs the three comparators, plus each country's top HS2 export categories.
+- **Track B** (`sql/03_track_b_sector_analysis.sql`) — the five focus sectors: value trend, YoY growth, 2014-vs-2023 composition shift, top HS6 products per sector, and product concentration (top-5 share + HHI).
+- **Track C** (`sql/04_track_c_partner_analysis.sql`) — the 20-partner panel: value trend, YoY growth, ranked share of the panel, concentration over time, and rank shifts with top HS2 chapters per leading partner.
+
+Each query file opens with its assumptions and ends with a validation block. Plain-English findings will be summarised in `insights/key_findings.md` (currently a stub).
 
 ## Tech stack
 
