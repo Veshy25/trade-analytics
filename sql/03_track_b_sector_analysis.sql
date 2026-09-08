@@ -6,18 +6,28 @@
 --
 -- Source table: clean_track_b_india_sector_detail (built in 01_data_cleaning.sql).
 -- Every row is India as reporter, World (partner_code = 0) as partner, and
--- carries a `sector` label mapped from the HS2 prefix by the pull script.
+-- carries a `sector` label that is DERIVED, not returned by the API: it was
+-- assigned during the pull by mapping the HS2 prefix of cmdCode to one of the
+-- five sector names (27 / 30 / 71 / 84-85 / 50-63 — see the sector table in
+-- data/raw/README.md). Every other column comes straight from Comtrade.
+--
+-- NOTE: sql/05_export_results.sql re-states several of the queries below in
+-- order to write them out as CSVs. If you change a query here, rerun 05 so the
+-- committed files under data/processed/ do not silently go stale.
 --
 -- Assumptions made here (flagging before running, not after):
 --   1. Sector and product totals sum only aggr_level = 6 rows (true HS6
 --      product detail). The pull used cmdCode='AG6', so the table should be
---      almost entirely level 6; the filter guards against any level-2/4
---      rollup rows double-counting. Validation V2 shows the split.
+--      almost entirely level 6; the filter guards against coarser level-2/4
+--      rollup rows entering an HS6 sum. It is not the double-counting guard
+--      — that is the UNIQUE index declared in 01. Validation V2 shows the
+--      split.
 --   2. Within aggr_level = 6, every row is summed regardless of is_reported
---      vs is_aggregate. Per the Track A finding these two flags partition the
---      rows (mutually exclusive, jointly exhaustive) with no overlap, so
---      summing both gives the most complete total rather than an undercount.
---      Validation V3 re-checks that here.
+--      vs is_aggregate. These two flags partition the rows (mutually
+--      exclusive, jointly exhaustive) with no overlap, so summing both gives
+--      the most complete total rather than an undercount. See 02 assumption 1
+--      for what is_aggregate means — it is a rollup marker, not an estimation
+--      marker. Validation V3 re-checks the partition here.
 --   3. partner_code = 0 (World) is filtered explicitly. Track B was pulled
 --      against World only, so this is a no-op today, but keeps the queries
 --      correct if a partner split is ever added.
@@ -165,8 +175,18 @@ WITH product_totals AS (
 ranked AS (
     SELECT
         pt.*,
-        RANK() OVER (
-            PARTITION BY sector ORDER BY value_2023_usd DESC NULLS LAST
+        -- ROW_NUMBER(), not RANK(), matching 02 Q3. Products that stopped
+        -- being exported before 2023 have a NULL value_2023_usd and all tie
+        -- on it — 37 such products in engineering/machinery and 37 in
+        -- textiles. RANK() would give every one of them the same rank, and a
+        -- "<= 10" filter placed on a tie block returns the whole block. The
+        -- full-period tie-break also makes the order deterministic between
+        -- runs rather than dependent on scan order.
+        ROW_NUMBER() OVER (
+            PARTITION BY sector
+            ORDER BY value_2023_usd DESC NULLS LAST,
+                     value_2014_2023_usd DESC,
+                     cmd_code
         ) AS rank_in_sector_2023
     FROM product_totals pt
 )
@@ -193,6 +213,14 @@ ORDER BY sector, rank_in_sector_2023;
 -- the number. Confirmed empirically: these three post the highest HHI of
 -- the five sectors (pharmaceuticals highest at 5751, ahead of petroleum's
 -- 5238 and gems & jewellery's 3831).
+--
+-- hs6_products_2023 counts products carrying a 2023 line, not every product
+-- the sector has ever held — the CTE filters to ref_year = 2023, so a product
+-- that stopped being exported before 2023 is correctly absent from a 2023
+-- concentration measure. The two counts differ: engineering 826 vs 863
+-- all-years, textiles 784 vs 821, pharmaceuticals 43 vs 53. Quote the 2023
+-- count alongside the 2023 HHI; the all-years figure is context, not a
+-- denominator for this index.
 -- ============================================================
 WITH product_2023 AS (
     SELECT
@@ -212,12 +240,17 @@ shares AS (
         value_2023_usd,
         value_2023_usd
             / NULLIF(SUM(value_2023_usd) OVER (PARTITION BY sector), 0) AS share,
-        RANK() OVER (PARTITION BY sector ORDER BY value_2023_usd DESC) AS rnk
+        -- ROW_NUMBER() so the "rnk <= 5" filter below returns exactly five
+        -- products per sector. RANK() would return the whole tie block if the
+        -- 5th and 6th products shared a value, inflating top5_share_pct.
+        ROW_NUMBER() OVER (
+            PARTITION BY sector ORDER BY value_2023_usd DESC, cmd_code
+        ) AS rnk
     FROM product_2023
 )
 SELECT
     sector,
-    COUNT(*)                                             AS distinct_hs6_products,
+    COUNT(*)                                             AS hs6_products_2023,
     ROUND(100.0 * SUM(share) FILTER (WHERE rnk <= 5), 1) AS top5_share_pct,
     ROUND(SUM(share * share) * 10000, 0)                 AS hhi_2023
 FROM shares

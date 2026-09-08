@@ -43,7 +43,13 @@ SELECT
     isaggregate::boolean                       AS is_aggregate
 FROM raw_track_a_country_benchmark;
 
-CREATE INDEX idx_clean_a_year_reporter_cmd
+-- Uniqueness is the real double-counting guard, not the aggr_level filter
+-- applied in 02/03/04: if the same country-year-chapter ever arrived as both
+-- a reported and an aggregate line, both would be level 2 and both would be
+-- summed. Declaring these UNIQUE makes a bad re-pull fail loudly at load
+-- instead of silently inflating every total. Verified at build time: 0
+-- duplicate groups in all three tracks.
+CREATE UNIQUE INDEX idx_clean_a_year_reporter_cmd
     ON clean_track_a_country_benchmark (ref_year, reporter_code, cmd_code);
 
 -- ============================================================
@@ -71,7 +77,13 @@ SELECT
     sector                                     AS sector
 FROM raw_track_b_india_sector_detail;
 
-CREATE INDEX idx_clean_b_year_sector_cmd
+-- Note on this key: `sector` is derived from the HS2 prefix of `cmd_code`,
+-- so it is functionally dependent on cmd_code and adds nothing to uniqueness
+-- — this is effectively (ref_year, cmd_code), which holds only because
+-- Track B is India -> World only. If the partner split anticipated in 03
+-- assumption 3 is ever added, partner_code must join this key or legitimate
+-- rows will be rejected at load.
+CREATE UNIQUE INDEX idx_clean_b_year_sector_cmd
     ON clean_track_b_india_sector_detail (ref_year, sector, cmd_code);
 
 -- ============================================================
@@ -98,7 +110,7 @@ SELECT
     isaggregate::boolean                       AS is_aggregate
 FROM raw_track_c_india_partner_view;
 
-CREATE INDEX idx_clean_c_year_partner_cmd
+CREATE UNIQUE INDEX idx_clean_c_year_partner_cmd
     ON clean_track_c_india_partner_view (ref_year, partner_code, cmd_code);
 
 -- ============================================================
