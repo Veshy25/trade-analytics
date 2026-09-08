@@ -1,0 +1,96 @@
+{
+  "_reconstructed": {
+    "note": "This manifest was written RETROACTIVELY on 08/09/2026, not by the pull itself. The pull predates the manifest feature, so the date below is derived from the CSVs' filesystem mtimes and is accurate to the day, not the second. Future pulls write this file directly and record exact start/finish timestamps.",
+    "reconstructed_on": "2026-09-08",
+    "date_source": "CSV file mtimes",
+    "confidence": "date reliable to the day; intra-day times are mtimes, not pull times"
+  },
+  "pull": {
+    "pulled_on": "2026-08-25",
+    "scope_agreed": "2026-08-21",
+    "generated_by": "scripts/pull_comtrade_data.py",
+    "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
+  },
+  "scope": {
+    "flow": "X (exports)",
+    "frequency": "A (annual)",
+    "period": "2014-2023",
+    "valuation": "exporter-reported FOB, USD",
+    "note": "2024-2025 excluded: recent years are still being revised by reporters."
+  },
+  "tracks": [
+    {
+      "file": "track_a_country_benchmark_hs2.csv",
+      "rows": 3282,
+      "bytes": 923302,
+      "sha256": "b27cb50451acd90f57bc0218ce6875c7a0b496f37efea8fa8d9a10263bcf8d98",
+      "file_mtime_utc": "2026-08-25T10:58:06+00:00",
+      "api_params": {
+        "reporterCode": "IND,CHN,BGD,VNM",
+        "cmdCode": "AG2",
+        "partnerCode": "0 (World)",
+        "flowCode": "X"
+      }
+    },
+    {
+      "file": "track_b_india_sector_detail_hs6.csv",
+      "rows": 16976,
+      "bytes": 5950145,
+      "sha256": "ad445f2d31bd104c292a4048b8dee2215ab1e0164477caa2899f49e44fb6256a",
+      "file_mtime_utc": "2026-08-25T10:59:36+00:00",
+      "api_params": {
+        "reporterCode": "IND",
+        "cmdCode": "AG6",
+        "partnerCode": "0 (World)",
+        "flowCode": "X",
+        "post_pull_filter": "HS2 prefix in the 5 target sectors",
+        "derived_column": "sector (mapped from cmdCode[:2], not returned by the API)",
+        "sectors": {
+          "petroleum_products": [
+            "27"
+          ],
+          "pharmaceuticals": [
+            "30"
+          ],
+          "textiles": [
+            "50",
+            "51",
+            "52",
+            "53",
+            "54",
+            "55",
+            "56",
+            "57",
+            "58",
+            "59",
+            "60",
+            "61",
+            "62",
+            "63"
+          ],
+          "gems_jewellery": [
+            "71"
+          ],
+          "engineering_machinery": [
+            "84",
+            "85"
+          ]
+        }
+      }
+    },
+    {
+      "file": "track_c_india_partner_view_hs2.csv",
+      "rows": 18956,
+      "bytes": 5346531,
+      "sha256": "32348bc89e73ecafdf98f84b63f4d3d98800f561c04ccb162a9b8268ac00d2aa",
+      "file_mtime_utc": "2026-08-25T11:00:42+00:00",
+      "api_params": {
+        "reporterCode": "IND",
+        "cmdCode": "AG2",
+        "partnerCode": "USA,ARE,CHN,BGD,MDV,GBR,DEU,NPL,SGP,VNM,NLD,SAU,FRA,LKA,IDN,MYS,ITA,BEL,ZAF,JPN",
+        "flowCode": "X",
+        "note": "no World row requested \u2014 Track C shares are share-of-panel"
+      }
+    }
+  ]
+}

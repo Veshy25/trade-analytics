@@ -5,6 +5,10 @@
 --
 -- Source table: clean_track_c_india_partner_view (built in 01_data_cleaning.sql).
 --
+-- NOTE: sql/05_export_results.sql re-states several of the queries below in
+-- order to write them out as CSVs. If you change a query here, rerun 05 so the
+-- committed files under data/processed/ do not silently go stale.
+--
 -- Assumptions made here (flagging before running, not after):
 --   1. This pull requested 20 named partners and NO World aggregate. So
 --      every row is a real partner market, there is no World total to
@@ -14,10 +18,15 @@
 --      total so the shares can be read in context.
 --   2. Partner-year totals sum aggr_level = 2 rows (HS2 chapters). The pull
 --      used cmdCode='AG2', so there are no all-commodities TOTAL rows to
---      double-count; the filter is a guard. Validation V2 shows the split.
+--      double-count; the filter guards against coarser rollup rows entering
+--      a level-2 sum. It is not the double-counting guard — that is the
+--      UNIQUE index on (ref_year, partner_code, cmd_code) declared in 01.
+--      Validation V2 shows the split.
 --   3. Within aggr_level = 2, every row is summed regardless of is_reported
 --      vs is_aggregate — same partition logic Track A established (V4
---      re-checks: no overlap, jointly exhaustive).
+--      re-checks: no overlap, jointly exhaustive). See 02 assumption 1 for
+--      what is_aggregate means — it is a rollup marker, not an estimation
+--      marker.
 --   4. Decade comparisons use 2014 (first) and 2023 (last). Validation V3
 --      lists any partner with a short series to caveat (cf. Bangladesh in
 --      Track A).
@@ -89,13 +98,21 @@ WITH partner_totals AS (
 SELECT
     partner_desc,
     value_2023_usd,
-    RANK() OVER (ORDER BY value_2023_usd DESC NULLS LAST) AS rank_2023,
+    -- ROW_NUMBER() throughout this file, matching 02 Q3: a league table of 20
+    -- partners should read 1-20 with no repeated or skipped positions, and
+    -- every rank here either drives a "top N" filter or is differenced
+    -- against another rank — both of which a RANK() tie block corrupts.
+    ROW_NUMBER() OVER (
+        ORDER BY value_2023_usd DESC NULLS LAST, value_2014_2023_usd DESC
+    ) AS rank_2023,
     ROUND(
         100.0 * value_2023_usd / NULLIF(SUM(value_2023_usd) OVER (), 0),
         1
     ) AS pct_of_tracked_2023,
     value_2014_2023_usd,
-    RANK() OVER (ORDER BY value_2014_2023_usd DESC NULLS LAST) AS rank_period,
+    ROW_NUMBER() OVER (
+        ORDER BY value_2014_2023_usd DESC NULLS LAST, partner_desc
+    ) AS rank_period,
     ROUND(
         100.0 * value_2014_2023_usd / NULLIF(SUM(value_2014_2023_usd) OVER (), 0),
         1
@@ -107,7 +124,35 @@ ORDER BY rank_2023;
 -- ============================================================
 -- Query 4: partner concentration over time
 --           top-5 partner share and HHI per year, across the 20-partner panel
---           HHI on 0-10000 scale (see 03_track_b Query 5 for bands)
+--           plus a bounded estimate of the true whole-market HHI
+--
+-- Do NOT read hhi_panel against the bands quoted in 03 Query 5. Those bands
+-- (<1500 unconcentrated, >2500 concentrated) assume shares sum to a whole
+-- market. This panel is 62-64% of India's exports, so every share is inflated
+-- by ~1.6x and HHI, being quadratic, by ~2.5x. Applying the bands to
+-- hhi_panel would overstate concentration by more than the bands are wide.
+--
+-- The panel figure is still recoverable, though, rather than merely
+-- unusable. If s_i are the panel shares and c is coverage (Track A's
+-- India->World total is the denominator, computed in V5), then each partner's
+-- true share is s_i * c, so:
+--
+--   hhi_true_lower = hhi_panel * c^2
+--       the unobserved residual is spread thinly across many small markets
+--       and contributes ~nothing. India's residual is ~37% split across
+--       ~180 reporters, so this is the realistic end of the range.
+--
+--   hhi_true_upper = hhi_panel * c^2 + (1 - c)^2 * 10000
+--       the entire residual is a single hidden partner. Implausible, but it
+--       is a genuine ceiling: no arrangement of the unobserved markets can
+--       push HHI above it.
+--
+-- The true value sits between. That range is what should be read against the
+-- bands, and it is decisive: the upper bound peaks at 1889 (2022) and never
+-- approaches the 2500 concentrated threshold, while the realistic lower bound
+-- sits around 390-480. India's export markets are unconcentrated on this
+-- measure under ANY assumption about the unobserved third of the market —
+-- a stronger statement than the panel figure alone can support.
 -- ============================================================
 WITH partner_yearly AS (
     SELECT
@@ -123,15 +168,50 @@ shares AS (
         ref_year,
         partner_desc,
         value_usd / NULLIF(SUM(value_usd) OVER (PARTITION BY ref_year), 0) AS share,
-        RANK() OVER (PARTITION BY ref_year ORDER BY value_usd DESC) AS rnk
+        -- ROW_NUMBER() so "rnk <= 5" returns exactly five partners per year;
+        -- a RANK() tie at 5th/6th would push six into top5_partner_share_pct.
+        ROW_NUMBER() OVER (
+            PARTITION BY ref_year ORDER BY value_usd DESC, partner_desc
+        ) AS rnk
     FROM partner_yearly
+),
+panel_hhi AS (
+    SELECT
+        ref_year,
+        SUM(share) FILTER (WHERE rnk <= 5) AS top5_share,
+        SUM(share * share) * 10000         AS hhi_panel,
+        SUM(value_usd)                     AS panel_value_usd
+    FROM shares
+    JOIN partner_yearly USING (ref_year, partner_desc)
+    GROUP BY ref_year
+),
+india_world AS (
+    -- Track A's India -> World HS2 total is the only whole-market denominator
+    -- available in this project; Track C was pulled without a World row on
+    -- purpose (assumption 1). This is the cross-track dependency noted in the
+    -- README run order: 04 cannot be run before 02's clean table exists.
+    SELECT ref_year, SUM(fob_value) AS world_value_usd
+    FROM clean_track_a_country_benchmark
+    WHERE reporter_iso = 'IND' AND aggr_level = 2
+    GROUP BY ref_year
+),
+coverage AS (
+    SELECT
+        p.ref_year,
+        p.top5_share,
+        p.hhi_panel,
+        p.panel_value_usd / NULLIF(w.world_value_usd, 0) AS c
+    FROM panel_hhi p
+    JOIN india_world w USING (ref_year)
 )
 SELECT
     ref_year,
-    ROUND(100.0 * SUM(share) FILTER (WHERE rnk <= 5), 1) AS top5_partner_share_pct,
-    ROUND(SUM(share * share) * 10000, 0)                 AS hhi
-FROM shares
-GROUP BY ref_year
+    ROUND(100.0 * top5_share, 1) AS top5_partner_share_pct,
+    ROUND(hhi_panel, 0)          AS hhi_panel,
+    ROUND(100.0 * c, 1)          AS panel_coverage_pct,
+    ROUND(hhi_panel * POWER(c, 2), 0)                            AS hhi_true_lower,
+    ROUND(hhi_panel * POWER(c, 2) + POWER(1 - c, 2) * 10000, 0)  AS hhi_true_upper
+FROM coverage
 ORDER BY ref_year;
 
 
@@ -155,7 +235,12 @@ ranked AS (
         partner_desc,
         ref_year,
         value_usd,
-        RANK() OVER (PARTITION BY ref_year ORDER BY value_usd DESC) AS rnk
+        -- ROW_NUMBER(): these ranks are subtracted from each other below to
+        -- give rank_improvement, so a tie block in either year would make the
+        -- difference meaningless.
+        ROW_NUMBER() OVER (
+            PARTITION BY ref_year ORDER BY value_usd DESC, partner_desc
+        ) AS rnk
     FROM partner_year
 )
 SELECT
@@ -181,8 +266,9 @@ WITH top_partners AS (
         SELECT
             partner_code,
             partner_desc,
-            RANK() OVER (
-                ORDER BY SUM(fob_value) FILTER (WHERE ref_year = 2023) DESC
+            ROW_NUMBER() OVER (
+                ORDER BY SUM(fob_value) FILTER (WHERE ref_year = 2023) DESC,
+                         partner_desc
             ) AS rnk
         FROM clean_track_c_india_partner_view
         WHERE aggr_level = 2
@@ -196,8 +282,8 @@ chapter_values AS (
         c.cmd_code,
         c.cmd_desc,
         SUM(c.fob_value) AS value_2023_usd,
-        RANK() OVER (
-            PARTITION BY c.partner_desc ORDER BY SUM(c.fob_value) DESC
+        ROW_NUMBER() OVER (
+            PARTITION BY c.partner_desc ORDER BY SUM(c.fob_value) DESC, c.cmd_code
         ) AS chapter_rank
     FROM clean_track_c_india_partner_view c
     JOIN top_partners tp ON tp.partner_code = c.partner_code

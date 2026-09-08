@@ -161,3 +161,36 @@ CREATE TABLE raw_track_c_india_partner_view (
     isreported              text,
     isaggregate             text
 );
+
+
+-- ============================================================
+-- Load step
+--
+-- The three commands below load the committed CSVs into the tables created
+-- above. Run this file from the repository root, because the paths are
+-- relative to the working directory psql was started in, not to this file.
+--
+--   psql -d trade_analytics -v ON_ERROR_STOP=1 -f sql/00_create_staging_tables.sql
+--
+-- \copy (not COPY) is deliberate: \copy is a psql client command that reads
+-- the file from the machine running psql, so it needs no server-side file
+-- permissions and works against a remote database unchanged.
+--
+-- Column order matters. \copy with HEADER true skips the header row but does
+-- NOT match on header names — it assigns columns positionally, so the raw_*
+-- table definitions above must stay in the exact order the CSVs are
+-- written in. Reordering a column in one place and not the other loads silently
+-- and wrongly.
+--
+-- pgAdmin's Import/Export Data tool does the same thing through the GUI and
+-- is equally positional; either route is fine.
+-- ============================================================
+
+\copy raw_track_a_country_benchmark FROM 'data/raw/track_a_country_benchmark_hs2.csv' WITH (FORMAT csv, HEADER true)
+\copy raw_track_b_india_sector_detail FROM 'data/raw/track_b_india_sector_detail_hs6.csv' WITH (FORMAT csv, HEADER true)
+\copy raw_track_c_india_partner_view FROM 'data/raw/track_c_india_partner_view_hs2.csv' WITH (FORMAT csv, HEADER true)
+
+-- Expected after loading: 3282 / 16976 / 18956 rows respectively.
+SELECT 'raw A' AS table_name, COUNT(*) FROM raw_track_a_country_benchmark
+UNION ALL SELECT 'raw B', COUNT(*) FROM raw_track_b_india_sector_detail
+UNION ALL SELECT 'raw C', COUNT(*) FROM raw_track_c_india_partner_view;
