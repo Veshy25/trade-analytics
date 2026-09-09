@@ -16,9 +16,7 @@ This project reflects a long-standing interest in international trade and export
 
 **UN Comtrade API** (https://comtradeplus.un.org) — the UN Statistics Division's official repository of international merchandise trade statistics, built from member states' own customs declarations. Chosen over DGFT (India-only, narrower) and Kaggle mirrors (secondhand, unclear provenance) specifically for the stronger, more defensible sourcing story: primary international data, pulled programmatically, with documented reliability caveats (see below) rather than taken at face value.
 
-The pull's exact parameters, its date, per-file checksums and a column-by-column data dictionary are recorded in **[`data/raw/README.md`](data/raw/README.md)** and [`data/raw/pull_manifest.json`](data/raw/pull_manifest.json).
-
-**The API pull script is deliberately not included.** This repository is meant to reproduce *this* analysis on *this* data. UN Comtrade revises figures after publication, so a fresh pull would return different numbers and the committed findings would no longer match what the code produced. Freezing the raw CSVs — and publishing their checksums — makes the analysis reproducible by construction rather than dependent on an external service that changes underneath it.
+The pull's exact parameters, its date, per-file checksums and a column-by-column data dictionary are recorded in **[`data/raw/README.md`](data/raw/README.md)** and [`data/raw/pull_manifest.json`](data/raw/pull_manifest.json) — including why the pull script itself is not published: Comtrade revises figures after publication, so the raw CSVs are frozen and checksummed to keep the analysis reproducible on the exact data it was run on.
 
 ### Scope
 
@@ -84,7 +82,7 @@ trade-analytics/
 
 ## Reproducing the analysis
 
-The three CSVs are committed under `data/raw/`, so the whole analysis rebuilds **without an API key**. Run everything from the repository root — the `\copy` paths are relative to the working directory, not to the SQL files.
+Everything the analysis needs is committed: the three raw CSVs under `data/raw/`, the six SQL files, and the chart script. You need PostgreSQL and `psql`; the optional chart step also needs Python with `matplotlib` and `pandas`. Run everything from the repository root — the `\copy` paths are relative to the working directory, not to the SQL files.
 
 ```bash
 createdb trade_analytics   # PostgreSQL 15+ (developed on 18)
@@ -96,14 +94,15 @@ psql -d trade_analytics -v ON_ERROR_STOP=1 -f sql/03_track_b_sector_analysis.sql
 psql -d trade_analytics -v ON_ERROR_STOP=1 -f sql/04_track_c_partner_analysis.sql
 
 psql -d trade_analytics -v ON_ERROR_STOP=1 -f sql/05_export_results.sql          # optional: rewrites data/processed/
+pip3 install matplotlib pandas                                                   # only needed for the chart step
 python3 scripts/make_chart.py                                                    # optional: redraws the chart
 ```
 
 Expected row counts after `01`: **3,282 / 16,976 / 18,956**. Each file opens with its assumptions and ends with a validation block — read those first.
 
-**Run order matters.** `03` V5 and `04` Q4/V5 both read `clean_track_a_country_benchmark`: Track B's cross-track reconciliation and Track C's panel-coverage rescaling are measured *against* Track A. The tracks are not independent, and running `03` or `04` before `02`'s clean table exists will fail on a missing table.
+**Run order matters.** `00` loads the raw tables and `01` creates all three `clean_*` tables, so those two must run first, in that order; `02`–`05` create nothing and only read. Beyond that the tracks are not independent: `03` V5 and `04` Q4/V5 both read `clean_track_a_country_benchmark`, because Track B's cross-track reconciliation and Track C's panel-coverage rescaling are measured *against* Track A.
 
-**No API key, no network access, no re-pull.** Every input is in the repository. `data/raw/pull_manifest.json` carries a SHA-256 for each CSV, so you can confirm the files you have are the ones the analysis was built on:
+**Verifying the inputs.** `data/raw/pull_manifest.json` carries a SHA-256 for each CSV, so you can confirm the files you have are the ones the analysis was built on:
 
 ```bash
 shasum -a 256 data/raw/*.csv        # compare against data/raw/pull_manifest.json
