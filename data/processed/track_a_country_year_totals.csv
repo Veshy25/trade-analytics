@@ -1,35 +1,35 @@
-reporter_desc,ref_year,total_export_value_usd_bn
-Bangladesh,2015,31.734
-Bangladesh,2016,34.753
-Bangladesh,2017,39.674
-Bangladesh,2018,40.066
-China,2014,2342.293
-China,2015,2273.468
-China,2016,2097.637
-China,2017,2263.371
-China,2018,2486.440
-China,2019,2499.207
-China,2020,2589.098
-China,2021,3316.022
-China,2022,3593.601
-China,2023,3379.748
-India,2014,317.545
-India,2015,264.381
-India,2016,260.327
-India,2017,294.364
-India,2018,322.492
-India,2019,323.251
-India,2020,275.489
-India,2021,394.814
-India,2022,452.684
-India,2023,431.412
-Viet Nam,2014,150.217
-Viet Nam,2015,162.017
-Viet Nam,2016,176.581
-Viet Nam,2017,215.119
-Viet Nam,2018,243.699
-Viet Nam,2019,264.610
-Viet Nam,2020,281.441
-Viet Nam,2021,335.793
-Viet Nam,2022,370.909
-Viet Nam,2023,353.078
+reporter_desc,ref_year,total_export_value_usd_bn,yoy_growth_pct
+Bangladesh,2015,31.734,
+Bangladesh,2016,34.753,9.5
+Bangladesh,2017,39.674,14.2
+Bangladesh,2018,40.066,1.0
+China,2014,2342.293,
+China,2015,2273.468,-2.9
+China,2016,2097.637,-7.7
+China,2017,2263.371,7.9
+China,2018,2486.440,9.9
+China,2019,2499.207,0.5
+China,2020,2589.098,3.6
+China,2021,3316.022,28.1
+China,2022,3593.601,8.4
+China,2023,3379.748,-6.0
+India,2014,317.545,
+India,2015,264.381,-16.7
+India,2016,260.327,-1.5
+India,2017,294.364,13.1
+India,2018,322.492,9.6
+India,2019,323.251,0.2
+India,2020,275.489,-14.8
+India,2021,394.814,43.3
+India,2022,452.684,14.7
+India,2023,431.412,-4.7
+Viet Nam,2014,150.217,
+Viet Nam,2015,162.017,7.9
+Viet Nam,2016,176.581,9.0
+Viet Nam,2017,215.119,21.8
+Viet Nam,2018,243.699,13.3
+Viet Nam,2019,264.610,8.6
+Viet Nam,2020,281.441,6.4
+Viet Nam,2021,335.793,19.3
+Viet Nam,2022,370.909,10.5
+Viet Nam,2023,353.078,-4.8

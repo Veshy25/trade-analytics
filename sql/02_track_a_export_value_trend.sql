@@ -50,6 +50,13 @@
 --      let all ~97 chapters through the "top 10" filter instead of 10.
 --      ROW_NUMBER() with value_2014_2023_usd as the tie-break caps
 --      Bangladesh at its top 10 chapters by full-period value instead.
+--   6. All values are nominal USD, exporter-reported FOB. No deflator is
+--      applied anywhere in this project (that would need a price index the
+--      pull does not include), so the 2022 commodity spike sits inside every
+--      series and part of what reads as 2014-to-2023 growth is price rather
+--      than volume, petroleum most of all. Query 4 and 4b, the CAGR and
+--      indexed series, are the figures most exposed to this. Stated again in
+--      the README scope table and the key_findings.md preamble.
 
 -- ============================================================
 -- Query 1: total export value by country and year
