@@ -1,0 +1,101 @@
+sector,partner_desc,share_2014_pct,share_2023_pct,shift_ppt
+engineering_machinery,USA,24.1,37.4,13.3
+engineering_machinery,Netherlands,3.5,5.1,1.6
+engineering_machinery,United Arab Emirates,10.4,11.6,1.2
+engineering_machinery,Italy,3.6,4.0,0.4
+engineering_machinery,Maldives,0.1,0.2,0.1
+engineering_machinery,France,4.2,4.0,-0.2
+engineering_machinery,Belgium,1.3,1.0,-0.3
+engineering_machinery,Singapore,4.8,4.3,-0.5
+engineering_machinery,South Africa,2.2,1.7,-0.5
+engineering_machinery,Nepal,2.4,1.7,-0.7
+engineering_machinery,United Kingdom,8.1,7.3,-0.8
+engineering_machinery,Japan,2.8,1.8,-0.9
+engineering_machinery,Viet Nam,2.2,1.2,-1.0
+engineering_machinery,Saudi Arabia,4.5,3.2,-1.3
+engineering_machinery,Sri Lanka,2.0,0.5,-1.4
+engineering_machinery,Germany,7.7,6.4,-1.4
+engineering_machinery,Bangladesh,3.5,1.8,-1.7
+engineering_machinery,Indonesia,3.2,1.5,-1.7
+engineering_machinery,Malaysia,3.4,1.5,-1.9
+engineering_machinery,China,6.0,3.8,-2.2
+gems_jewellery,USA,32.5,44.8,12.3
+gems_jewellery,Singapore,2.0,3.1,1.1
+gems_jewellery,France,0.4,1.4,1.0
+gems_jewellery,United Kingdom,2.0,2.7,0.8
+gems_jewellery,Italy,0.5,1.0,0.5
+gems_jewellery,Saudi Arabia,0.1,0.4,0.3
+gems_jewellery,Malaysia,0.3,0.6,0.3
+gems_jewellery,Germany,0.4,0.6,0.2
+gems_jewellery,Netherlands,0.1,0.2,0.1
+gems_jewellery,Sri Lanka,0.1,0.2,0.1
+gems_jewellery,Nepal,0.1,0.1,0.1
+gems_jewellery,Indonesia,0.0,0.1,0.1
+gems_jewellery,Viet Nam,0.0,0.0,0.0
+gems_jewellery,Bangladesh,0.0,0.0,0.0
+gems_jewellery,Maldives,0.0,0.0,0.0
+gems_jewellery,Japan,1.3,1.2,-0.1
+gems_jewellery,South Africa,0.4,0.2,-0.2
+gems_jewellery,China,0.6,0.2,-0.4
+gems_jewellery,Belgium,11.5,9.7,-1.8
+gems_jewellery,United Arab Emirates,47.6,33.4,-14.2
+petroleum_products,Netherlands,7.3,28.5,21.2
+petroleum_products,Bangladesh,0.5,4.2,3.7
+petroleum_products,United Kingdom,0.6,2.4,1.8
+petroleum_products,Belgium,0.3,2.0,1.7
+petroleum_products,South Africa,5.1,6.7,1.6
+petroleum_products,Nepal,3.2,4.4,1.2
+petroleum_products,Indonesia,2.6,3.6,1.0
+petroleum_products,USA,11.7,12.4,0.7
+petroleum_products,Maldives,0.0,0.3,0.2
+petroleum_products,France,1.9,1.9,0.0
+petroleum_products,Malaysia,2.8,2.7,-0.1
+petroleum_products,Germany,0.1,0.0,-0.1
+petroleum_products,Viet Nam,0.2,0.0,-0.1
+petroleum_products,Italy,1.8,1.1,-0.7
+petroleum_products,Sri Lanka,1.7,0.7,-1.0
+petroleum_products,China,4.2,2.2,-1.9
+petroleum_products,Singapore,13.0,10.5,-2.5
+petroleum_products,United Arab Emirates,18.7,14.2,-4.6
+petroleum_products,Japan,5.4,0.3,-5.1
+petroleum_products,Saudi Arabia,18.8,1.8,-17.1
+pharmaceuticals,Belgium,1.3,3.5,2.2
+pharmaceuticals,France,2.3,4.2,1.8
+pharmaceuticals,Netherlands,2.9,4.4,1.5
+pharmaceuticals,United Arab Emirates,0.8,1.7,1.0
+pharmaceuticals,Saudi Arabia,0.1,0.8,0.7
+pharmaceuticals,Indonesia,0.3,0.7,0.4
+pharmaceuticals,Japan,0.6,0.9,0.3
+pharmaceuticals,Italy,0.4,0.6,0.2
+pharmaceuticals,Maldives,0.2,0.2,0.1
+pharmaceuticals,China,0.6,0.6,0.0
+pharmaceuticals,Germany,2.9,2.9,0.0
+pharmaceuticals,Bangladesh,0.5,0.4,-0.1
+pharmaceuticals,Malaysia,0.9,0.8,-0.1
+pharmaceuticals,Sri Lanka,2.5,2.2,-0.3
+pharmaceuticals,Singapore,0.9,0.6,-0.3
+pharmaceuticals,Nepal,2.3,1.8,-0.5
+pharmaceuticals,USA,63.1,62.2,-0.9
+pharmaceuticals,Viet Nam,2.8,1.2,-1.6
+pharmaceuticals,United Kingdom,7.3,5.2,-2.1
+pharmaceuticals,South Africa,7.5,5.1,-2.4
+textiles,USA,26.7,38.7,12.0
+textiles,Bangladesh,7.9,11.0,3.1
+textiles,Netherlands,2.5,3.6,1.1
+textiles,Nepal,0.5,1.1,0.7
+textiles,Saudi Arabia,1.7,2.3,0.6
+textiles,Sri Lanka,2.2,2.8,0.6
+textiles,South Africa,0.9,1.1,0.2
+textiles,Maldives,0.0,0.1,0.0
+textiles,Italy,3.4,3.2,-0.2
+textiles,Malaysia,1.1,0.9,-0.2
+textiles,Japan,1.6,1.5,-0.2
+textiles,Singapore,0.5,0.3,-0.2
+textiles,Indonesia,0.9,0.6,-0.3
+textiles,Belgium,2.1,1.7,-0.4
+textiles,France,4.3,3.8,-0.5
+textiles,Viet Nam,2.2,1.4,-0.8
+textiles,United Kingdom,9.4,7.8,-1.6
+textiles,Germany,7.2,5.3,-2.0
+textiles,United Arab Emirates,13.0,8.2,-4.8
+textiles,China,11.8,4.6,-7.2

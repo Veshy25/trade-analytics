@@ -4,8 +4,8 @@
 -- country-year total), plus each country's top HS2 export categories (Q3),
 -- covering the "top categories and trends" scope stated in the README.
 --
--- NOTE: sql/05_export_results.sql re-states several of the queries below in
--- order to write them out as CSVs. If you change a query here, rerun 05 so the
+-- NOTE: sql/08_export_results.sql re-states several of the queries below in
+-- order to write them out as CSVs. If you change a query here, rerun 08 so the
 -- committed files under data/processed/ do not silently go stale.
 --
 -- Assumptions made here (flagging before running, not after):
@@ -57,6 +57,19 @@
 --      than volume, petroleum most of all. Query 4 and 4b, the CAGR and
 --      indexed series, are the figures most exposed to this. Stated again in
 --      the README scope table and the key_findings.md preamble.
+--   7. HS descriptions are NOT stable across the decade. The HS 2022 edition
+--      reworded five chapters (15, 16, 24, 84, 88) from ref_year 2022
+--      onward — e.g. 84 changed from "Nuclear reactors, boilers, machinery
+--      ..." to "Machinery and mechanical appliances, boilers, nuclear
+--      reactors ..." — and 73 HS6 products in Track B/D likewise. Any
+--      multi-year GROUP BY that includes cmd_desc therefore splits one code
+--      into two rows and silently truncates the full-period sum to the years
+--      sharing the latest wording. Query 3 grouped that way until
+--      15/09/2026: China's HS 84 full-period value read 1,062.6bn instead of
+--      4,385.0bn (India 56.8 vs 197.7, Vietnam 61.7 vs 169.0); 2023 values
+--      and all ranks were unaffected. The fix groups on cmd_code only and
+--      shows the latest year's description. Found during Phase 2 (07 Q4 had
+--      the same bug); the correction is kept visible here, per the README.
 
 -- ============================================================
 -- Query 1: total export value by country and year
@@ -124,12 +137,13 @@ WITH chapter_totals AS (
     SELECT
         reporter_desc,
         cmd_code,
-        cmd_desc,
+        -- latest wording, not a GROUP BY key (assumption 7)
+        (ARRAY_AGG(cmd_desc ORDER BY ref_year DESC))[1]  AS cmd_desc,
         SUM(fob_value) FILTER (WHERE ref_year = 2023) AS value_2023_usd,
         SUM(fob_value)                                AS value_2014_2023_usd
     FROM clean_track_a_country_benchmark
     WHERE aggr_level = 2
-    GROUP BY reporter_desc, cmd_code, cmd_desc
+    GROUP BY reporter_desc, cmd_code
 ),
 ranked AS (
     SELECT
