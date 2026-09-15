@@ -1,0 +1,76 @@
+sector,partner_rank,partner_desc,product_rank,cmd_code,cmd_desc,value_2023_mn,pct_of_partner_sector
+engineering_machinery,1,USA,1,851713,Telephone sets; smartphones for cellular or other wireless networks,4700.8,29.6
+engineering_machinery,1,USA,2,854143,"Electrical apparatus; photosensitive semiconductor devices, photovoltaic cells assembled in modules or made up into panels",1757.7,11.1
+engineering_machinery,1,USA,3,850440,Electrical static converters,597.8,3.8
+engineering_machinery,1,USA,4,848340,"Gears and gearing; (not toothed wheels, chain sprockets and other transmission elements presented separately); ball or roller screws; gear boxes and other speed changers, including torque converters",505.0,3.2
+engineering_machinery,1,USA,5,841112,Turbo-jets; of a thrust exceeding 25kN,347.5,2.2
+engineering_machinery,2,United Arab Emirates,1,851713,Telephone sets; smartphones for cellular or other wireless networks,2707.2,55.1
+engineering_machinery,2,United Arab Emirates,2,854449,"Insulated electric conductors; for a voltage not exceeding 1000 volts, not fitted with connectors",98.8,2.0
+engineering_machinery,2,United Arab Emirates,3,848180,"Taps, cocks, valves and similar appliances; for pipes, boiler shells, tanks, vats or the like, including thermostatically controlled valves",90.4,1.8
+engineering_machinery,2,United Arab Emirates,4,847130,"Automatic data processing machines; portable, weighing not more than 10kg, consisting of at least a central processing unit, a keyboard and a display",88.4,1.8
+engineering_machinery,2,United Arab Emirates,5,850720,"Electric accumulators; lead-acid, (other than for starting piston engines), including separators, whether or not rectangular (including square)",64.8,1.3
+engineering_machinery,3,United Kingdom,1,851713,Telephone sets; smartphones for cellular or other wireless networks,1040.1,33.7
+engineering_machinery,3,United Kingdom,2,841112,Turbo-jets; of a thrust exceeding 25kN,343.6,11.1
+engineering_machinery,3,United Kingdom,3,843149,"Machinery; parts of machines handling earth, minerals or ores and n.e.c. in heading no. 8431",171.1,5.5
+engineering_machinery,3,United Kingdom,4,840999,Engines; parts for internal combustion piston engines (excluding spark-ignition),138.3,4.5
+engineering_machinery,3,United Kingdom,5,854449,"Insulated electric conductors; for a voltage not exceeding 1000 volts, not fitted with connectors",84.4,2.7
+gems_jewellery,1,USA,1,710239,"Diamonds; non-industrial, (other than unworked or simply sawn, cleaved or bruted), but not mounted or set",5925.0,58.3
+gems_jewellery,1,USA,2,711319,"Jewellery; of precious metal (excluding silver) whether or not plated or clad with precious metal, and parts thereof",2831.5,27.9
+gems_jewellery,1,USA,3,710491,"Stones; diamonds, n.e.c. in heading 7104, worked or graded but not strung, mounted or set; ungraded synthetic or reconstructed precious or semi-precious stones, temporarily strung for convenience of transport",840.2,8.3
+gems_jewellery,1,USA,4,711311,"Jewellery; of silver, whether or not plated or clad with other precious metal, and parts thereof",324.8,3.2
+gems_jewellery,1,USA,5,710391,"Stones; rubies, sapphires and emeralds, worked (other than simply sawn or roughly shaped), not strung, mounted or set",66.0,0.6
+gems_jewellery,2,United Arab Emirates,1,711319,"Jewellery; of precious metal (excluding silver) whether or not plated or clad with precious metal, and parts thereof",5192.0,68.5
+gems_jewellery,2,United Arab Emirates,2,710239,"Diamonds; non-industrial, (other than unworked or simply sawn, cleaved or bruted), but not mounted or set",1749.0,23.1
+gems_jewellery,2,United Arab Emirates,3,710231,"Diamonds; non-industrial, unworked or simply sawn, cleaved or bruted, but not mounted or set",335.9,4.4
+gems_jewellery,2,United Arab Emirates,4,710491,"Stones; diamonds, n.e.c. in heading 7104, worked or graded but not strung, mounted or set; ungraded synthetic or reconstructed precious or semi-precious stones, temporarily strung for convenience of transport",167.2,2.2
+gems_jewellery,2,United Arab Emirates,5,710421,"Stones; diamonds, unworked or simply sawn or roughly shaped",60.5,0.8
+gems_jewellery,3,Belgium,1,710239,"Diamonds; non-industrial, (other than unworked or simply sawn, cleaved or bruted), but not mounted or set",1798.7,81.6
+gems_jewellery,3,Belgium,2,710231,"Diamonds; non-industrial, unworked or simply sawn, cleaved or bruted, but not mounted or set",293.9,13.3
+gems_jewellery,3,Belgium,3,711319,"Jewellery; of precious metal (excluding silver) whether or not plated or clad with precious metal, and parts thereof",65.4,3.0
+gems_jewellery,3,Belgium,4,710491,"Stones; diamonds, n.e.c. in heading 7104, worked or graded but not strung, mounted or set; ungraded synthetic or reconstructed precious or semi-precious stones, temporarily strung for convenience of transport",29.1,1.3
+gems_jewellery,3,Belgium,5,710391,"Stones; rubies, sapphires and emeralds, worked (other than simply sawn or roughly shaped), not strung, mounted or set",5.7,0.3
+petroleum_products,1,Netherlands,1,271019,"Petroleum oils and oils from bituminous minerals, not containing biodiesel, not crude, not waste oils; preparations n.e.c, containing by weight 70% or more of petroleum oils or oils from bituminous minerals; not light oils and preparations",14958.4,99.8
+petroleum_products,1,Netherlands,2,271099,"Waste Oils; of petroleum or obtained from bituminous minerals, not crude and preparations n.e.c., weight 70% or preparations of the same, not containing polychlorinated biphenyls (PCBs), polychorinated terphenyls (PCTs) or polybrominated biphenyls (PBBs)",26.4,0.2
+petroleum_products,1,Netherlands,3,271210,Petroleum jelly,2.9,0.0
+petroleum_products,1,Netherlands,4,270799,Oils and other products of the distillation of high temperature coal tar; n.e.c. in heading no. 2707,2.7,0.0
+petroleum_products,1,Netherlands,5,270750,"Aromatic hydrocarbon mixtures; n.e.c. in heading no. 2707, of which 65% or more by volume (including losses) distils at 250 degrees Celsius by the ISO 3405 method (equivalent to the ASTM D 86 method)",0.8,0.0
+petroleum_products,2,United Arab Emirates,1,271012,"Petroleum oils and oils from bituminous minerals, not containing biodiesel, not crude, not waste oils; preparations n.e.c, containing by weight 70% or more of petroleum oils or oils from bituminous minerals; light oils and preparations",3721.7,49.9
+petroleum_products,2,United Arab Emirates,2,271019,"Petroleum oils and oils from bituminous minerals, not containing biodiesel, not crude, not waste oils; preparations n.e.c, containing by weight 70% or more of petroleum oils or oils from bituminous minerals; not light oils and preparations",2771.1,37.2
+petroleum_products,2,United Arab Emirates,3,270750,"Aromatic hydrocarbon mixtures; n.e.c. in heading no. 2707, of which 65% or more by volume (including losses) distils at 250 degrees Celsius by the ISO 3405 method (equivalent to the ASTM D 86 method)",906.2,12.2
+petroleum_products,2,United Arab Emirates,4,270810,Pitch; obtained from coal tar or from other mineral tars,15.4,0.2
+petroleum_products,2,United Arab Emirates,5,270799,Oils and other products of the distillation of high temperature coal tar; n.e.c. in heading no. 2707,14.3,0.2
+petroleum_products,3,USA,1,271012,"Petroleum oils and oils from bituminous minerals, not containing biodiesel, not crude, not waste oils; preparations n.e.c, containing by weight 70% or more of petroleum oils or oils from bituminous minerals; light oils and preparations",5296.7,81.2
+petroleum_products,3,USA,2,271019,"Petroleum oils and oils from bituminous minerals, not containing biodiesel, not crude, not waste oils; preparations n.e.c, containing by weight 70% or more of petroleum oils or oils from bituminous minerals; not light oils and preparations",973.0,14.9
+petroleum_products,3,USA,3,271099,"Waste Oils; of petroleum or obtained from bituminous minerals, not crude and preparations n.e.c., weight 70% or preparations of the same, not containing polychlorinated biphenyls (PCBs), polychorinated terphenyls (PCTs) or polybrominated biphenyls (PBBs)",130.5,2.0
+petroleum_products,3,USA,4,270750,"Aromatic hydrocarbon mixtures; n.e.c. in heading no. 2707, of which 65% or more by volume (including losses) distils at 250 degrees Celsius by the ISO 3405 method (equivalent to the ASTM D 86 method)",110.0,1.7
+petroleum_products,3,USA,5,271210,Petroleum jelly,5.7,0.1
+pharmaceuticals,1,USA,1,300490,"Medicaments; consisting of mixed or unmixed products n.e.c. in heading no. 3004, for therapeutic or prophylactic uses, packaged for retail sale",6461.8,85.6
+pharmaceuticals,1,USA,2,300420,"Medicaments; containing antibiotics (other than penicillins, streptomycins or their derivatives), for therapeutic or prophylactic uses, packaged for retail sale",420.1,5.6
+pharmaceuticals,1,USA,3,300410,"Medicaments; containing penicillins, streptomycins or their derivatives, for therapeutic or prophylactic uses, packaged for retail sale",192.3,2.5
+pharmaceuticals,1,USA,4,300190,"Glands and other organs; heparin and its salts; other human or animal substances prepared for therapeutic or prophylactic uses, n.e.c. in heading 3001",80.1,1.1
+pharmaceuticals,1,USA,5,300390,"Medicaments; (not containing antibiotics, hormones, alkaloids or their derivatives), for therapeutic or prophylactic uses, (not packaged for retail sale)",70.1,0.9
+pharmaceuticals,2,United Kingdom,1,300490,"Medicaments; consisting of mixed or unmixed products n.e.c. in heading no. 3004, for therapeutic or prophylactic uses, packaged for retail sale",527.1,82.8
+pharmaceuticals,2,United Kingdom,2,300410,"Medicaments; containing penicillins, streptomycins or their derivatives, for therapeutic or prophylactic uses, packaged for retail sale",29.0,4.6
+pharmaceuticals,2,United Kingdom,3,300215,"Blood, human or animal, antisera, other blood fractions and immunological products; immunological products, put up in measured doses or in forms or packings for retail sale",24.8,3.9
+pharmaceuticals,2,United Kingdom,4,300420,"Medicaments; containing antibiotics (other than penicillins, streptomycins or their derivatives), for therapeutic or prophylactic uses, packaged for retail sale",18.8,3.0
+pharmaceuticals,2,United Kingdom,5,300450,"Medicaments; containing vitamins or their derivatives, for therapeutic or prophylactic use, packaged for retail sale",13.2,2.1
+pharmaceuticals,3,South Africa,1,300490,"Medicaments; consisting of mixed or unmixed products n.e.c. in heading no. 3004, for therapeutic or prophylactic uses, packaged for retail sale",517.7,82.8
+pharmaceuticals,3,South Africa,2,300410,"Medicaments; containing penicillins, streptomycins or their derivatives, for therapeutic or prophylactic uses, packaged for retail sale",30.2,4.8
+pharmaceuticals,3,South Africa,3,300420,"Medicaments; containing antibiotics (other than penicillins, streptomycins or their derivatives), for therapeutic or prophylactic uses, packaged for retail sale",28.1,4.5
+pharmaceuticals,3,South Africa,4,300241,"Vaccines, toxins, cultures of micro-organisms (excluding yeasts) and similar products; for human medicine",17.3,2.8
+pharmaceuticals,3,South Africa,5,300432,"Medicaments; containing corticosteroid hormones, their derivatives or structural analogues (but not containing antibiotics), for therapeutic or prophylactic uses, packaged for retail sale",8.5,1.4
+textiles,1,USA,1,630260,"Kitchen and toilet linen; of terry towelling or similar terry fabrics, of cotton",702.5,7.6
+textiles,1,USA,2,630419,Bedspreads; not knitted or crocheted,519.9,5.6
+textiles,1,USA,3,610910,"T-shirts, singlets and other vests; of cotton, knitted or crocheted",422.7,4.5
+textiles,1,USA,4,630492,"Furnishing articles; of cotton, not knitted or crocheted (excluding bedspreads and articles of heading no. 9404)",356.2,3.8
+textiles,1,USA,5,630231,"Bed linen; of cotton (not printed, knitted or crocheted)",337.4,3.6
+textiles,2,Bangladesh,1,520100,Cotton; not carded or combed,556.8,21.1
+textiles,2,Bangladesh,2,520523,"Cotton yarn; (not sewing thread), single, of combed fibres, 85% or more by weight of cotton, less than 232.56 but not less than 192.31 decitex (exceeding 43 but not exceeding 52 metric number), not for retail sale",404.8,15.3
+textiles,2,Bangladesh,3,520524,"Cotton yarn; (not sewing thread), single, of combed fibres, 85% or more by weight of cotton, less than 192.31 but not less than 125 decitex (exceeding 52 but not exceeding 80 metric number), not for retail sale",345.9,13.1
+textiles,2,Bangladesh,4,520522,"Cotton yarn; (not sewing thread), single, of combed fibres, 85% or more by weight of cotton, less than 714.29 but not less than 232.56 decitex (exceeding 14 but not exceeding 43 metric number), not for retail sale",130.7,4.9
+textiles,2,Bangladesh,5,520942,"Fabrics, woven; containing 85% or more by weight of cotton, of yarns of different colours, weighing more than 200g/m2, denim",70.3,2.7
+textiles,3,United Arab Emirates,1,610910,"T-shirts, singlets and other vests; of cotton, knitted or crocheted",179.5,9.1
+textiles,3,United Arab Emirates,2,630790,"Textiles; made up articles (including dress patterns), n.e.c. in chapter 63, n.e.c. in heading no. 6307",82.0,4.1
+textiles,3,United Arab Emirates,3,610990,"T-shirts, singlets and other vests; of textile materials (other than cotton), knitted or crocheted",65.9,3.3
+textiles,3,United Arab Emirates,4,620443,"Dresses; women's or girls', of synthetic fibres (not knitted or crocheted)",62.0,3.1
+textiles,3,United Arab Emirates,5,610510,"Shirts; men's or boys', of cotton, knitted or crocheted",51.8,2.6

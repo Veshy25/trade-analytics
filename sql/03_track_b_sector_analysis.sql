@@ -11,8 +11,8 @@
 -- five sector names (27 / 30 / 71 / 84-85 / 50-63 — see the sector table in
 -- data/raw/README.md). Every other column comes straight from Comtrade.
 --
--- NOTE: sql/05_export_results.sql re-states several of the queries below in
--- order to write them out as CSVs. If you change a query here, rerun 05 so the
+-- NOTE: sql/08_export_results.sql re-states several of the queries below in
+-- order to write them out as CSVs. If you change a query here, rerun 08 so the
 -- committed files under data/processed/ do not silently go stale.
 --
 -- Assumptions made here (flagging before running, not after):
@@ -38,6 +38,22 @@
 --      USD billion for readability.
 --   6. Every growth / share ratio wraps its divisor in NULLIF(..., 0) so a
 --      zero or missing base returns NULL rather than raising an error.
+--   7. VOLUME (Queries 6-8, added 15/09/2026 for Phase 2). net_wgt in kg is
+--      the single volume measure. qty is in mixed units (u, m2, carat, kWh)
+--      and is never summed. Volume exists only at HS6 — Comtrade does not
+--      aggregate mixed units to chapter level, so this is sector-level by
+--      construction and Track A (HS2) has no volume at all. Coverage is not
+--      uniform: at build time the share of sector VALUE sitting on rows with
+--      a populated net_wgt was petroleum 100.0/98.3, pharma 100.0/100.0,
+--      textiles 97.8/93.0, engineering 96.2/91.0, gems 40.2/67.0 (2014/2023,
+--      from Q8). Unit values (USD/kg) are computed only over rows that carry
+--      both value and weight, so numerator and denominator cover the same
+--      trade. Any sector under 80% value coverage in either endpoint year —
+--      gems & jewellery — gets its volume row reported but flagged, and no
+--      volume claim is made for it. Weight is also a poor measure of gems by
+--      nature (a carat of diamond and a kilo of scrap silver are not the same
+--      "volume"); the flag is about coverage, but the caveat would stand even
+--      at 100%.
 
 
 -- ============================================================
@@ -164,13 +180,18 @@ WITH product_totals AS (
     SELECT
         sector,
         cmd_code,
-        cmd_desc,
+        -- latest wording, not a GROUP BY key: 73 HS6 codes in this table
+        -- were reworded by HS 2022 (see 02 assumption 7). Grouping on
+        -- cmd_desc split them and truncated value_2014_2023_usd to the
+        -- 2022-23 rows — fixed 15/09/2026; one top-10 row was affected
+        -- (petroleum 270750: 3.58bn -> 3.62bn).
+        (ARRAY_AGG(cmd_desc ORDER BY ref_year DESC))[1]  AS cmd_desc,
         SUM(fob_value) FILTER (WHERE ref_year = 2023) AS value_2023_usd,
         SUM(fob_value)                                AS value_2014_2023_usd
     FROM clean_track_b_india_sector_detail
     WHERE aggr_level = 6
       AND partner_code = 0
-    GROUP BY sector, cmd_code, cmd_desc
+    GROUP BY sector, cmd_code
 ),
 ranked AS (
     SELECT
@@ -256,6 +277,109 @@ SELECT
 FROM shares
 GROUP BY sector
 ORDER BY hhi_2023 DESC;
+
+
+-- ============================================================
+-- Query 6: volume vs value, 2014 -> 2023, per sector (assumption 7)
+--          How much of each sector's decade growth is tonnes, and how much
+--          is price. Unit value is USD per kg over weight-bearing rows only.
+-- ============================================================
+WITH ep AS (
+    SELECT
+        sector,
+        ref_year,
+        SUM(fob_value)                                           AS value_usd,
+        SUM(fob_value) FILTER (WHERE net_wgt > 0)                AS value_weighed_usd,
+        SUM(net_wgt)   FILTER (WHERE net_wgt > 0)                AS net_wgt_kg
+    FROM clean_track_b_india_sector_detail
+    WHERE aggr_level = 6 AND partner_code = 0 AND ref_year IN (2014, 2023)
+    GROUP BY sector, ref_year
+),
+wide AS (
+    SELECT
+        sector,
+        MAX(value_usd)         FILTER (WHERE ref_year = 2014) AS value_2014,
+        MAX(value_usd)         FILTER (WHERE ref_year = 2023) AS value_2023,
+        MAX(value_weighed_usd) FILTER (WHERE ref_year = 2014) AS vw_2014,
+        MAX(value_weighed_usd) FILTER (WHERE ref_year = 2023) AS vw_2023,
+        MAX(net_wgt_kg)        FILTER (WHERE ref_year = 2014) AS kg_2014,
+        MAX(net_wgt_kg)        FILTER (WHERE ref_year = 2023) AS kg_2023
+    FROM ep
+    GROUP BY sector
+)
+SELECT
+    sector,
+    ROUND(value_2014 / 1e9, 2)                                             AS value_2014_bn,
+    ROUND(value_2023 / 1e9, 2)                                             AS value_2023_bn,
+    ROUND(kg_2014 / 1e9, 3)                                                AS mn_tonnes_2014,
+    ROUND(kg_2023 / 1e9, 3)                                                AS mn_tonnes_2023,
+    ROUND(vw_2014 / NULLIF(kg_2014, 0), 3)                                 AS usd_per_kg_2014,
+    ROUND(vw_2023 / NULLIF(kg_2023, 0), 3)                                 AS usd_per_kg_2023,
+    ROUND(100.0 * (POWER(value_2023 / NULLIF(value_2014, 0), 1.0 / 9) - 1), 2) AS value_cagr_pct,
+    ROUND(100.0 * (POWER(kg_2023    / NULLIF(kg_2014, 0),    1.0 / 9) - 1), 2) AS volume_cagr_pct,
+    ROUND(100.0 * (kg_2023 / NULLIF(kg_2014, 0) - 1), 1)                   AS volume_change_pct,
+    ROUND(100.0 * ((vw_2023 / NULLIF(kg_2023, 0)) / NULLIF(vw_2014 / NULLIF(kg_2014, 0), 0) - 1), 1)
+                                                                           AS unit_value_change_pct,
+    ROUND(100.0 * vw_2014 / NULLIF(value_2014, 0), 1)                      AS value_coverage_2014_pct,
+    ROUND(100.0 * vw_2023 / NULLIF(value_2023, 0), 1)                      AS value_coverage_2023_pct,
+    CASE WHEN vw_2014 / NULLIF(value_2014, 0) < 0.8
+           OR vw_2023 / NULLIF(value_2023, 0) < 0.8
+         THEN 'LOW COVERAGE — no volume claim' ELSE 'ok' END               AS volume_flag
+FROM wide
+ORDER BY sector;
+
+-- ============================================================
+-- Query 7: petroleum products, year by year — tonnes, USD, USD/kg, and each
+--          indexed to 2014 = 100. The 2022 spike in three columns.
+-- ============================================================
+WITH yearly AS (
+    SELECT
+        ref_year,
+        SUM(fob_value)                              AS value_usd,
+        SUM(fob_value) FILTER (WHERE net_wgt > 0)   AS value_weighed_usd,
+        SUM(net_wgt)   FILTER (WHERE net_wgt > 0)   AS net_wgt_kg
+    FROM clean_track_b_india_sector_detail
+    WHERE aggr_level = 6 AND partner_code = 0 AND sector = 'petroleum_products'
+    GROUP BY ref_year
+),
+based AS (
+    SELECT
+        *,
+        value_weighed_usd / NULLIF(net_wgt_kg, 0)                         AS usd_per_kg,
+        FIRST_VALUE(value_usd)   OVER (ORDER BY ref_year)                 AS base_value,
+        FIRST_VALUE(net_wgt_kg)  OVER (ORDER BY ref_year)                 AS base_kg,
+        FIRST_VALUE(value_weighed_usd / NULLIF(net_wgt_kg, 0)) OVER (ORDER BY ref_year) AS base_unit
+    FROM yearly
+)
+SELECT
+    ref_year,
+    ROUND(value_usd / 1e9, 1)                                   AS value_bn,
+    ROUND(net_wgt_kg / 1e9, 1)                                  AS mn_tonnes,
+    ROUND(usd_per_kg, 3)                                        AS usd_per_kg,
+    ROUND(100.0 * value_usd  / NULLIF(base_value, 0), 1)        AS value_index,
+    ROUND(100.0 * net_wgt_kg / NULLIF(base_kg, 0), 1)           AS volume_index,
+    ROUND(100.0 * usd_per_kg / NULLIF(base_unit, 0), 1)         AS unit_value_index
+FROM based
+ORDER BY ref_year;
+
+-- ============================================================
+-- Query 8: volume coverage per sector per year — the gate on Q6/Q7.
+--          Share of sector value on rows with a populated net_wgt, and the
+--          share of those rows Comtrade flags as weight-estimated.
+-- ============================================================
+SELECT
+    sector,
+    ref_year,
+    COUNT(*)                                                                    AS hs6_rows,
+    COUNT(*) FILTER (WHERE net_wgt > 0)                                         AS rows_with_weight,
+    ROUND(100.0 * SUM(fob_value) FILTER (WHERE net_wgt > 0)
+          / NULLIF(SUM(fob_value), 0), 1)                                       AS value_coverage_pct,
+    ROUND(100.0 * COUNT(*) FILTER (WHERE net_wgt > 0 AND is_net_wgt_estimated)
+          / NULLIF(COUNT(*) FILTER (WHERE net_wgt > 0), 0), 1)                  AS weight_estimated_rows_pct
+FROM clean_track_b_india_sector_detail
+WHERE aggr_level = 6 AND partner_code = 0
+GROUP BY sector, ref_year
+ORDER BY sector, ref_year;
 
 
 -- ============================================================
