@@ -91,6 +91,175 @@
         "flowCode": "X",
         "note": "no World row requested \u2014 Track C shares are share-of-panel"
       }
+    },
+    {
+      "track": "D_1",
+      "file": "track_d_india_partner_sector_hs6_2014_2018.csv",
+      "rows": 110211,
+      "bytes": 37855023,
+      "sha256": "843f82a15fc6d580ff48579d4cc09da787c3b3d5b4334220564191deb0c21aec",
+      "api_params": {
+        "reporterCode": "IND",
+        "cmdCode": "AG6",
+        "partnerCode": "USA,ARE,CHN,BGD,MDV,GBR,DEU,NPL,SGP,VNM,NLD,SAU,FRA,LKA,IDN,MYS,ITA,BEL,ZAF,JPN",
+        "flowCode": "X",
+        "post_pull_filter": "HS2 prefix in the 5 target sectors",
+        "derived_column": "sector (mapped from cmdCode[:2], not returned by the API)",
+        "sectors": {
+          "petroleum_products": [
+            "27"
+          ],
+          "pharmaceuticals": [
+            "30"
+          ],
+          "textiles": [
+            "50",
+            "51",
+            "52",
+            "53",
+            "54",
+            "55",
+            "56",
+            "57",
+            "58",
+            "59",
+            "60",
+            "61",
+            "62",
+            "63"
+          ],
+          "gems_jewellery": [
+            "71"
+          ],
+          "engineering_machinery": [
+            "84",
+            "85"
+          ]
+        },
+        "note": "no World row requested \u2014 same 20-partner panel as Track C"
+      },
+      "pulled_on": "2026-09-15",
+      "pull": {
+        "started_at_utc": "2026-09-15T15:47:31+00:00",
+        "finished_at_utc": "2026-09-15T16:35:36+00:00",
+        "duration_seconds": 2884.9,
+        "generated_by": "scripts/pull_comtrade_data.py",
+        "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
+      }
+    },
+    {
+      "track": "D_2",
+      "file": "track_d_india_partner_sector_hs6_2019_2023.csv",
+      "rows": 115087,
+      "bytes": 40673309,
+      "sha256": "5f1e8be5d4d52ad824b82024ceee7d730357fffb682232f2252c0e44b7fbdf81",
+      "api_params": {
+        "reporterCode": "IND",
+        "cmdCode": "AG6",
+        "partnerCode": "USA,ARE,CHN,BGD,MDV,GBR,DEU,NPL,SGP,VNM,NLD,SAU,FRA,LKA,IDN,MYS,ITA,BEL,ZAF,JPN",
+        "flowCode": "X",
+        "post_pull_filter": "HS2 prefix in the 5 target sectors",
+        "derived_column": "sector (mapped from cmdCode[:2], not returned by the API)",
+        "sectors": {
+          "petroleum_products": [
+            "27"
+          ],
+          "pharmaceuticals": [
+            "30"
+          ],
+          "textiles": [
+            "50",
+            "51",
+            "52",
+            "53",
+            "54",
+            "55",
+            "56",
+            "57",
+            "58",
+            "59",
+            "60",
+            "61",
+            "62",
+            "63"
+          ],
+          "gems_jewellery": [
+            "71"
+          ],
+          "engineering_machinery": [
+            "84",
+            "85"
+          ]
+        },
+        "note": "no World row requested \u2014 same 20-partner panel as Track C"
+      },
+      "pulled_on": "2026-09-15",
+      "pull": {
+        "started_at_utc": "2026-09-15T15:47:31+00:00",
+        "finished_at_utc": "2026-09-15T16:35:36+00:00",
+        "duration_seconds": 2884.9,
+        "generated_by": "scripts/pull_comtrade_data.py",
+        "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
+      }
+    },
+    {
+      "track": "E1",
+      "file": "track_e_country_imports_hs2.csv",
+      "rows": 3294,
+      "bytes": 926691,
+      "sha256": "b2283b8ade93661db12469d6f13d724bdc03258fec59daf1f13c0a7b3310f3f7",
+      "api_params": {
+        "reporterCode": "IND,CHN,BGD,VNM",
+        "cmdCode": "AG2",
+        "partnerCode": "0 (World)",
+        "flowCode": "M",
+        "note": "imports are valued CIF; primaryValue = cifvalue on these rows"
+      },
+      "pulled_on": "2026-09-15",
+      "pull": {
+        "started_at_utc": "2026-09-15T15:47:31+00:00",
+        "finished_at_utc": "2026-09-15T16:35:36+00:00",
+        "duration_seconds": 2884.9,
+        "generated_by": "scripts/pull_comtrade_data.py",
+        "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
+      }
+    },
+    {
+      "track": "E2",
+      "file": "track_e_india_partner_imports_hs2.csv",
+      "rows": 16946,
+      "bytes": 4781956,
+      "sha256": "2ea06256405b43dedd5f976ab1dfa38132bfa46b74d126528b77d1b29a0c08a7",
+      "api_params": {
+        "reporterCode": "IND",
+        "cmdCode": "AG2",
+        "partnerCode": "USA,ARE,CHN,BGD,MDV,GBR,DEU,NPL,SGP,VNM,NLD,SAU,FRA,LKA,IDN,MYS,ITA,BEL,ZAF,JPN",
+        "flowCode": "M",
+        "note": "imports are valued CIF; no World row \u2014 same 20-partner panel as Track C"
+      },
+      "pulled_on": "2026-09-15",
+      "pull": {
+        "started_at_utc": "2026-09-15T15:47:31+00:00",
+        "finished_at_utc": "2026-09-15T16:35:36+00:00",
+        "duration_seconds": 2884.9,
+        "generated_by": "scripts/pull_comtrade_data.py",
+        "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
+      }
+    }
+  ],
+  "pulls": [
+    {
+      "started_at_utc": "2026-09-15T15:47:31+00:00",
+      "finished_at_utc": "2026-09-15T16:35:36+00:00",
+      "duration_seconds": 2884.9,
+      "generated_by": "scripts/pull_comtrade_data.py",
+      "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client",
+      "tracks": [
+        "D_1",
+        "D_2",
+        "E1",
+        "E2"
+      ]
     }
   ]
 }

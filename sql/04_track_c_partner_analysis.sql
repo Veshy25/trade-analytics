@@ -5,8 +5,8 @@
 --
 -- Source table: clean_track_c_india_partner_view (built in 01_data_cleaning.sql).
 --
--- NOTE: sql/05_export_results.sql re-states several of the queries below in
--- order to write them out as CSVs. If you change a query here, rerun 05 so the
+-- NOTE: sql/08_export_results.sql re-states several of the queries below in
+-- order to write them out as CSVs. If you change a query here, rerun 08 so the
 -- committed files under data/processed/ do not silently go stale.
 --
 -- Assumptions made here (flagging before running, not after):

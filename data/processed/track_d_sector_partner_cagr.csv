@@ -1,0 +1,101 @@
+sector,partner_desc,value_2014_mn,value_2023_mn,cagr_pct
+engineering_machinery,Maldives,8.0,77.5,28.64
+engineering_machinery,USA,3321.3,15881.1,18.99
+engineering_machinery,Netherlands,485.1,2161.1,18.06
+engineering_machinery,United Arab Emirates,1431.2,4912.9,14.69
+engineering_machinery,Italy,493.4,1679.3,14.58
+engineering_machinery,France,581.6,1687.4,12.56
+engineering_machinery,United Kingdom,1115.8,3085.8,11.97
+engineering_machinery,Singapore,661.9,1806.4,11.80
+engineering_machinery,Germany,1066.7,2704.2,10.89
+engineering_machinery,Belgium,178.9,435.2,10.38
+engineering_machinery,South Africa,305.2,740.5,10.35
+engineering_machinery,Saudi Arabia,623.6,1379.9,9.23
+engineering_machinery,Nepal,328.3,702.4,8.82
+engineering_machinery,Japan,380.7,782.3,8.33
+engineering_machinery,China,834.5,1620.3,7.65
+engineering_machinery,Viet Nam,308.8,521.2,5.99
+engineering_machinery,Bangladesh,488.7,781.5,5.35
+engineering_machinery,Indonesia,442.2,657.6,4.51
+engineering_machinery,Malaysia,473.4,637.9,3.37
+engineering_machinery,Sri Lanka,273.9,233.1,-1.77
+gems_jewellery,Indonesia,0.7,20.3,46.20
+gems_jewellery,Viet Nam,1.1,8.4,24.94
+gems_jewellery,Saudi Arabia,20.6,90.3,17.82
+gems_jewellery,France,99.9,310.1,13.41
+gems_jewellery,Netherlands,19.7,46.3,9.96
+gems_jewellery,Maldives,0.1,0.1,9.46
+gems_jewellery,Nepal,12.3,25.6,8.47
+gems_jewellery,Italy,126.8,229.9,6.84
+gems_jewellery,Malaysia,86.0,143.2,5.83
+gems_jewellery,Singapore,499.7,713.7,4.04
+gems_jewellery,Sri Lanka,31.9,45.3,3.97
+gems_jewellery,Germany,102.3,133.4,2.99
+gems_jewellery,United Kingdom,482.8,618.1,2.78
+gems_jewellery,USA,8003.3,10166.5,2.69
+gems_jewellery,Japan,308.0,272.7,-1.34
+gems_jewellery,Belgium,2825.6,2203.1,-2.73
+gems_jewellery,United Arab Emirates,11719.3,7577.7,-4.73
+gems_jewellery,Bangladesh,5.1,2.7,-6.90
+gems_jewellery,South Africa,93.9,35.5,-10.24
+gems_jewellery,China,157.2,46.3,-12.71
+petroleum_products,Bangladesh,181.0,2189.3,31.91
+petroleum_products,Maldives,14.3,149.4,29.81
+petroleum_products,Belgium,103.4,1026.9,29.06
+petroleum_products,Netherlands,2819.1,14991.7,20.40
+petroleum_products,United Kingdom,242.7,1281.4,20.31
+petroleum_products,Indonesia,999.2,1912.3,7.48
+petroleum_products,Nepal,1237.4,2319.4,7.23
+petroleum_products,South Africa,1957.7,3523.2,6.75
+petroleum_products,USA,4517.7,6523.6,4.17
+petroleum_products,France,725.8,1001.3,3.64
+petroleum_products,Malaysia,1076.0,1421.1,3.14
+petroleum_products,Singapore,5009.5,5539.5,1.12
+petroleum_products,United Arab Emirates,7208.8,7455.6,0.37
+petroleum_products,Italy,699.2,588.4,-1.90
+petroleum_products,China,1605.5,1180.0,-3.36
+petroleum_products,Sri Lanka,649.7,362.3,-6.28
+petroleum_products,Viet Nam,66.7,21.9,-11.62
+petroleum_products,Germany,29.8,4.5,-19.00
+petroleum_products,Saudi Arabia,7247.4,920.9,-20.49
+petroleum_products,Japan,2082.4,142.5,-25.77
+pharmaceuticals,Saudi Arabia,6.6,96.5,34.70
+pharmaceuticals,Belgium,80.0,422.5,20.31
+pharmaceuticals,Indonesia,16.8,84.5,19.70
+pharmaceuticals,United Arab Emirates,45.9,212.4,18.55
+pharmaceuticals,France,142.9,505.4,15.07
+pharmaceuticals,Maldives,9.3,30.3,14.05
+pharmaceuticals,Italy,21.4,69.5,13.99
+pharmaceuticals,Netherlands,173.9,531.8,13.22
+pharmaceuticals,Japan,36.5,107.3,12.74
+pharmaceuticals,China,36.3,74.0,8.25
+pharmaceuticals,Germany,178.4,356.2,7.98
+pharmaceuticals,USA,3844.6,7551.0,7.79
+pharmaceuticals,Malaysia,54.1,96.0,6.58
+pharmaceuticals,Sri Lanka,149.4,264.1,6.53
+pharmaceuticals,Bangladesh,29.4,50.3,6.15
+pharmaceuticals,Nepal,142.6,222.4,5.06
+pharmaceuticals,United Kingdom,444.5,636.4,4.07
+pharmaceuticals,South Africa,459.3,625.1,3.48
+pharmaceuticals,Singapore,53.6,70.5,3.09
+pharmaceuticals,Viet Nam,170.7,142.4,-1.99
+textiles,Maldives,5.0,15.8,13.62
+textiles,Nepal,121.1,269.0,9.27
+textiles,USA,7033.1,9296.3,3.15
+textiles,Netherlands,656.8,856.3,2.99
+textiles,Bangladesh,2085.4,2642.3,2.66
+textiles,Saudi Arabia,439.6,555.0,2.62
+textiles,Sri Lanka,572.0,676.6,1.88
+textiles,South Africa,235.8,255.3,0.89
+textiles,Italy,902.8,778.2,-1.64
+textiles,Japan,423.3,349.6,-2.10
+textiles,France,1124.6,913.5,-2.28
+textiles,Malaysia,295.6,223.5,-3.06
+textiles,Belgium,543.5,410.4,-3.07
+textiles,United Kingdom,2484.5,1873.4,-3.09
+textiles,Germany,1900.5,1266.4,-4.41
+textiles,Indonesia,246.5,148.9,-5.45
+textiles,Singapore,125.4,73.8,-5.72
+textiles,Viet Nam,577.9,339.3,-5.75
+textiles,United Arab Emirates,3434.8,1979.5,-5.94
+textiles,China,3114.1,1108.8,-10.84
