@@ -19,8 +19,11 @@
 -- ============================================================
 
 
--- Track A — country-year totals, the base series behind every trend claim.
-\copy (SELECT reporter_desc, ref_year, ROUND(SUM(fob_value)/1e9, 3) AS total_export_value_usd_bn FROM clean_track_a_country_benchmark WHERE aggr_level = 2 GROUP BY reporter_desc, ref_year ORDER BY reporter_desc, ref_year) TO 'data/processed/track_a_country_year_totals.csv' WITH (FORMAT csv, HEADER true)
+-- Track A — country-year totals, the base series behind every trend claim,
+-- with year-on-year growth alongside (02 Query 1 + Query 2 in one file). YoY
+-- is computed on the unrounded total and LAG()ed within each reporter, so
+-- the first year of every series is NULL — expected, not a gap.
+\copy (WITH yearly AS (SELECT reporter_desc, ref_year, SUM(fob_value) AS total_usd FROM clean_track_a_country_benchmark WHERE aggr_level = 2 GROUP BY 1,2) SELECT reporter_desc, ref_year, ROUND(total_usd/1e9, 3) AS total_export_value_usd_bn, ROUND(100.0*(total_usd - LAG(total_usd) OVER (PARTITION BY reporter_desc ORDER BY ref_year))/NULLIF(LAG(total_usd) OVER (PARTITION BY reporter_desc ORDER BY ref_year),0), 1) AS yoy_growth_pct FROM yearly ORDER BY reporter_desc, ref_year) TO 'data/processed/track_a_country_year_totals.csv' WITH (FORMAT csv, HEADER true)
 
 -- Track A — decade CAGR per country, with each country's own span shown so a
 -- 4-year Bangladesh rate is never read as a 9-year one.
