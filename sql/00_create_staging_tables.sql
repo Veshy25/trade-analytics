@@ -177,7 +177,9 @@ CREATE TABLE raw_track_c_india_partner_view (
 
 -- Track D — India -> 20 partners, HS6, 5 sectors (mirrors Track B's 48
 -- columns incl. the derived `sector`). Delivered as TWO CSVs split by year
--- range because the single file exceeded 50 MB; both load into this one
+-- range because the single file came to 74.9 MB, past GitHub's 50 MB warning
+-- threshold (its hard limit is 100 MB); the two halves total 78.5 MB and both
+-- load into this one
 -- table.
 DROP TABLE IF EXISTS raw_track_d_india_partner_sector;
 CREATE TABLE raw_track_d_india_partner_sector

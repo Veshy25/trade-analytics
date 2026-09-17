@@ -1,6 +1,6 @@
-sector,hs6_products_2023,top5_share_pct,hhi_2023
-pharmaceuticals,43,91.3,5751
-petroleum_products,41,98.6,5238
-gems_jewellery,53,96.5,3831
-engineering_machinery,826,36.2,624
-textiles,784,15.4,118
+sector,hs6_products_2023,hs6_products_all_years,top5_share_pct,hhi_2023
+pharmaceuticals,43,53,91.3,5751
+petroleum_products,41,43,98.6,5238
+gems_jewellery,53,55,96.5,3831
+engineering_machinery,826,863,36.2,624
+textiles,784,821,15.4,118

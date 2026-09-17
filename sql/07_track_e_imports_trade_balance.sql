@@ -15,9 +15,14 @@
 --      this file is FOB exports minus CIF imports. That is how published
 --      merchandise balances are constructed, but the CIF side carries
 --      freight and insurance the FOB side does not, so deficits are
---      overstated (and surpluses understated) by that margin — the README's
---      "Data reliability" section puts it at roughly 10-20% of the import
---      value. No adjustment is applied; the caveat travels with the number.
+--      overstated (and surpluses understated) by that margin. The size of
+--      that margin is NOT measured here and cannot be from this data — it is
+--      a convention: the IMF's Direction of Trade Statistics has long used a
+--      10% CIF/FOB factor, and figures up to 20% appear in the literature for
+--      long-haul and low-value-density trade. Treat 10-20% as an assumed
+--      range, not a finding (this file and the README quoted it without a
+--      source until 17/09/2026). No adjustment is applied; the caveat
+--      travels with the number.
 --   2. Row inclusion and aggregation follow 02 assumptions 1 and 3: both
 --      is_reported and is_aggregate rows are summed (V3 re-confirms the
 --      partition), aggr_level = 2 only.
@@ -82,15 +87,21 @@ WITH x AS (
     GROUP BY 1, 2
 ),
 m AS (
-    SELECT cmd_code, SUM(cif_value) AS imports_usd
+    SELECT cmd_code, cmd_desc, SUM(cif_value) AS imports_usd
     FROM clean_track_e_country_imports
     WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023
-    GROUP BY 1
+    GROUP BY 1, 2
 ),
+-- The join is FULL OUTER so a chapter India imports but does not export (or
+-- vice versa) still appears. cmd_desc must therefore be COALESCEd across both
+-- sides: taking it from x alone would print a NULL description for any
+-- import-only chapter. That is a no-op on this data — all 97 chapters are
+-- present on both sides in 2023, asserted in V6 below — but the query should
+-- not depend on that holding.
 bal AS (
     SELECT
         COALESCE(x.cmd_code, m.cmd_code)                    AS cmd_code,
-        x.cmd_desc,
+        COALESCE(x.cmd_desc, m.cmd_desc)                    AS cmd_desc,
         COALESCE(x.exports_usd, 0)                          AS exports_usd,
         COALESCE(m.imports_usd, 0)                          AS imports_usd,
         COALESCE(x.exports_usd, 0) - COALESCE(m.imports_usd, 0) AS balance_usd
@@ -132,6 +143,11 @@ m AS (
     WHERE aggr_level = 2 AND ref_year IN (2014, 2023)
     GROUP BY 1, 2
 ),
+-- Inner join, deliberately: a partner-year present on only one side would be
+-- dropped silently, and balance_change_bn below would go NULL if either 2014
+-- or 2023 were missing. Verified a no-op here — all 20 partners carry both an
+-- export and an import row in both years, so the join returns 40 of 40 pairs;
+-- V6 asserts it rather than leaving it to trust.
 j AS (
     SELECT x.partner_desc, x.ref_year, x.exports_usd, m.imports_usd,
            x.exports_usd - m.imports_usd AS balance_usd
@@ -260,3 +276,50 @@ SELECT
     ROUND(100.0 * p.panel_usd / NULLIF(w.world_usd, 0), 1)   AS panel_coverage_pct
 FROM p JOIN w USING (ref_year)
 ORDER BY p.ref_year;
+
+
+-- V6. Join-coverage assertions (added 17/09/2026). Q2 and Q3 both join an
+--     export track to an import track. Both are no-ops on this data, and both
+--     would drop or blank rows silently if that ever stopped being true, so
+--     the condition is asserted rather than assumed. A cold audit on
+--     16/09/2026 flagged them as latent; this is the answer to that.
+DO $$
+DECLARE
+    only_one_side bigint;
+    pairs         bigint;
+BEGIN
+    -- Q2: every 2023 HS2 chapter must appear on both the export and import side.
+    SELECT COUNT(*) INTO only_one_side FROM (
+        (SELECT cmd_code FROM clean_track_a_country_benchmark
+          WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023
+         EXCEPT
+         SELECT cmd_code FROM clean_track_e_country_imports
+          WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023)
+        UNION ALL
+        (SELECT cmd_code FROM clean_track_e_country_imports
+          WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023
+         EXCEPT
+         SELECT cmd_code FROM clean_track_a_country_benchmark
+          WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023)
+    ) q;
+    IF only_one_side <> 0 THEN
+        RAISE EXCEPTION
+            '07 V6: % HS2 chapters appear on only one side of the 2023 balance — Q2 relies on COALESCE for cmd_desc, check the output', only_one_side;
+    END IF;
+
+    -- Q3: all 20 partners must carry both flows in both 2014 and 2023 (40 pairs).
+    SELECT COUNT(*) INTO pairs FROM (
+        SELECT x.partner_code, x.ref_year
+        FROM (SELECT DISTINCT partner_code, ref_year FROM clean_track_c_india_partner_view
+               WHERE aggr_level = 2 AND ref_year IN (2014, 2023)) x
+        JOIN (SELECT DISTINCT partner_code, ref_year FROM clean_track_e_india_partner_imports
+               WHERE aggr_level = 2 AND ref_year IN (2014, 2023)) m
+          USING (partner_code, ref_year)
+    ) p;
+    IF pairs <> 40 THEN
+        RAISE EXCEPTION
+            '07 V6: Q3 partner-year join returns % pairs, expected 40 — a partner is missing a flow in 2014 or 2023', pairs;
+    END IF;
+
+    RAISE NOTICE '07 V6 PASSED: Q2 chapter coverage symmetric, Q3 returns all 40 partner-year pairs.';
+END $$;

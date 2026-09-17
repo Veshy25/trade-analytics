@@ -34,14 +34,20 @@
 --   7. Two pulls, two dates. Track D was pulled 15/09/2026; Tracks B and C on
 --      25/08/2026. Comtrade revises published figures, so the cross-track
 --      checks in V3/V4 could in principle show revision drift. In practice
---      they do not: V3 reconciles to 0.00% for petroleum in all 200
---      partner-years and within 1% everywhere else, EXCEPT engineering /
---      machinery in 2022, where 10 partner-years run -1.0% to -11.5% (Japan
---      worst). That is the same sector-year where Track B already diverges
---      -2.46% from Track A (03 V5, finding 10) — a property of how Comtrade
---      holds India's 2022 HS 84/85 records (some value at chapter level with
---      no HS6 breakdown), not a pull-date artefact. Verified: every other
---      sector-year matches to the cent.
+--      they do not, but be exact about what "in practice" means here, because
+--      this assumption overstated it until 17/09/2026. Worst absolute
+--      divergence per sector over all 200 partner-years: petroleum 0.00%,
+--      textiles 0.18%, pharmaceuticals 0.97%, gems & jewellery 1.95%,
+--      engineering / machinery 11.54% (Japan, 2022). ELEVEN partner-years
+--      exceed 1% — ten of them engineering in 2022, and one gems & jewellery
+--      in 2022. Only petroleum matches to the cent; the earlier claim that
+--      "every other sector-year matches to the cent" and that "every
+--      partner-year over 1% is engineering in 2022" were both false, and V3
+--      printed the counter-example directly beneath them. The engineering gap
+--      is the same sector-year where Track B already diverges -2.46% from
+--      Track A (03 V5, finding 10) — a property of how Comtrade holds India's
+--      2022 HS 84/85 records (some value at chapter level with no HS6
+--      breakdown), not a pull-date artefact.
 --   8. Nominal USD throughout (02 assumption 6). Every growth figure is
 --      exposed to the 2022 commodity spike, petroleum most of all.
 --   9. Every share, growth and CAGR divisor is wrapped in NULLIF(..., 0).
@@ -254,10 +260,17 @@ GROUP BY aggr_level;
 --     year) should match Track C's corresponding HS2 chapter(s) for that
 --     partner. Reported per sector as the worst absolute % divergence over
 --     all 200 partner-years. Result at build time (assumption 7): petroleum
---     0.00 / textiles 0.18 / pharma 0.97 / gems 1.95 / engineering 11.54 —
---     and every partner-year over 1% is engineering in 2022. Direction is
---     always negative (HS6 sum <= HS2 chapter), consistent with value held
---     at chapter level only.
+--     0.00 / textiles 0.18 / pharma 0.97 / gems 1.95 / engineering 11.54.
+--     Eleven partner-years exceed 1%: ten engineering 2022, one gems 2022.
+--     Direction is always negative (HS6 sum <= HS2 chapter), consistent with
+--     value held at chapter level only.
+--
+--     The join below is inner, so a sector-year present in one track and not
+--     the other would vanish from the comparison instead of failing it. That
+--     is a no-op on this data — both panels hold the same 20 partners and the
+--     same 10 years, asserted in 01 validation 6 — but the reconciliation is
+--     precisely the check that should not quietly skip rows, so the row count
+--     is reported alongside the divergences.
 WITH d AS (
     SELECT sector, partner_code, ref_year, SUM(fob_value) AS d_value
     FROM clean_track_d_india_partner_sector

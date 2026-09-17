@@ -202,6 +202,9 @@ coverage AS (
         p.hhi_panel,
         p.panel_value_usd / NULLIF(w.world_value_usd, 0) AS c
     FROM panel_hhi p
+    -- Inner join to Track A's India total. A year present in Track C but not
+    -- Track A would silently vanish from the coverage rescaling rather than
+    -- raise; both tracks carry 2014-2023 for India, so this is a no-op today.
     JOIN india_world w USING (ref_year)
 )
 SELECT
@@ -371,5 +374,6 @@ SELECT
     w.india_world_usd,
     ROUND(100.0 * t.tracked_partners_usd / NULLIF(w.india_world_usd, 0), 1) AS tracked_pct_of_india_total
 FROM tracked t
+-- Same inner join as Q4, same no-op, same reason it is worth naming.
 JOIN india_world w USING (ref_year)
 ORDER BY t.ref_year;

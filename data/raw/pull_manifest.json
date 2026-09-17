@@ -9,6 +9,7 @@
     "pulled_on": "2026-08-25",
     "scope_agreed": "2026-08-21",
     "generated_by": "scripts/pull_comtrade_data.py",
+    "generated_by_note": "not published \u2014 see README; the committed CSVs are the input of record",
     "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
   },
   "scope": {
@@ -144,6 +145,7 @@
         "finished_at_utc": "2026-09-15T16:35:36+00:00",
         "duration_seconds": 2884.9,
         "generated_by": "scripts/pull_comtrade_data.py",
+        "generated_by_note": "not published \u2014 see README; the committed CSVs are the input of record",
         "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
       }
     },
@@ -199,6 +201,7 @@
         "finished_at_utc": "2026-09-15T16:35:36+00:00",
         "duration_seconds": 2884.9,
         "generated_by": "scripts/pull_comtrade_data.py",
+        "generated_by_note": "not published \u2014 see README; the committed CSVs are the input of record",
         "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
       }
     },
@@ -221,6 +224,7 @@
         "finished_at_utc": "2026-09-15T16:35:36+00:00",
         "duration_seconds": 2884.9,
         "generated_by": "scripts/pull_comtrade_data.py",
+        "generated_by_note": "not published \u2014 see README; the committed CSVs are the input of record",
         "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
       }
     },
@@ -243,6 +247,7 @@
         "finished_at_utc": "2026-09-15T16:35:36+00:00",
         "duration_seconds": 2884.9,
         "generated_by": "scripts/pull_comtrade_data.py",
+        "generated_by_note": "not published \u2014 see README; the committed CSVs are the input of record",
         "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
       }
     }
@@ -253,6 +258,7 @@
       "finished_at_utc": "2026-09-15T16:35:36+00:00",
       "duration_seconds": 2884.9,
       "generated_by": "scripts/pull_comtrade_data.py",
+      "generated_by_note": "not published \u2014 see README; the committed CSVs are the input of record",
       "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client",
       "tracks": [
         "D_1",

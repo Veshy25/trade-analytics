@@ -2,7 +2,8 @@
 -- Track A analysis: India vs comparators (China, Bangladesh, Vietnam) —
 -- total export value trend, 2014-2023 (Q1/Q2, HS2 aggregated to a single
 -- country-year total), plus each country's top HS2 export categories (Q3),
--- covering the "top categories and trends" scope stated in the README.
+-- covering the "top categories and trends" scope stated in the README, plus
+-- the chapters behind the 2023 fall (Q5).
 --
 -- NOTE: sql/08_export_results.sql re-states several of the queries below in
 -- order to write them out as CSVs. If you change a query here, rerun 08 so the
@@ -13,21 +14,39 @@
 --      = true) and Comtrade-derived aggregate rows (is_aggregate = true).
 --      Note what is_aggregate actually means: the record was COMPUTED BY
 --      ROLLING UP more detailed lines. It describes how the figure was
---      assembled, not whether it was estimated — estimation is carried
---      separately by legacy_estimation_flag, which is a different question
---      and is not filtered on here. These two flags are mutually exclusive
+--      assembled, not whether it was estimated. Nothing in this pull marks
+--      a VALUE as estimated at all: legacy_estimation_flag, which this file
+--      treated as that marker until 17/09/2026, is a quantity/net-weight
+--      code — see V1a, where the misreading is set out and corrected.
+--      These two flags are mutually exclusive
 --      and together cover every row (verified against the raw CSV: 675
 --      reported + 2607 aggregate = 3282, no overlap), so summing both
 --      gives the most complete country-year total available rather than
 --      an artificially undercounted one. 03 and 04 apply the same rule and
 --      point back to this assumption for the definition.
 --   2. Bangladesh only has data for 2015-2018 in this pull (India, China,
---      Vietnam have the full 2014-2023 range) - this is a genuine gap in
---      what UN Comtrade holds for Bangladesh over this window, not a pull
---      error (verified against the raw CSV: BGD rows only exist for
---      refYear 2015-2018). Any chart or narrative built on this query
---      needs to caveat Bangladesh's shorter series rather than imply a
---      10-year comparison across all four countries.
+--      Vietnam have the full 2014-2023 range). Any chart or narrative built
+--      on this query needs to caveat Bangladesh's shorter series rather than
+--      imply a 10-year comparison across all four countries.
+--
+--      On the claim that this is "a genuine gap in what UN Comtrade holds,
+--      not a pull error" — narrowed 17/09/2026. The evidence originally
+--      offered was that BGD rows exist only for refYear 2015-2018 in the raw
+--      CSV, which is circular: the CSV is the pull, so it cannot testify that
+--      the pull was complete. What can be said independently is that WITS
+--      also carries no Bangladesh merchandise export total after the
+--      mid-2010s, so the sparseness is not an artefact of this project's
+--      request. Treat "genuine gap" as well-supported but not proven here.
+--
+--      An unresolved labelling question sits underneath it. WITS reports
+--      Bangladesh's latest total as 31,734,162.42 thousand USD under the year
+--      label 2016; this pull carries exactly that value under refYear 2015.
+--      Bangladesh's fiscal year runs July-June, so a fiscal-versus-calendar
+--      labelling difference is the obvious candidate, but it is not confirmed
+--      and the two sources are not independent (WITS draws on Comtrade). If
+--      the label is off by one, Bangladesh's window is 2016-2019 rather than
+--      2015-2018 and its 3-year CAGR span is unaffected. Flagged rather than
+--      silently assumed either way.
 --   3. Totals sum aggr_level = 2 rows only (HS2 chapters). The pull used
 --      cmdCode='AG2' for all four reporters, so the table should be
 --      entirely level 2 — verified: 100% of clean_track_a_country_benchmark
@@ -57,11 +76,21 @@
 --      than volume, petroleum most of all. Query 4 and 4b, the CAGR and
 --      indexed series, are the figures most exposed to this. Stated again in
 --      the README scope table and the key_findings.md preamble.
---   7. HS descriptions are NOT stable across the decade. The HS 2022 edition
---      reworded five chapters (15, 16, 24, 84, 88) from ref_year 2022
---      onward — e.g. 84 changed from "Nuclear reactors, boilers, machinery
---      ..." to "Machinery and mechanical appliances, boilers, nuclear
---      reactors ..." — and 73 HS6 products in Track B/D likewise. Any
+--   7. HS descriptions are NOT stable across the decade, and TWO editions
+--      move them, not one. The five HS2 chapter rewordings (15, 16, 24, 84,
+--      88) are all HS 2022, from ref_year 2022 onward — e.g. 84 changed from
+--      "Nuclear reactors, boilers, machinery ..." to "Machinery and
+--      mechanical appliances, boilers, nuclear reactors ...". The 73 HS6
+--      products reworded in Track B/D are NOT: 42 of them change at 2017
+--      (the HS 2017 edition, classificationCode H4 -> H5) and 34 at 2022
+--      (HS 2022, H5 -> H6), three codes (570490, 847510, 852352) changing
+--      in both years — 847510 and 852352 revert to their pre-2017 wording.
+--      This file said "HS 2022" for the HS6 count until 17/09/2026, which
+--      was wrong: the worked example below, petroleum 270750, is itself a
+--      2017 change ("ASTM D 86 method" -> "ISO 3405 method (equivalent to
+--      the ASTM D 86 method)"). The edition each row was filed under is in
+--      classificationCode, carried forward on Track B and mapped in 01
+--      validation 7. Any
 --      multi-year GROUP BY that includes cmd_desc therefore splits one code
 --      into two rows and silently truncates the full-period sum to the years
 --      sharing the latest wording. Query 3 grouped that way until
@@ -214,7 +243,7 @@ bounds AS (
     GROUP BY reporter_iso
 )
 SELECT
-    y.reporter_desc,
+    l.reporter_desc,
     b.first_year,
     b.last_year,
     b.years_present,
@@ -230,7 +259,9 @@ SELECT
         2
     ) AS cagr_pct
 FROM bounds b
-JOIN yearly y ON y.reporter_iso = b.reporter_iso AND y.ref_year = b.last_year
+-- Two joins, not three: `l` is the last year (and supplies reporter_desc),
+-- `f` the first. A third join on the same last-year key was carried here
+-- until 17/09/2026 purely to read reporter_desc off it.
 JOIN yearly f ON f.reporter_iso = b.reporter_iso AND f.ref_year = b.first_year
 JOIN yearly l ON l.reporter_iso = b.reporter_iso AND l.ref_year = b.last_year
 ORDER BY cagr_pct DESC;
@@ -272,78 +303,193 @@ ORDER BY reporter_desc, ref_year;
 
 
 -- ============================================================
+-- Query 5: India's largest chapter movements, 2022 -> 2023 (added
+--          17/09/2026). key_findings.md finding 3 attributes most of the
+--          2023 fall to three chapters — petroleum, gems and iron & steel —
+--          and until this query existed those three figures were derived
+--          ad hoc and cited to a CSV that does not contain them. They are a
+--          headline claim about the single biggest year-on-year move in the
+--          series, so they get a named query and a committed result set like
+--          everything else.
+--
+--          Grouped on cmd_code only, never cmd_desc (assumption 7). Both
+--          years sit inside HS 2022 here so no code is currently split, but
+--          the pattern is the one that broke Q3, and a later pull could
+--          extend the window across an edition boundary.
+-- ============================================================
+WITH india_chapter AS (
+    SELECT
+        cmd_code,
+        (ARRAY_AGG(cmd_desc ORDER BY ref_year DESC))[1]      AS cmd_desc,
+        SUM(fob_value) FILTER (WHERE ref_year = 2022)        AS value_2022_usd,
+        SUM(fob_value) FILTER (WHERE ref_year = 2023)        AS value_2023_usd
+    FROM clean_track_a_country_benchmark
+    WHERE reporter_iso = 'IND'
+      AND aggr_level = 2
+    GROUP BY cmd_code
+),
+moved AS (
+    SELECT
+        ic.*,
+        COALESCE(value_2023_usd, 0) - COALESCE(value_2022_usd, 0) AS change_usd,
+        ROW_NUMBER() OVER (ORDER BY COALESCE(value_2023_usd,0) - COALESCE(value_2022_usd,0) ASC,  cmd_code) AS fall_rank,
+        ROW_NUMBER() OVER (ORDER BY COALESCE(value_2023_usd,0) - COALESCE(value_2022_usd,0) DESC, cmd_code) AS rise_rank
+    FROM india_chapter ic
+)
+SELECT
+    CASE WHEN fall_rank <= 10 THEN 'fall' ELSE 'rise' END AS direction,
+    CASE WHEN fall_rank <= 10 THEN fall_rank ELSE rise_rank END AS rank_on_side,
+    cmd_code,
+    cmd_desc,
+    ROUND(value_2022_usd / 1e9, 2) AS value_2022_bn,
+    ROUND(value_2023_usd / 1e9, 2) AS value_2023_bn,
+    ROUND(change_usd / 1e9, 2)     AS change_bn
+FROM moved
+WHERE fall_rank <= 10 OR rise_rank <= 10
+ORDER BY direction, rank_on_side;
+
+
+-- ============================================================
 -- Validation — run before trusting the queries above
 -- ============================================================
 
--- V1a. Estimation sensitivity, by country-year.
---      The README states the raw data carries flags that distinguish
---      as-reported figures from filled-in ones. This is where that claim is
---      exercised rather than asserted. legacy_estimation_flag takes only two
---      values in this pull: 0 (as reported) and 4 (estimated by Comtrade).
+-- V1a. Reporting basis and net-weight estimation exposure, by country-year.
+--      CORRECTED 17/09/2026 — this block previously asserted something false,
+--      and the correction is kept visible rather than quietly rewritten.
 --
---      Read estimated_pct as a REGIME MARKER, not a gradient. Almost every
---      country-year is either ~0% or ~90-100%, not somewhere in between:
---      India is 0% through 2018 and 79-100% from 2019; Vietnam switches on in
---      2018 and back down to 11-19% in 2022-23; China flips on in 2016, off
---      again in 2017, then on from 2018. Bangladesh is 0% in 2015 and ~90%
---      for 2016-2018.
+--      What it used to say. Until 17/09/2026 this validation read
+--      legacy_estimation_flag = 4 as "estimated by Comtrade rather than
+--      as-reported" and reported the share of export VALUE on those rows as
+--      an estimation exposure — the number behind finding 12 and the
+--      README's "reporting gaps get filled by estimation" paragraph.
 --
---      Consequence for any 2014-vs-2023 comparison: the two endpoints are not
---      constructed the same way. India's 2014 total is entirely as-reported;
---      its 2023 total is 78.8% Comtrade-estimated. That does not invalidate
---      the comparison — these are the standard published figures — but it is
---      a caveat that belongs next to the growth number, not in a footnote.
+--      Why that was wrong. legacyEstimationFlag is a quantity and net-weight
+--      code, not a value code. UN Statistics Division, "Quantity and Weight
+--      information in UN Comtrade" (October 2009), section 4.1:
+--          0 = no estimation
+--          2 = quantity estimation only
+--          4 = net weight estimation only
+--          6 = both quantity and net weight are estimated
+--      Neither that document nor the 2019 methodology guide describes a flag
+--      for an estimated value.
+--
+--      The data says the same without the document. On Track B, which carries
+--      the flag and both modern booleans, flag 2 rows are exactly the
+--      qty-only-estimated rows (162), flag 4 exactly the net-weight-only rows
+--      (3,776) and flag 6 exactly the both-estimated rows (6,656) — no
+--      exceptions. On Track A the first query below asserts the same
+--      containment.
+--
+--      The asymmetry matters and is easy to get wrong: the implication runs
+--      ONE WAY. 552 Track A rows carry is_net_wgt_estimated = true with a
+--      legacy flag of 0 — six reporter-years before 2019 (China 2015 and
+--      2017, India 2017 and 2018, Viet Nam 2016 and 2017) where the boolean
+--      is set and the legacy field was never back-filled. Flag 4 implies
+--      net-weight estimation; net-weight estimation does not imply flag 4.
+--      So flag 0 is not a clean "nothing estimated here" marker either.
+--
+--      And the sting: netWgt on this HS2 pull holds no positive value at all
+--      (blank on 48.3% of Track A rows, exactly 0 on the remaining 51.7% —
+--      see 01's header note). The flag marks estimation of a quantity this
+--      track does not carry. It says nothing about the export values every
+--      figure in this project is built from.
+--
+--      What IS a real change in construction, and is reported below, is the
+--      is_reported -> is_aggregate switch: each reporter files chapter
+--      figures directly for its first year or two, then Comtrade assembles
+--      them by rolling up the reporter's HS6 detail. China switches at 2015,
+--      Viet Nam and Bangladesh at 2016, India at 2017, and none switches
+--      back. That is a genuine "the endpoints are not built the same way"
+--      caveat for any 2014-vs-2023 comparison — which is the caveat the old
+--      wording was reaching for with the wrong column.
+
+-- V1a-i. Containment assertion: every flag-4 row must be net-weight
+--        estimated. This is the claim the corrected reading rests on, so it
+--        is asserted rather than described. The converse is NOT asserted —
+--        see the note above.
+DO $$
+DECLARE n bigint;
+BEGIN
+    SELECT COUNT(*) INTO n
+    FROM clean_track_a_country_benchmark
+    WHERE legacy_estimation_flag = 4 AND NOT is_net_wgt_estimated;
+    IF n <> 0 THEN
+        RAISE EXCEPTION
+            '02 V1a: % rows carry legacy_estimation_flag = 4 without is_net_wgt_estimated — the flag is not a net-weight code on this pull', n;
+    END IF;
+    RAISE NOTICE '02 V1a PASSED: all legacy_estimation_flag = 4 rows are net-weight-estimated rows.';
+END $$;
+
+-- V1a-ii. The country-year table itself.
 WITH by_country_year AS (
     SELECT
-        reporter_iso,
+        reporter_desc,
         ref_year,
-        SUM(fob_value)                                                        AS total_usd,
-        COALESCE(SUM(fob_value) FILTER (WHERE legacy_estimation_flag = 4), 0) AS estimated_usd
+        SUM(fob_value)                                                          AS total_usd,
+        COALESCE(SUM(fob_value) FILTER (WHERE is_net_wgt_estimated), 0)         AS netwgt_est_usd,
+        COUNT(*)                                                                AS rows_all,
+        COUNT(*) FILTER (WHERE is_aggregate)                                    AS rows_aggregate,
+        COUNT(*) FILTER (WHERE is_reported)                                     AS rows_reported,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 4)                      AS rows_flag4,
+        COUNT(*) FILTER (WHERE is_net_wgt_estimated)                            AS rows_netwgt_est
     FROM clean_track_a_country_benchmark
     WHERE aggr_level = 2
-    GROUP BY reporter_iso, ref_year
+    GROUP BY reporter_desc, ref_year
 )
 SELECT
-    reporter_iso,
+    reporter_desc,
     ref_year,
-    ROUND(total_usd / 1e9, 1)                              AS total_bn,
-    ROUND((total_usd - estimated_usd) / 1e9, 1)            AS as_reported_bn,
-    ROUND(100.0 * estimated_usd / NULLIF(total_usd, 0), 1) AS estimated_pct
+    ROUND(total_usd / 1e9, 1)                                   AS total_bn,
+    -- Share of value sitting on rows whose NET WEIGHT Comtrade estimated.
+    -- Not a share of estimated value; there is no such column.
+    ROUND(100.0 * netwgt_est_usd / NULLIF(total_usd, 0), 1)     AS pct_value_on_netwgt_est_rows,
+    ROUND(100.0 * rows_aggregate / NULLIF(rows_all, 0), 1)      AS pct_rows_is_aggregate,
+    ROUND(100.0 * rows_reported  / NULLIF(rows_all, 0), 1)      AS pct_rows_is_reported,
+    -- The gap between these two is the legacy field's under-population,
+    -- not a difference in meaning.
+    rows_flag4,
+    rows_netwgt_est
 FROM by_country_year
-ORDER BY reporter_iso, ref_year;
+ORDER BY reporter_desc, ref_year;
 
--- V1b. Estimation sensitivity, decade summary per country.
---      first_flagged_year is the column that makes the regime change visible
---      in a single row: nothing is flagged before it, most things after it.
+-- V1b. Decade summary per country: when the construction basis switched.
+--      basis_switch_year is the first year the reporter's chapter figures
+--      arrive as Comtrade rollups instead of direct filings. Nothing before
+--      it is an aggregate; nothing after it is not.
 WITH by_country AS (
     SELECT
-        reporter_iso,
-        SUM(fob_value)                                                        AS total_usd,
-        COALESCE(SUM(fob_value) FILTER (WHERE legacy_estimation_flag = 4), 0) AS estimated_usd,
-        COUNT(*)                                                              AS rows_all,
-        COUNT(*) FILTER (WHERE legacy_estimation_flag = 4)                    AS rows_estimated,
-        MIN(ref_year) FILTER (WHERE legacy_estimation_flag = 4)               AS first_flagged_year
+        reporter_desc,
+        SUM(fob_value)                                                  AS total_usd,
+        COALESCE(SUM(fob_value) FILTER (WHERE is_net_wgt_estimated), 0) AS netwgt_est_usd,
+        COUNT(*)                                                        AS rows_all,
+        COUNT(*) FILTER (WHERE is_net_wgt_estimated)                    AS rows_netwgt_est,
+        MIN(ref_year) FILTER (WHERE is_aggregate)                       AS basis_switch_year,
+        MIN(ref_year)                                                   AS first_year,
+        MAX(ref_year)                                                   AS last_year
     FROM clean_track_a_country_benchmark
     WHERE aggr_level = 2
-    GROUP BY reporter_iso
+    GROUP BY reporter_desc
 )
 SELECT
-    reporter_iso,
-    ROUND(total_usd / 1e9, 1)                              AS decade_total_bn,
-    ROUND(100.0 * estimated_usd / NULLIF(total_usd, 0), 1) AS estimated_pct,
-    rows_estimated,
-    rows_all,
-    first_flagged_year
+    reporter_desc,
+    first_year,
+    last_year,
+    basis_switch_year,
+    ROUND(total_usd / 1e9, 1)                                AS decade_total_bn,
+    ROUND(100.0 * netwgt_est_usd / NULLIF(total_usd, 0), 1)  AS pct_value_on_netwgt_est_rows,
+    rows_netwgt_est,
+    rows_all
 FROM by_country
-ORDER BY estimated_pct DESC;
+ORDER BY reporter_desc;
 
 -- V2. Flag partition check. is_reported and is_aggregate must be mutually
 --     exclusive and jointly exhaustive, which is what assumption 1 relies on.
 --     Expect: both_true = 0, neither_true = 0, reported + aggregate = 3282.
---     Note this is a DIFFERENT question from V1 above — is_aggregate describes
---     how a figure was assembled (rolled up), legacy_estimation_flag describes
---     whether it was estimated. Rows can be aggregate and as-reported, or
---     reported and estimated; the two axes are independent.
+--     Note this is a DIFFERENT question from the net-weight flags in V1
+--     above. is_aggregate describes how a VALUE was assembled (rolled up from
+--     HS6 detail); is_net_wgt_estimated and legacy_estimation_flag describe
+--     whether a WEIGHT was estimated. The two axes are independent, and
+--     neither marks an estimated value — see V1a.
 SELECT
     COUNT(*) FILTER (WHERE is_reported AND is_aggregate)         AS both_true,
     COUNT(*) FILTER (WHERE NOT is_reported AND NOT is_aggregate) AS neither_true,
