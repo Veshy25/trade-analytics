@@ -142,7 +142,8 @@ def chart_petroleum_volume() -> None:
     ax.legend(frameon=False, fontsize=9, loc="upper left")
     fig.text(0.01, 0.015,
              "Source: UN Comtrade, pulled 25/08/2026. HS 27 at HS6, India to World, FOB, nominal USD. "
-             "Unit value over rows carrying net weight (98-100% of value).",
+             "Unit value over rows carrying net weight (98-100% of value); 95-100% of\n"
+             "that weight is Comtrade-estimated from value, not reporter-filed (03 Q8).",
              fontsize=7.5, color="#666")
     fig.tight_layout(rect=(0, 0.035, 1, 1))
     fig.savefig(out, dpi=160)
@@ -190,7 +191,7 @@ def chart_sector_partner_heatmap() -> None:
     cbar.set_label("% of sector panel", fontsize=8.5)
     fig.text(0.01, 0.015,
              "Source: UN Comtrade, pulled 15/09/2026. India to 20 partners at HS6, FOB, nominal USD. "
-             "Panel covers 57-70% of each sector's world exports (06 V4). Cells under 1% unlabelled.",
+             "Panel covers 57-70% of each sector's world exports in 2023 (06 V4). Cells under 1% unlabelled.",
              fontsize=7.5, color="#666")
     fig.tight_layout(rect=(0, 0.04, 1, 1))
     fig.savefig(out, dpi=160)

@@ -54,6 +54,24 @@
 --      nature (a carat of diamond and a kilo of scrap silver are not the same
 --      "volume"); the flag is about coverage, but the caveat would stand even
 --      at 100%.
+--
+--      HOW MUCH OF THE WEIGHT IS COMTRADE'S, NOT INDIA'S (added 17/09/2026).
+--      Coverage is not the only gate, and the more important one was missing.
+--      Where a reporter files no net weight, Comtrade estimates it — and its
+--      stated method (UNSD, "Quantity and Weight information in UN Comtrade",
+--      October 2009) is to derive the missing weight FROM THE VALUE using
+--      weighted or standard unit values. Estimated weight is therefore not an
+--      independent measurement of volume; it is value divided by an assumed
+--      price. Q8 reported only the share of ROWS flagged, which for petroleum
+--      reads a comfortable 24-63%. Weighted by kilograms — the thing actually
+--      being summed — the share is 95.3% in 2014 and 95.3% in 2023, peaking
+--      at 99.7%, because the few estimated rows are the enormous ones. Q8 now
+--      carries weight_estimated_kg_pct alongside the row share for exactly
+--      this reason, and Q7's petroleum series must be read with it: the
+--      volume-not-price reading in key_findings.md finding 17 holds only as
+--      far as Comtrade's unit-value assumptions hold. Row share and kg share
+--      diverge most where it matters most, so never quote the row figure as
+--      the tonnage figure.
 
 
 -- ============================================================
@@ -181,10 +199,12 @@ WITH product_totals AS (
         sector,
         cmd_code,
         -- latest wording, not a GROUP BY key: 73 HS6 codes in this table
-        -- were reworded by HS 2022 (see 02 assumption 7). Grouping on
-        -- cmd_desc split them and truncated value_2014_2023_usd to the
-        -- 2022-23 rows — fixed 15/09/2026; one top-10 row was affected
-        -- (petroleum 270750: 3.58bn -> 3.62bn).
+        -- were reworded across TWO editions — 42 at 2017 (HS 2017) and 34 at
+        -- 2022 (HS 2022), three codes in both (see 02 assumption 7; this
+        -- comment said "by HS 2022" until 17/09/2026). Grouping on cmd_desc
+        -- split them and truncated value_2014_2023_usd to the rows sharing
+        -- the latest wording — fixed 15/09/2026; one top-10 row was affected
+        -- (petroleum 270750: 3.58bn -> 3.62bn, itself a 2017 rewording).
         (ARRAY_AGG(cmd_desc ORDER BY ref_year DESC))[1]  AS cmd_desc,
         SUM(fob_value) FILTER (WHERE ref_year = 2023) AS value_2023_usd,
         SUM(fob_value)                                AS value_2014_2023_usd
@@ -241,9 +261,18 @@ ORDER BY sector, rank_in_sector_2023;
 -- concentration measure. The two counts differ: engineering 826 vs 863
 -- all-years, textiles 784 vs 821, pharmaceuticals 43 vs 53. Quote the 2023
 -- count alongside the 2023 HHI; the all-years figure is context, not a
--- denominator for this index.
+-- denominator for this index. Both counts are now returned as columns
+-- (17/09/2026) — the all-years figure was quoted in key_findings.md finding 6
+-- while existing only in this comment, which is exactly the kind of
+-- untraceable number the project claims not to have.
 -- ============================================================
-WITH product_2023 AS (
+WITH product_all_years AS (
+    SELECT sector, COUNT(DISTINCT cmd_code) AS hs6_products_all_years
+    FROM clean_track_b_india_sector_detail
+    WHERE aggr_level = 6 AND partner_code = 0
+    GROUP BY sector
+),
+product_2023 AS (
     SELECT
         sector,
         cmd_code,
@@ -270,12 +299,14 @@ shares AS (
     FROM product_2023
 )
 SELECT
-    sector,
-    COUNT(*)                                             AS hs6_products_2023,
-    ROUND(100.0 * SUM(share) FILTER (WHERE rnk <= 5), 1) AS top5_share_pct,
-    ROUND(SUM(share * share) * 10000, 0)                 AS hhi_2023
-FROM shares
-GROUP BY sector
+    s.sector,
+    COUNT(*)                                               AS hs6_products_2023,
+    MAX(pa.hs6_products_all_years)                         AS hs6_products_all_years,
+    ROUND(100.0 * SUM(s.share) FILTER (WHERE s.rnk <= 5), 1) AS top5_share_pct,
+    ROUND(SUM(s.share * s.share) * 10000, 0)               AS hhi_2023
+FROM shares s
+JOIN product_all_years pa USING (sector)
+GROUP BY s.sector
 ORDER BY hhi_2023 DESC;
 
 
@@ -364,8 +395,21 @@ ORDER BY ref_year;
 
 -- ============================================================
 -- Query 8: volume coverage per sector per year — the gate on Q6/Q7.
---          Share of sector value on rows with a populated net_wgt, and the
---          share of those rows Comtrade flags as weight-estimated.
+--          Share of sector value on rows with a populated net_wgt, and TWO
+--          measures of how much of that weight Comtrade estimated rather than
+--          the reporter filing it.
+--
+--          Read weight_estimated_kg_pct, not weight_estimated_rows_pct, when
+--          judging a volume claim. The row share treats a 10-tonne line and a
+--          10-million-tonne line alike; the kg share weights them by what is
+--          actually being summed. For petroleum the two diverge violently —
+--          28.9% of rows but 95.3% of tonnage in 2023 — because the estimated
+--          rows are the big ones. Comtrade derives missing weight from value
+--          via unit values (assumption 7), so a high kg share means the
+--          "volume" series is substantially value divided by an assumed
+--          price, and a volume-versus-price conclusion drawn from it is
+--          partly circular. The row-share column is kept only so the two can
+--          be compared; it was the only one here until 17/09/2026.
 -- ============================================================
 SELECT
     sector,
@@ -375,7 +419,9 @@ SELECT
     ROUND(100.0 * SUM(fob_value) FILTER (WHERE net_wgt > 0)
           / NULLIF(SUM(fob_value), 0), 1)                                       AS value_coverage_pct,
     ROUND(100.0 * COUNT(*) FILTER (WHERE net_wgt > 0 AND is_net_wgt_estimated)
-          / NULLIF(COUNT(*) FILTER (WHERE net_wgt > 0), 0), 1)                  AS weight_estimated_rows_pct
+          / NULLIF(COUNT(*) FILTER (WHERE net_wgt > 0), 0), 1)                  AS weight_estimated_rows_pct,
+    ROUND(100.0 * SUM(net_wgt) FILTER (WHERE net_wgt > 0 AND is_net_wgt_estimated)
+          / NULLIF(SUM(net_wgt) FILTER (WHERE net_wgt > 0), 0), 1)              AS weight_estimated_kg_pct
 FROM clean_track_b_india_sector_detail
 WHERE aggr_level = 6 AND partner_code = 0
 GROUP BY sector, ref_year
@@ -461,5 +507,9 @@ SELECT
     a.a_value_usd,
     ROUND(100.0 * (b.b_value_usd - a.a_value_usd) / NULLIF(a.a_value_usd, 0), 1) AS pct_diff
 FROM track_b_sector b
+-- Inner join: a sector-year in one track but not the other would be dropped
+-- from the reconciliation rather than flagged by it — the one place a silent
+-- skip would be worst. A no-op here (both tracks hold all 50 sector-years, and
+-- the row count below proves it), but stated rather than assumed.
 JOIN track_a_sector a USING (sector, ref_year)
 ORDER BY b.sector, b.ref_year;
