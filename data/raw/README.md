@@ -46,9 +46,13 @@ all 200 partner-years; textiles (worst 0.18%), pharmaceuticals (0.97%) and gems
 −11.5%. Eleven of the 1,000 partner-years checked exceed 1% — ten engineering
 2022 and one gems 2022. (This paragraph claimed a match "to the cent everywhere
 except engineering" until 17/09/2026, which the query's own output contradicted.)
-The engineering gap is a known property of Comtrade's HS 84/85 records for that
-year (Track B shows the same gap against Track A, finding 10), not revision drift. The three Phase 1 files were **not** re-pulled
-and are byte-identical to their 25/08/2026 checksums.
+The engineering gap is consistent with a property of Comtrade's HS 84/85 records
+for that year rather than revision drift: Track B diverges from Track A in the
+same sector-year (finding 10), and those two come from the *same* 25/08 pull.
+That is an inference, not a proof — no series was pulled on both dates, so
+revision between them cannot be ruled out directly. (This paragraph stated it
+as established fact until 23/09/2026.) The three Phase 1 files were **not**
+re-pulled and are byte-identical to their 25/08/2026 checksums.
 
 ### `pull_manifest.json`
 
@@ -94,12 +98,21 @@ Common to all: `period=2014…2023` (one call per year), `partner2Code='0'`,
 codes at runtime. Track D was fetched as one call per year with the full
 partner list; no response reached the API's 100,000-record cap, so no
 per-partner fallback was needed. It is delivered as **two files split by year
-range** because the single file came to 74.9 MB — past GitHub's 50 MB warning
-threshold, though still under its 100 MB hard limit. The two committed halves
-total 78.5 MB; `sql/00` loads both into one table.
+range** because the single file came to 78.5 MB (74.9 MiB) — past GitHub's
+50 MiB warning threshold, though still under its 100 MiB hard limit. The two
+committed halves total the same 78.5 MB; `sql/00` loads both into one table.
+Sizes in this file are decimal MB throughout; until 23/09/2026 some were MiB,
+so the same bytes were quoted as both 74.9 and 78.5 MB.
 
 **Partners (20, identical for Tracks C, D and E2):** USA, ARE, CHN, BGD, MDV,
 GBR, DEU, NPL, SGP, VNM, NLD, SAU, FRA, LKA, IDN, MYS, ITA, BEL, ZAF, JPN.
+**This is a selected panel, not India's top 20 markets.** No selection rule
+survives in the project's records. It contains India's largest export
+destinations, all four South Asian neighbours regardless of size (the Maldives
+takes 0.2% of the panel) and Viet Nam, a Track A comparator; several markets
+larger than the smallest members are left out. It was chosen for exports and
+reused unchanged for imports (E2), where it under-represents energy and gold
+suppliers — `sql/04` assumption 7 and `sql/07` assumption 9.
 There is deliberately no World row, so every share computed in `sql/04`,
 `sql/06` and `sql/07` is a share *of these twenty*, not of India's global
 trade. Panel coverage is measured in each file: 61.9%–64.4% of India's exports
@@ -121,13 +134,13 @@ identically in both):
 
 | File | Rows | Size |
 |---|---:|---:|
-| `track_a_country_benchmark_hs2.csv` | 3,282 | ~0.92 MB |
-| `track_b_india_sector_detail_hs6.csv` | 16,976 | ~5.95 MB |
-| `track_c_india_partner_view_hs2.csv` | 18,956 | ~5.35 MB |
-| `track_d_india_partner_sector_hs6_2014_2018.csv` | 110,211 | ~36.1 MB |
-| `track_d_india_partner_sector_hs6_2019_2023.csv` | 115,087 | ~38.8 MB |
-| `track_e_country_imports_hs2.csv` | 3,294 | ~0.9 MB |
-| `track_e_india_partner_imports_hs2.csv` | 16,946 | ~4.6 MB |
+| `track_a_country_benchmark_hs2.csv` | 3,282 | 0.92 MB |
+| `track_b_india_sector_detail_hs6.csv` | 16,976 | 5.95 MB |
+| `track_c_india_partner_view_hs2.csv` | 18,956 | 5.35 MB |
+| `track_d_india_partner_sector_hs6_2014_2018.csv` | 110,211 | 37.86 MB |
+| `track_d_india_partner_sector_hs6_2019_2023.csv` | 115,087 | 40.67 MB |
+| `track_e_country_imports_hs2.csv` | 3,294 | 0.93 MB |
+| `track_e_india_partner_imports_hs2.csv` | 16,946 | 4.78 MB |
 
 Checksums for all seven are in `pull_manifest.json`. Track D's two files load
 into one table (225,298 rows).
@@ -156,7 +169,6 @@ slightly by track — see the notes column.
 | `reporterISO` | `reporter_iso` | text | IND / CHN / BGD / VNM |
 | `reporterDesc` | `reporter_desc` | text | |
 | `partnerCode` | `partner_code` | integer | `0` = World |
-| `partnerISO` | `partner_iso` | text | |
 | `partnerDesc` | `partner_desc` | text | |
 | `cmdCode` | `cmd_code` | **text** | **Kept as text on purpose** — chapters 01–09 are zero-padded, and casting to integer would mangle nine HS chapters and break the string range comparison in `03` V5 |
 | `cmdDesc` | `cmd_desc` | text | |
@@ -179,7 +191,9 @@ slightly by track — see the notes column.
 
 On the export tracks, `cifvalue` — non-blank on 873 Track A rows, but all 873
 hold exactly `0`, so "populated" overstated it; irrelevant to an FOB-valued
-export in any case, and `sql/01` asserts `primary_value = fob_value` throughout.
+export in any case, and `sql/01` validation 3 asserts `primary_value = fob_value`
+on every export track (A, B, C and D — Track A only until 23/09/2026, when this
+sentence already said "throughout").
 On the import tracks, `fobvalue` (blank or `0`, never positive). On the HS2
 tracks, all quantity and weight fields — blank or `0` by construction, never
 positive; on the HS6 tracks, `altQty`, `grossWgt` and their unit/estimated
@@ -200,11 +214,23 @@ them. The five HS2 chapter rewordings (15, 16, 24, 84, 88) are HS 2022, from
 **42 change at 2017** (HS 2017, `classificationCode` H4 → H5) and **34 at 2022**
 (HS 2022, H5 → H6), with three codes — 570490, 847510, 852352 — changing in
 both years, two of which revert to their pre-2017 wording. This file attributed
-all 73 to HS 2022 until 17/09/2026. The code is the key; the description is a
-label that changes, and `classificationCode` is the column that says which
-edition a row belongs to. Any multi-year `GROUP BY` that includes `cmdDesc`
-splits one code into two rows — `sql/02` assumption 7 records the case where
-that happened and was corrected.
+all 73 to HS 2022 until 17/09/2026. The description is a label that changes,
+and `classificationCode` is the column that says which edition a row belongs
+to. Any multi-year `GROUP BY` that includes `cmdDesc` splits one code into two
+rows — `sql/02` assumption 7 records the case where that happened and was
+corrected.
+
+**The code is the key only within one edition.** This file used to say "the
+code is the key" without qualification. At HS2 that holds — all 97 chapters
+exist every year. At HS6 it does not: each edition also *splits, merges and
+retires* codes (mobile phones were `851712` until 2021, then `851713`
+smartphones and `851714` other). Most HS6 codes that "disappear" from Track B
+do so in 2016 or 2021, the year before an edition change — retired or split,
+not discontinued. So a per-code series spanning 2016/2017 or 2021/2022 is not
+like-for-like, and a count of distinct codes across the decade is not a count
+of products. This project does not map codes across editions (that would need
+UNSD's HS correlation tables); it keeps product-level claims within a single
+edition or states them as code counts.
 
 ## Reproducing the analysis
 

@@ -1,0 +1,6 @@
+# Pinned for scripts/make_chart.py — the versions the committed PNGs were
+# rendered with. Other versions will draw the same charts but are not
+# guaranteed to reproduce them byte-for-byte. Python 3.9.
+matplotlib==3.9.4
+numpy==2.0.2
+pandas==2.3.3

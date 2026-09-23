@@ -177,10 +177,9 @@ CREATE TABLE raw_track_c_india_partner_view (
 
 -- Track D — India -> 20 partners, HS6, 5 sectors (mirrors Track B's 48
 -- columns incl. the derived `sector`). Delivered as TWO CSVs split by year
--- range because the single file came to 74.9 MB, past GitHub's 50 MB warning
--- threshold (its hard limit is 100 MB); the two halves total 78.5 MB and both
--- load into this one
--- table.
+-- range because the single file came to 78.5 MB (74.9 MiB), past GitHub's
+-- 50 MiB warning threshold (its hard limit is 100 MiB); both halves load into
+-- this one table.
 DROP TABLE IF EXISTS raw_track_d_india_partner_sector;
 CREATE TABLE raw_track_d_india_partner_sector
     (LIKE raw_track_b_india_sector_detail);
@@ -215,6 +214,17 @@ CREATE TABLE raw_track_e_india_partner_imports
 -- table definitions above must stay in the exact order the CSVs are
 -- written in. Reordering a column in one place and not the other loads silently
 -- and wrongly.
+--
+-- Why HEADER MATCH (PostgreSQL 15+) is not used to close that gap: it matches
+-- header names case-sensitively, and the API writes camelCase (typeCode)
+-- while these tables use unquoted lower-case names (typecode) — tested, it
+-- rejects every file. Adopting it would mean quoting all ~47 column names here
+-- and in every reference in 01. What guards the load instead: the SHA-256s in
+-- data/raw/pull_manifest.json pin the exact files, 01 casts every typed
+-- column (a shifted column would put text into an ::int or ::numeric cast and
+-- abort), and 01 validation 1 asserts the row counts. A column swap between
+-- two TEXT columns of the same type would still get through; that is the
+-- residual risk, stated rather than hidden.
 --
 -- pgAdmin's Import/Export Data tool does the same thing through the GUI and
 -- is equally positional; either route is fine.
