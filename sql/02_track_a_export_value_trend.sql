@@ -3,11 +3,16 @@
 -- total export value trend, 2014-2023 (Q1/Q2, HS2 aggregated to a single
 -- country-year total), plus each country's top HS2 export categories (Q3),
 -- covering the "top categories and trends" scope stated in the README, plus
--- the chapters behind the 2023 fall (Q5).
+-- the chapters behind the 2023 fall (Q5) and each chapter's contribution to
+-- the decade's growth (Q6).
 --
--- NOTE: sql/08_export_results.sql re-states several of the queries below in
--- order to write them out as CSVs. If you change a query here, rerun 08 so the
--- committed files under data/processed/ do not silently go stale.
+-- NOTE on views (23/09/2026): every result set exported to data/processed/ is
+-- defined ONCE here, as a view (v_track_a_*), and sql/08 only copies the view
+-- out. Until this date 08 re-stated each query as a one-line copy, and two of
+-- those copies had drifted from the queries they were named after (a missing
+-- COALESCE in the Track E chapter balance, and different rounding here). The
+-- views are the only objects this file creates; they read clean_* only. If you
+-- change a view, rerun 08 so the committed CSVs follow.
 --
 -- Assumptions made here (flagging before running, not after):
 --   1. Totals include both directly-reported chapter values (is_reported
@@ -34,19 +39,19 @@
 --      offered was that BGD rows exist only for refYear 2015-2018 in the raw
 --      CSV, which is circular: the CSV is the pull, so it cannot testify that
 --      the pull was complete. What can be said independently is that WITS
---      also carries no Bangladesh merchandise export total after the
---      mid-2010s, so the sparseness is not an artefact of this project's
---      request. Treat "genuine gap" as well-supported but not proven here.
+--      carries no Bangladesh merchandise export total after 2015, so the
+--      sparseness is not an artefact of this project's request. Treat
+--      "genuine gap" as well-supported but not proven here.
 --
---      An unresolved labelling question sits underneath it. WITS reports
---      Bangladesh's latest total as 31,734,162.42 thousand USD under the year
---      label 2016; this pull carries exactly that value under refYear 2015.
---      Bangladesh's fiscal year runs July-June, so a fiscal-versus-calendar
---      labelling difference is the obvious candidate, but it is not confirmed
---      and the two sources are not independent (WITS draws on Comtrade). If
---      the label is off by one, Bangladesh's window is 2016-2019 rather than
---      2015-2018 and its 3-year CAGR span is unaffected. Flagged rather than
---      silently assumed either way.
+--      Year labelling — RESOLVED 23/09/2026. From 17/09/2026 this assumption
+--      recorded that WITS showed Bangladesh's latest total (31,734,162.42
+--      thousand USD) under the year 2016 while this pull holds it under 2015.
+--      Re-checked against the WITS page source: the value is labelled 2015
+--      (series entry Year '2015', Export 31734162.419), the 2015 profile page
+--      headlines it as 2015, and the 2016 page has no export figure of its
+--      own — it only repeats the chart series that ends in 2015. That page
+--      is the likely source of the earlier misreading. WITS and this pull
+--      agree on the year; there is no off-by-one.
 --   3. Totals sum aggr_level = 2 rows only (HS2 chapters). The pull used
 --      cmdCode='AG2' for all four reporters, so the table should be
 --      entirely level 2 — verified: 100% of clean_track_a_country_benchmark
@@ -99,6 +104,20 @@
 --      and all ranks were unaffected. The fix groups on cmd_code only and
 --      shows the latest year's description. Found during Phase 2 (07 Q4 had
 --      the same bug); the correction is kept visible here, per the README.
+--
+--      The fix assumes the CODE is stable even where its wording is not.
+--      At HS2 that holds: all 97 chapters exist in every year. At HS6 it does
+--      NOT (added 23/09/2026). Each HS edition also splits, merges and retires
+--      codes — e.g. mobile phones were 851712 until 2021 and 851713
+--      (smartphones) / 851714 (other) from 2022. Of the codes Track B shows
+--      with no 2023 row, most (32 of 37 in engineering, 30 of 37 in textiles,
+--      8 of 10 in pharmaceuticals) last appear in 2016 or 2021, the final year
+--      before an edition change. So any per-code series or count that spans
+--      2016/2017 or 2021/2022 at HS6 is not like-for-like: a code that
+--      "disappears" was usually retired or split, not stopped being exported.
+--      This project does not map codes across editions (that would need the
+--      UNSD HS correlation tables); product-level claims are kept within a
+--      single edition or stated as code counts, never as product counts.
 
 -- ============================================================
 -- Query 1: total export value by country and year
@@ -122,14 +141,18 @@ ORDER BY reporter_desc, ref_year;
 -- not the calendar year value - so 2016's "prior year" correctly
 -- resolves to 2015 (both present, contiguous) even though 2014 is
 -- missing entirely. The first year in each country's series will show
--- prior_year_value_usd and yoy_growth_pct as NULL, since there's nothing
--- before it in the data - that's expected, not a bug.
+-- yoy_growth_pct as NULL, since there's nothing before it in the data -
+-- that's expected, not a bug. Totals are in USD bn to 3 dp; Query 1 above
+-- keeps the unrounded dollars (the figure finding 11 matches to WITS).
 -- ============================================================
+-- Exported as data/processed/track_a_country_year_totals.csv (sql/08).
+DROP VIEW IF EXISTS v_track_a_country_year_totals;
+CREATE VIEW v_track_a_country_year_totals AS
 WITH yearly_totals AS (
     SELECT
         reporter_desc,
         ref_year,
-        SUM(fob_value) AS total_export_value_usd
+        SUM(fob_value) AS total_usd
     FROM clean_track_a_country_benchmark
     WHERE aggr_level = 2
     GROUP BY reporter_desc, ref_year
@@ -137,20 +160,14 @@ WITH yearly_totals AS (
 SELECT
     reporter_desc,
     ref_year,
-    total_export_value_usd,
-    LAG(total_export_value_usd) OVER (
-        PARTITION BY reporter_desc ORDER BY ref_year
-    ) AS prior_year_value_usd,
+    ROUND(total_usd / 1e9, 3) AS total_export_value_usd_bn,
+    -- growth is computed on the unrounded totals, then rounded
     ROUND(
         100.0 * (
-            total_export_value_usd
-            - LAG(total_export_value_usd) OVER (
-                PARTITION BY reporter_desc ORDER BY ref_year
-              )
+            total_usd
+            - LAG(total_usd) OVER (PARTITION BY reporter_desc ORDER BY ref_year)
         ) / NULLIF(
-            LAG(total_export_value_usd) OVER (
-                PARTITION BY reporter_desc ORDER BY ref_year
-            ),
+            LAG(total_usd) OVER (PARTITION BY reporter_desc ORDER BY ref_year),
             0
         ),
         1
@@ -158,10 +175,19 @@ SELECT
 FROM yearly_totals
 ORDER BY reporter_desc, ref_year;
 
+SELECT * FROM v_track_a_country_year_totals;
+
 -- ============================================================
 -- Query 3: top 10 HS2 export categories per country
 --          ranked on 2023 value; full-period total shown alongside
+--
+-- rank_basis (added 23/09/2026) says what each rank was computed on. For
+-- Bangladesh, which has no 2023 data (assumption 2), rank_2023 is a
+-- full-period rank and value_2023_bn is blank — the column name alone
+-- implied a 2023 ranking that does not exist.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_a_top10_chapters;
+CREATE VIEW v_track_a_top10_chapters AS
 WITH chapter_totals AS (
     SELECT
         reporter_desc,
@@ -186,19 +212,24 @@ ranked AS (
         ROW_NUMBER() OVER (
             PARTITION BY reporter_desc
             ORDER BY value_2023_usd DESC NULLS LAST, value_2014_2023_usd DESC
-        ) AS rank_in_country_2023
+        ) AS rnk,
+        BOOL_OR(value_2023_usd IS NOT NULL) OVER (PARTITION BY reporter_desc) AS has_2023
     FROM chapter_totals ct
 )
 SELECT
     reporter_desc,
-    rank_in_country_2023,
+    rnk                                   AS rank_2023,
     cmd_code,
     cmd_desc,
-    value_2023_usd,
-    value_2014_2023_usd
+    ROUND(value_2023_usd / 1e9, 3)        AS value_2023_bn,
+    ROUND(value_2014_2023_usd / 1e9, 3)   AS value_2014_2023_bn,
+    CASE WHEN has_2023 THEN '2023 value'
+         ELSE 'full-period value (no 2023 data)' END AS rank_basis
 FROM ranked
-WHERE rank_in_country_2023 <= 10
-ORDER BY reporter_desc, rank_in_country_2023;
+WHERE rnk <= 10
+ORDER BY reporter_desc, rnk;
+
+SELECT * FROM v_track_a_top10_chapters;
 
 
 -- ============================================================
@@ -223,6 +254,8 @@ ORDER BY reporter_desc, rank_in_country_2023;
 -- any series ending in 2022; part of what reads as growth is price, not
 -- volume, petroleum most of all.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_a_cagr;
+CREATE VIEW v_track_a_cagr AS
 WITH yearly AS (
     SELECT
         reporter_desc,
@@ -247,8 +280,8 @@ SELECT
     b.first_year,
     b.last_year,
     b.years_present,
-    ROUND(f.total_usd / 1e9, 1) AS first_year_bn,
-    ROUND(l.total_usd / 1e9, 1) AS last_year_bn,
+    ROUND(f.total_usd / 1e9, 3) AS first_year_bn,
+    ROUND(l.total_usd / 1e9, 3) AS last_year_bn,
     -- CAGR over the country's OWN span, not an assumed 9 years. The exponent
     -- is 1/(last-first); with a 4-year Bangladesh series that divisor is 3.
     ROUND(
@@ -266,11 +299,15 @@ JOIN yearly f ON f.reporter_iso = b.reporter_iso AND f.ref_year = b.first_year
 JOIN yearly l ON l.reporter_iso = b.reporter_iso AND l.ref_year = b.last_year
 ORDER BY cagr_pct DESC;
 
+SELECT * FROM v_track_a_cagr;
+
 
 -- ============================================================
 -- Query 4b: full indexed series, each country rebased to 100 at its own
 --            first available year. This is the series to plot.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_a_indexed_series;
+CREATE VIEW v_track_a_indexed_series AS
 WITH yearly AS (
     SELECT
         reporter_desc,
@@ -296,10 +333,12 @@ SELECT
     reporter_desc,
     ref_year,
     base_year,
-    ROUND(total_usd / 1e9, 1)                              AS total_bn,
+    ROUND(total_usd / 1e9, 3)                              AS total_bn,
     ROUND(100.0 * total_usd / NULLIF(base_usd, 0), 1)      AS index_base_100
 FROM based
 ORDER BY reporter_desc, ref_year;
+
+SELECT * FROM v_track_a_indexed_series;
 
 
 -- ============================================================
@@ -317,6 +356,8 @@ ORDER BY reporter_desc, ref_year;
 --          the pattern is the one that broke Q3, and a later pull could
 --          extend the window across an edition boundary.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_a_india_chapter_change_2022_2023;
+CREATE VIEW v_track_a_india_chapter_change_2022_2023 AS
 WITH india_chapter AS (
     SELECT
         cmd_code,
@@ -348,6 +389,58 @@ FROM moved
 WHERE fall_rank <= 10 OR rise_rank <= 10
 ORDER BY direction, rank_on_side;
 
+SELECT * FROM v_track_a_india_chapter_change_2022_2023;
+
+
+-- ============================================================
+-- Query 6: each chapter's contribution to India's 2014 -> 2023 change
+--          (added 23/09/2026, behind the headline).
+--
+--          The headline used to say India's growth was "concentrated in"
+--          petroleum, quoting HS 27's 20.7% share of 2023 exports. That is a
+--          LEVEL share. The question the headline was answering is about
+--          GROWTH, and the level share does not answer it. This query does:
+--          of the USD 113.9bn net increase, HS 27 supplied 27.0bn (23.7%),
+--          while electrical machinery (85, 20.5%) and machinery (84, 13.8%)
+--          together supplied 34.3%. Petroleum is the largest single
+--          contributor, not the concentration of the growth.
+--
+--          pct_of_net_change is each chapter's change over the NET change,
+--          so falling chapters carry negative shares and the column sums to
+--          100 before rounding (100.3 as printed). share_2023_pct is the level share, kept alongside so the two
+--          are never confused again. Grouped on cmd_code only (assumption 7);
+--          all 97 chapters are present in both years for India.
+-- ============================================================
+DROP VIEW IF EXISTS v_track_a_india_chapter_contribution;
+CREATE VIEW v_track_a_india_chapter_contribution AS
+WITH ic AS (
+    SELECT
+        cmd_code,
+        (ARRAY_AGG(cmd_desc ORDER BY ref_year DESC))[1]  AS cmd_desc,
+        SUM(fob_value) FILTER (WHERE ref_year = 2014)    AS v14,
+        SUM(fob_value) FILTER (WHERE ref_year = 2023)    AS v23
+    FROM clean_track_a_country_benchmark
+    WHERE reporter_iso = 'IND'
+      AND aggr_level = 2
+    GROUP BY cmd_code
+),
+tot AS (
+    SELECT SUM(v14) AS t14, SUM(v23) AS t23 FROM ic
+)
+SELECT
+    ROW_NUMBER() OVER (ORDER BY COALESCE(v23,0) - COALESCE(v14,0) DESC, cmd_code) AS rank_by_change,
+    cmd_code,
+    cmd_desc,
+    ROUND(v14 / 1e9, 3)                                                    AS value_2014_bn,
+    ROUND(v23 / 1e9, 3)                                                    AS value_2023_bn,
+    ROUND((COALESCE(v23,0) - COALESCE(v14,0)) / 1e9, 3)                    AS change_bn,
+    ROUND(100.0 * (COALESCE(v23,0) - COALESCE(v14,0)) / NULLIF(t23 - t14, 0), 1) AS pct_of_net_change,
+    ROUND(100.0 * v23 / NULLIF(t23, 0), 1)                                 AS share_2023_pct
+FROM ic CROSS JOIN tot
+ORDER BY rank_by_change;
+
+SELECT * FROM v_track_a_india_chapter_contribution;
+
 
 -- ============================================================
 -- Validation — run before trusting the queries above
@@ -374,10 +467,13 @@ ORDER BY direction, rank_on_side;
 --      for an estimated value.
 --
 --      The data says the same without the document. On Track B, which carries
---      the flag and both modern booleans, flag 2 rows are exactly the
---      qty-only-estimated rows (162), flag 4 exactly the net-weight-only rows
---      (3,776) and flag 6 exactly the both-estimated rows (6,656) — no
---      exceptions. On Track A the first query below asserts the same
+--      the flag and both modern booleans, every flag-2 row (162) is
+--      quantity-only estimated, every flag-4 row (3,776) net-weight-only and
+--      every flag-6 row (6,656) both. The reverse does NOT hold there either:
+--      2,905 flag-0 Track B rows are estimated too (2 quantity-only, 1,187
+--      net-weight-only, 1,716 both). This paragraph said "exactly ... no
+--      exceptions" until 23/09/2026, which is true only in the flag-to-boolean
+--      direction. On Track A the first query below asserts the same
 --      containment.
 --
 --      The asymmetry matters and is easy to get wrong: the implication runs
@@ -420,7 +516,13 @@ BEGIN
     RAISE NOTICE '02 V1a PASSED: all legacy_estimation_flag = 4 rows are net-weight-estimated rows.';
 END $$;
 
--- V1a-ii. The country-year table itself.
+-- V1a-ii. The country-year table itself. Exported as
+--         data/processed/track_a_reporting_basis.csv (sql/08). rows_flag4 and
+--         rows_netwgt_est were printed here but left out of the CSV until
+--         23/09/2026; they are now in both, so the 552-row gap described
+--         above can be read from a committed file.
+DROP VIEW IF EXISTS v_track_a_reporting_basis;
+CREATE VIEW v_track_a_reporting_basis AS
 WITH by_country_year AS (
     SELECT
         reporter_desc,
@@ -439,7 +541,7 @@ WITH by_country_year AS (
 SELECT
     reporter_desc,
     ref_year,
-    ROUND(total_usd / 1e9, 1)                                   AS total_bn,
+    ROUND(total_usd / 1e9, 3)                                   AS total_bn,
     -- Share of value sitting on rows whose NET WEIGHT Comtrade estimated.
     -- Not a share of estimated value; there is no such column.
     ROUND(100.0 * netwgt_est_usd / NULLIF(total_usd, 0), 1)     AS pct_value_on_netwgt_est_rows,
@@ -451,6 +553,8 @@ SELECT
     rows_netwgt_est
 FROM by_country_year
 ORDER BY reporter_desc, ref_year;
+
+SELECT * FROM v_track_a_reporting_basis;
 
 -- V1b. Decade summary per country: when the construction basis switched.
 --      basis_switch_year is the first year the reporter's chapter figures

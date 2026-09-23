@@ -1,13 +1,14 @@
 -- 04_track_c_partner_analysis.sql
--- Track C analysis: India's HS2 exports to 20 major partner markets,
--- 2014-2023. Partners (ISO3): USA, ARE, CHN, BGD, MDV, GBR, DEU, NPL, SGP,
--- VNM, NLD, SAU, FRA, LKA, IDN, MYS, ITA, BEL, ZAF, JPN.
+-- Track C analysis: India's HS2 exports to a panel of 20 selected partner
+-- markets, 2014-2023. Partners (ISO3): USA, ARE, CHN, BGD, MDV, GBR, DEU,
+-- NPL, SGP, VNM, NLD, SAU, FRA, LKA, IDN, MYS, ITA, BEL, ZAF, JPN. How the
+-- twenty were chosen is not recorded — see assumption 7.
 --
 -- Source table: clean_track_c_india_partner_view (built in 01_data_cleaning.sql).
 --
--- NOTE: sql/08_export_results.sql re-states several of the queries below in
--- order to write them out as CSVs. If you change a query here, rerun 08 so the
--- committed files under data/processed/ do not silently go stale.
+-- NOTE on views (23/09/2026): every result set exported to data/processed/ is
+-- defined once here as a view (v_track_c_*), and sql/08 only copies it out —
+-- see 02's header for why. If you change a view, rerun 08.
 --
 -- Assumptions made here (flagging before running, not after):
 --   1. This pull requested 20 named partners and NO World aggregate. So
@@ -33,6 +34,18 @@
 --   5. Values are USD, exporter-reported FOB.
 --   6. Every growth / share ratio wraps its divisor in NULLIF(..., 0) so a
 --      zero or missing base returns NULL rather than raising an error.
+--   7. The panel is a SELECTION, not a ranking (stated 23/09/2026). No rule
+--      for choosing the twenty survives in the project's records, so it
+--      should not be read as "India's top 20 markets". What the data shows:
+--      it holds India's largest destinations (USA, UAE, Netherlands, China,
+--      UK, Singapore — together 63.4% of the panel in 2023), all four South
+--      Asian neighbours whatever their size (Bangladesh 11.3bn, Nepal 7.2bn,
+--      Sri Lanka 3.6bn, Maldives 0.6bn), and Viet Nam, a Track A comparator.
+--      The Maldives, at USD 0.59bn (0.2% of the panel), is almost certainly
+--      smaller than several markets left out. The panel covers 61.9-64.4% of
+--      India's exports (V5), so shares and rankings are within-panel
+--      statements. The same twenty are reused for imports in 07, where the
+--      selection matters more — see 07 assumption 9.
 
 
 -- ============================================================
@@ -84,8 +97,13 @@ ORDER BY partner_desc, ref_year;
 
 -- ============================================================
 -- Query 3: top partners ranked, with share of the tracked panel
---           latest year (2023) and full-period (2014-2023) totals
+--           latest year (2023) plus the full-period (2014-2023) total.
+--           Exported as track_c_partner_totals.csv. The full-period rank and
+--           share printed here until 23/09/2026 were read by nothing and were
+--           not in the CSV; dropped when this became a view.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_c_partner_totals;
+CREATE VIEW v_track_c_partner_totals AS
 WITH partner_totals AS (
     SELECT
         partner_desc,
@@ -97,7 +115,6 @@ WITH partner_totals AS (
 )
 SELECT
     partner_desc,
-    value_2023_usd,
     -- ROW_NUMBER() throughout this file, matching 02 Q3: a league table of 20
     -- partners should read 1-20 with no repeated or skipped positions, and
     -- every rank here either drives a "top N" filter or is differenced
@@ -105,20 +122,16 @@ SELECT
     ROW_NUMBER() OVER (
         ORDER BY value_2023_usd DESC NULLS LAST, value_2014_2023_usd DESC
     ) AS rank_2023,
+    ROUND(value_2023_usd / 1e9, 3) AS value_2023_bn,
     ROUND(
         100.0 * value_2023_usd / NULLIF(SUM(value_2023_usd) OVER (), 0),
         1
-    ) AS pct_of_tracked_2023,
-    value_2014_2023_usd,
-    ROW_NUMBER() OVER (
-        ORDER BY value_2014_2023_usd DESC NULLS LAST, partner_desc
-    ) AS rank_period,
-    ROUND(
-        100.0 * value_2014_2023_usd / NULLIF(SUM(value_2014_2023_usd) OVER (), 0),
-        1
-    ) AS pct_of_tracked_period
+    ) AS pct_of_panel_2023,
+    ROUND(value_2014_2023_usd / 1e9, 3) AS value_2014_2023_bn
 FROM partner_totals
 ORDER BY rank_2023;
+
+SELECT * FROM v_track_c_partner_totals;
 
 
 -- ============================================================
@@ -147,13 +160,28 @@ ORDER BY rank_2023;
 --       is a genuine ceiling: no arrangement of the unobserved markets can
 --       push HHI above it.
 --
--- The true value sits between. That range is what should be read against the
--- bands, and it is decisive: the upper bound peaks at 1889 (2022) and never
--- approaches the 2500 concentrated threshold, while the realistic lower bound
--- sits around 390-480. India's export markets are unconcentrated on this
--- measure under ANY assumption about the unobserved third of the market —
--- a stronger statement than the panel figure alone can support.
+-- The true value sits between. What the range supports — REWORDED
+-- 23/09/2026. This comment used to conclude that India's export markets are
+-- "unconcentrated under ANY assumption" because the upper bound (1,750-1,889)
+-- never reaches 2,500. That does not follow: on the 2010 US merger bands this
+-- project quotes (03 Query 5), 1,500-2,500 is MODERATELY concentrated, so the
+-- ceiling lands in the moderate band in every year; and under the 2023 US
+-- Merger Guidelines, which replaced those bands with a single > 1,800 "highly
+-- concentrated" line, the ceiling crosses it in 2014-2016, 2022 and 2023.
+-- The bands are an antitrust heuristic in any case, not a trade standard.
+--
+-- What the range does support: the ceiling needs one unlisted country to take
+-- the entire unobserved ~37% of India's exports — about twice the USA's
+-- 17.6% (75.8bn of 431.4bn in 2023). No arrangement short of that reaches
+-- 2,500. The lower bound (386-481) assumes the residual is spread thinly
+-- across many markets. So: never highly concentrated on the 2010 bands under
+-- any assumption, and low on any realistic one — but "unconcentrated under
+-- any assumption" was an overstatement.
+--
+-- Exported as track_c_partner_concentration.csv.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_c_partner_concentration;
+CREATE VIEW v_track_c_partner_concentration AS
 WITH partner_yearly AS (
     SELECT
         partner_desc,
@@ -167,6 +195,9 @@ shares AS (
     SELECT
         ref_year,
         partner_desc,
+        -- value_usd carried through here so panel_hhi below needs no second
+        -- join back to partner_yearly (there was one until 23/09/2026).
+        value_usd,
         value_usd / NULLIF(SUM(value_usd) OVER (PARTITION BY ref_year), 0) AS share,
         -- ROW_NUMBER() so "rnk <= 5" returns exactly five partners per year;
         -- a RANK() tie at 5th/6th would push six into top5_partner_share_pct.
@@ -182,14 +213,13 @@ panel_hhi AS (
         SUM(share * share) * 10000         AS hhi_panel,
         SUM(value_usd)                     AS panel_value_usd
     FROM shares
-    JOIN partner_yearly USING (ref_year, partner_desc)
     GROUP BY ref_year
 ),
 india_world AS (
     -- Track A's India -> World HS2 total is the only whole-market denominator
     -- available in this project; Track C was pulled without a World row on
     -- purpose (assumption 1). This is the cross-track dependency noted in the
-    -- README run order: 04 cannot be run before 02's clean table exists.
+    -- README run order: 04 needs Track A's clean table from 01.
     SELECT ref_year, SUM(fob_value) AS world_value_usd
     FROM clean_track_a_country_benchmark
     WHERE reporter_iso = 'IND' AND aggr_level = 2
@@ -217,12 +247,17 @@ SELECT
 FROM coverage
 ORDER BY ref_year;
 
+SELECT * FROM v_track_c_partner_concentration;
+
 
 -- ============================================================
 -- Query 5a: partner mix shift — rank in 2014 vs 2023 and the move
 --            rank_improvement > 0 means the partner climbed the table
 --            (its rank number got smaller)
 -- ============================================================
+-- Exported as track_c_partner_rank_moves.csv.
+DROP VIEW IF EXISTS v_track_c_partner_rank_moves;
+CREATE VIEW v_track_c_partner_rank_moves AS
 WITH partner_year AS (
     SELECT
         partner_desc,
@@ -248,15 +283,17 @@ ranked AS (
 )
 SELECT
     partner_desc,
-    MAX(value_usd) FILTER (WHERE ref_year = 2014) AS value_2014_usd,
     MAX(rnk)       FILTER (WHERE ref_year = 2014) AS rank_2014,
-    MAX(value_usd) FILTER (WHERE ref_year = 2023) AS value_2023_usd,
     MAX(rnk)       FILTER (WHERE ref_year = 2023) AS rank_2023,
     MAX(rnk) FILTER (WHERE ref_year = 2014)
-        - MAX(rnk) FILTER (WHERE ref_year = 2023) AS rank_improvement
+        - MAX(rnk) FILTER (WHERE ref_year = 2023) AS rank_improvement,
+    ROUND(MAX(value_usd) FILTER (WHERE ref_year = 2014) / 1e9, 3) AS value_2014_bn,
+    ROUND(MAX(value_usd) FILTER (WHERE ref_year = 2023) / 1e9, 3) AS value_2023_bn
 FROM ranked
 GROUP BY partner_desc
 ORDER BY rank_2023 NULLS LAST;
+
+SELECT * FROM v_track_c_partner_rank_moves;
 
 
 -- ============================================================
@@ -309,9 +346,9 @@ ORDER BY partner_desc, chapter_rank;
 -- Validation — run before trusting the queries above
 -- ============================================================
 
--- V1. Partner coverage. Expect ~20 named partners and NO World (partner_code
---     = 0) row. If a code-0 row exists, add "AND partner_code <> 0" to every
---     query above.
+-- V1. Partner coverage. Expect 20 named partners and NO World (partner_code
+--     = 0) row. Asserted in 01 validation 6 since 23/09/2026, together with
+--     the identity of the C, D and E2 panels; this prints the detail.
 SELECT
     partner_code,
     partner_desc,
@@ -377,3 +414,17 @@ FROM tracked t
 -- Same inner join as Q4, same no-op, same reason it is worth naming.
 JOIN india_world w USING (ref_year)
 ORDER BY t.ref_year;
+
+-- V5 assertion (added 23/09/2026): the README and findings state the panel
+-- covers 61.9%-64.4% of India's exports in every year. Hold the data to it.
+DO $$
+DECLARE n bigint; lo numeric; hi numeric;
+BEGIN
+    SELECT COUNT(*), MIN(panel_coverage_pct), MAX(panel_coverage_pct)
+      INTO n, lo, hi
+    FROM v_track_c_partner_concentration;
+    IF n <> 10 OR lo < 61.9 OR hi > 64.4 THEN
+        RAISE EXCEPTION '04 V5: % years, coverage % to % percent, expected 10 years within 61.9 to 64.4 percent', n, lo, hi;
+    END IF;
+    RAISE NOTICE '04 V5 PASSED: panel coverage % to % percent across all 10 years.', lo, hi;
+END $$;

@@ -50,14 +50,15 @@
 --     in 07 is therefore FOB exports minus CIF imports — the standard
 --     published construction, stated there.
 --
--- Run the validation block at the end after each CREATE TABLE to confirm
--- row counts match the raw staging tables and no values were silently
--- dropped by a bad cast.
+-- DROP ... CASCADE (added 23/09/2026): 02-07 define the exported result sets
+-- as views over these tables, so a plain DROP TABLE would refuse to run on a
+-- database that has been built before. CASCADE drops those views with the
+-- tables; re-running 02-07 recreates them. Nothing else depends on clean_*.
 
 -- ============================================================
 -- Track A: country benchmark (India/China/Bangladesh/Vietnam, HS2)
 -- ============================================================
-DROP TABLE IF EXISTS clean_track_a_country_benchmark;
+DROP TABLE IF EXISTS clean_track_a_country_benchmark CASCADE;
 CREATE TABLE clean_track_a_country_benchmark AS
 SELECT
     refyear::int                               AS ref_year,
@@ -90,7 +91,7 @@ CREATE UNIQUE INDEX idx_clean_a_year_reporter_cmd
 -- ============================================================
 -- Track B: India sector detail (HS6, 5 sectors)
 -- ============================================================
-DROP TABLE IF EXISTS clean_track_b_india_sector_detail;
+DROP TABLE IF EXISTS clean_track_b_india_sector_detail CASCADE;
 CREATE TABLE clean_track_b_india_sector_detail AS
 SELECT
     refyear::int                               AS ref_year,
@@ -130,7 +131,7 @@ CREATE UNIQUE INDEX idx_clean_b_year_sector_cmd
 -- ============================================================
 -- Track C: India partner-market view (HS2, ~20 partners)
 -- ============================================================
-DROP TABLE IF EXISTS clean_track_c_india_partner_view;
+DROP TABLE IF EXISTS clean_track_c_india_partner_view CASCADE;
 CREATE TABLE clean_track_c_india_partner_view AS
 SELECT
     refyear::int                               AS ref_year,
@@ -156,7 +157,7 @@ CREATE UNIQUE INDEX idx_clean_c_year_partner_cmd
 -- Track D: India partner x sector (HS6, 20 partners, 5 sectors) — Phase 2
 -- Same column set as Track B, including volume, plus a partner in the key.
 -- ============================================================
-DROP TABLE IF EXISTS clean_track_d_india_partner_sector;
+DROP TABLE IF EXISTS clean_track_d_india_partner_sector CASCADE;
 CREATE TABLE clean_track_d_india_partner_sector AS
 SELECT
     refyear::int                               AS ref_year,
@@ -187,7 +188,7 @@ CREATE UNIQUE INDEX idx_clean_d_year_partner_cmd
 -- Track E1: country imports (India/China/Bangladesh/Vietnam, HS2) — Phase 2
 -- Mirror of Track A with cif_value in place of fob_value (imports are CIF).
 -- ============================================================
-DROP TABLE IF EXISTS clean_track_e_country_imports;
+DROP TABLE IF EXISTS clean_track_e_country_imports CASCADE;
 CREATE TABLE clean_track_e_country_imports AS
 SELECT
     refyear::int                               AS ref_year,
@@ -213,7 +214,7 @@ CREATE UNIQUE INDEX idx_clean_e1_year_reporter_cmd
 -- Track E2: India partner imports (HS2, 20 partners) — Phase 2
 -- Mirror of Track C with cif_value in place of fob_value.
 -- ============================================================
-DROP TABLE IF EXISTS clean_track_e_india_partner_imports;
+DROP TABLE IF EXISTS clean_track_e_india_partner_imports CASCADE;
 CREATE TABLE clean_track_e_india_partner_imports AS
 SELECT
     refyear::int                               AS ref_year,
@@ -298,22 +299,30 @@ SELECT
 FROM raw_track_a_country_benchmark;
 
 -- 3. For exports, primary_value must equal fob_value on every row — this is
---    what makes it safe to drop cifValue. Asserted, not just printed.
+--    what makes it safe to drop cifValue. Asserted, not just printed, on all
+--    four export tracks. Until 23/09/2026 the assertion covered Track A only
+--    while data/raw/README.md said it held "throughout"; the data held on B,
+--    C and D as well, but nothing checked it.
 DO $$
-DECLARE n bigint;
+DECLARE n_a bigint; n_b bigint; n_c bigint; n_d bigint;
 BEGIN
-    SELECT COUNT(*) INTO n
-    FROM clean_track_a_country_benchmark
-    WHERE primary_value IS DISTINCT FROM fob_value;
-    IF n <> 0 THEN
-        RAISE EXCEPTION '01 validation 3: % Track A rows have primary_value <> fob_value', n;
+    SELECT COUNT(*) INTO n_a FROM clean_track_a_country_benchmark   WHERE primary_value IS DISTINCT FROM fob_value;
+    SELECT COUNT(*) INTO n_b FROM clean_track_b_india_sector_detail WHERE primary_value IS DISTINCT FROM fob_value;
+    SELECT COUNT(*) INTO n_c FROM clean_track_c_india_partner_view  WHERE primary_value IS DISTINCT FROM fob_value;
+    SELECT COUNT(*) INTO n_d FROM clean_track_d_india_partner_sector WHERE primary_value IS DISTINCT FROM fob_value;
+    IF n_a + n_b + n_c + n_d <> 0 THEN
+        RAISE EXCEPTION '01 validation 3: primary_value <> fob_value on A:% B:% C:% D:% rows', n_a, n_b, n_c, n_d;
     END IF;
-    RAISE NOTICE '01 validation 3 PASSED: primary_value = fob_value on all Track A rows.';
+    RAISE NOTICE '01 validation 3 PASSED: primary_value = fob_value on all Track A, B, C and D rows.';
 END $$;
 
-SELECT COUNT(*) AS mismatches
-FROM clean_track_a_country_benchmark
-WHERE primary_value IS DISTINCT FROM fob_value;
+SELECT 'A' AS track, COUNT(*) AS mismatches FROM clean_track_a_country_benchmark   WHERE primary_value IS DISTINCT FROM fob_value
+UNION ALL
+SELECT 'B', COUNT(*) FROM clean_track_b_india_sector_detail WHERE primary_value IS DISTINCT FROM fob_value
+UNION ALL
+SELECT 'C', COUNT(*) FROM clean_track_c_india_partner_view  WHERE primary_value IS DISTINCT FROM fob_value
+UNION ALL
+SELECT 'D', COUNT(*) FROM clean_track_d_india_partner_sector WHERE primary_value IS DISTINCT FROM fob_value;
 
 -- ---- Phase 2 additions (15/09/2026) ----
 
@@ -352,20 +361,39 @@ SELECT 'E2', COUNT(*)
 FROM clean_track_e_india_partner_imports
 WHERE primary_value IS DISTINCT FROM cif_value;
 
--- 6. Track D must have no World row and exactly the Track C partner panel.
---    Expect world_rows = 0, partners_d = 20, partners_only_in_one = 0.
-SELECT
-    (SELECT COUNT(*) FROM clean_track_d_india_partner_sector WHERE partner_code = 0) AS world_rows,
-    (SELECT COUNT(DISTINCT partner_code) FROM clean_track_d_india_partner_sector)     AS partners_d,
-    (SELECT COUNT(*) FROM (
+-- 6. The partner panel: Tracks C, D and E2 must carry no World row and the
+--    same 20 partners. Asserted since 23/09/2026 — until then this was a
+--    plain SELECT covering C and D only, while 06 described it as asserted.
+--    Every share-of-panel figure in 04, 06 and 07 assumes this identity.
+DO $$
+DECLARE world_rows bigint; n_c int; n_d int; n_e2 int; only_in_one bigint;
+BEGIN
+    SELECT (SELECT COUNT(*) FROM clean_track_c_india_partner_view    WHERE partner_code = 0)
+         + (SELECT COUNT(*) FROM clean_track_d_india_partner_sector  WHERE partner_code = 0)
+         + (SELECT COUNT(*) FROM clean_track_e_india_partner_imports WHERE partner_code = 0)
+      INTO world_rows;
+    SELECT COUNT(DISTINCT partner_code) INTO n_c  FROM clean_track_c_india_partner_view;
+    SELECT COUNT(DISTINCT partner_code) INTO n_d  FROM clean_track_d_india_partner_sector;
+    SELECT COUNT(DISTINCT partner_code) INTO n_e2 FROM clean_track_e_india_partner_imports;
+    SELECT COUNT(*) INTO only_in_one FROM (
         (SELECT partner_code FROM clean_track_d_india_partner_sector
-         EXCEPT
-         SELECT partner_code FROM clean_track_c_india_partner_view)
+         EXCEPT SELECT partner_code FROM clean_track_c_india_partner_view)
         UNION ALL
         (SELECT partner_code FROM clean_track_c_india_partner_view
-         EXCEPT
-         SELECT partner_code FROM clean_track_d_india_partner_sector)
-    ) x) AS partners_only_in_one;
+         EXCEPT SELECT partner_code FROM clean_track_d_india_partner_sector)
+        UNION ALL
+        (SELECT partner_code FROM clean_track_e_india_partner_imports
+         EXCEPT SELECT partner_code FROM clean_track_c_india_partner_view)
+        UNION ALL
+        (SELECT partner_code FROM clean_track_c_india_partner_view
+         EXCEPT SELECT partner_code FROM clean_track_e_india_partner_imports)
+    ) x;
+    IF world_rows <> 0 OR n_c <> 20 OR n_d <> 20 OR n_e2 <> 20 OR only_in_one <> 0 THEN
+        RAISE EXCEPTION '01 validation 6: world_rows=% partners C/D/E2=%/%/% only_in_one=%',
+            world_rows, n_c, n_d, n_e2, only_in_one;
+    END IF;
+    RAISE NOTICE '01 validation 6 PASSED: C, D and E2 share one 20-partner panel with no World row.';
+END $$;
 
 -- Note on the parentheses above (added 17/09/2026). EXCEPT and UNION ALL
 -- have equal precedence in SQL and associate left to right, so the

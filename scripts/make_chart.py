@@ -29,11 +29,18 @@ split by partner, share of the sector's panel. Rows are sectors, columns the
 partners ordered by total across sectors; cells show the percentage. 06 Q1.
 Shares are of the panel, not of India's world exports (06 V4).
 
+Footnote facts (pull dates, coverage ranges) are read from the committed
+CSVs and data/raw/pull_manifest.json, not typed in, so a change to the data
+cannot leave a chart asserting a stale figure. Until 23/09/2026 they were
+hard-coded strings.
+
 Run from the repository root, after sql/08_export_results.sql:
-    pip3 install pandas matplotlib
+    pip3 install -r requirements.txt
     python3 scripts/make_chart.py
 """
 
+import datetime
+import json
 import pathlib
 
 import matplotlib
@@ -46,6 +53,25 @@ PROCESSED = ROOT / "data" / "processed"
 INSIGHTS = ROOT / "insights"
 SRC = PROCESSED / "track_a_indexed_series.csv"
 OUT = INSIGHTS / "indexed_export_trend.png"
+MANIFEST = ROOT / "data" / "raw" / "pull_manifest.json"
+
+
+def pulled_on(csv_prefix: str) -> str:
+    """Pull date of the raw file(s) behind a track, as DD/MM/YYYY.
+
+    Phase 1 entries inherit the top-level `pull` block; Phase 2 entries carry
+    their own `pulled_on` (see data/raw/README.md)."""
+    manifest = json.loads(MANIFEST.read_text())
+    for t in manifest["tracks"]:
+        if t["file"].startswith(csv_prefix):
+            iso = t.get("pulled_on", manifest["pull"]["pulled_on"])
+            return datetime.date.fromisoformat(iso).strftime("%d/%m/%Y")
+    raise KeyError(csv_prefix)
+
+
+def pct_range(values) -> str:
+    """'lo-hi' as whole percentages, for footnotes."""
+    return f"{round(min(values)):.0f}-{round(max(values)):.0f}"
 
 # Deliberate colour choices: India emphasised, comparators receding.
 STYLE = {
@@ -99,7 +125,7 @@ def chart_indexed_trend() -> None:
 
     fig.text(
         0.01, 0.015,
-        "Source: UN Comtrade, pulled 25/08/2026. Exports, FOB, nominal USD. "
+        f"Source: UN Comtrade, pulled {pulled_on('track_a_')}. Exports, FOB, nominal USD. "
         "Bangladesh dashed: 2015-2018 only.",
         fontsize=7.5, color="#666",
     )
@@ -140,9 +166,12 @@ def chart_petroleum_volume() -> None:
     for spine in ("top", "right"):
         ax.spines[spine].set_visible(False)
     ax.legend(frameon=False, fontsize=9, loc="upper left")
+    cov = pd.read_csv(PROCESSED / "track_b_volume_coverage.csv")
+    cov = cov[cov["sector"] == "petroleum_products"]
     fig.text(0.01, 0.015,
-             "Source: UN Comtrade, pulled 25/08/2026. HS 27 at HS6, India to World, FOB, nominal USD. "
-             "Unit value over rows carrying net weight (98-100% of value); 95-100% of\n"
+             f"Source: UN Comtrade, pulled {pulled_on('track_b_')}. HS 27 at HS6, India to World, FOB, nominal USD. "
+             f"Unit value over rows carrying net weight ({pct_range(cov['value_coverage_pct'])}% of value); "
+             f"{pct_range(cov['weight_estimated_kg_pct'])}% of\n"
              "that weight is Comtrade-estimated from value, not reporter-filed (03 Q8).",
              fontsize=7.5, color="#666")
     fig.tight_layout(rect=(0, 0.035, 1, 1))
@@ -169,6 +198,12 @@ def chart_sector_partner_heatmap() -> None:
                       .sort_values(ascending=False).index.tolist())
     mat = (df.pivot(index="sector", columns="partner_desc", values="pct_of_sector_panel")
              .reindex(index=sector_order, columns=partner_order).fillna(0))
+    # Whether a (sector, partner) row exists at all. A row exists only where
+    # there was trade (01 found no zero values), so this separates "under 1%"
+    # from "no trade". value_2023_bn cannot: it is rounded to USD 1mn, and
+    # Maldives gems (USD 0.12mn) reads 0.000.
+    has_trade = (df.pivot(index="sector", columns="partner_desc", values="value_2023_bn")
+                   .reindex(index=sector_order, columns=partner_order).notna())
 
     fig, ax = plt.subplots(figsize=(12, 4.6))
     im = ax.imshow(mat.values, cmap="YlOrRd", aspect="auto", vmin=0, vmax=mat.values.max())
@@ -182,6 +217,10 @@ def chart_sector_partner_heatmap() -> None:
             if v >= 1.0:
                 ax.text(j, i, f"{v:.0f}", ha="center", va="center", fontsize=7.5,
                         color="white" if v > 0.55 * mat.values.max() else "#222")
+            elif has_trade.values[i, j]:
+                # Trade exists but under 1%. Blank used to cover both this and
+                # no trade at all; blank now means no trade only.
+                ax.text(j, i, "<1", ha="center", va="center", fontsize=6.5, color="#888")
     for spine in ax.spines.values():
         spine.set_visible(False)
     ax.set_title("Where each sector's exports go, 2023 — share of the sector's 20-partner panel (%)",
@@ -189,9 +228,15 @@ def chart_sector_partner_heatmap() -> None:
     cbar = fig.colorbar(im, ax=ax, fraction=0.025, pad=0.02)
     cbar.ax.tick_params(labelsize=8)
     cbar.set_label("% of sector panel", fontsize=8.5)
+    # Panel coverage per sector, 2023: the panel's value (this CSV) over the
+    # sector's world total (Track B), the same ratio 06 V4 computes.
+    world = pd.read_csv(PROCESSED / "track_b_sector_year_totals.csv")
+    world = world[world["ref_year"] == 2023].set_index("sector")["sector_value_usd_bn"]
+    coverage = 100 * df.groupby("sector")["value_2023_bn"].sum() / world
     fig.text(0.01, 0.015,
-             "Source: UN Comtrade, pulled 15/09/2026. India to 20 partners at HS6, FOB, nominal USD. "
-             "Panel covers 57-70% of each sector's world exports in 2023 (06 V4). Cells under 1% unlabelled.",
+             f"Source: UN Comtrade, pulled {pulled_on('track_d_')}. India to 20 partners at HS6, FOB, nominal USD. "
+             f"Panel covers {pct_range(coverage)}% of each sector's world exports in 2023 (06 V4). "
+             "'<1': under 1%; blank: no trade.",
              fontsize=7.5, color="#666")
     fig.tight_layout(rect=(0, 0.04, 1, 1))
     fig.savefig(out, dpi=160)

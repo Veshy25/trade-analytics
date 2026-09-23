@@ -10,14 +10,16 @@
     "scope_agreed": "2026-08-21",
     "generated_by": "scripts/pull_comtrade_data.py",
     "generated_by_note": "not published \u2014 see README; the committed CSVs are the input of record",
-    "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client"
+    "source": "UN Comtrade API (comtradeapi.un.org), comtradeapicall client",
+    "applies_to": "Describes the 25/08/2026 pull only (Tracks A, B, C: exports, FOB). The 15/09/2026 tracks (D, E1, E2) carry their own per-entry pull block, and E1/E2 are imports (flow M, CIF). Note added 23/09/2026."
   },
   "scope": {
     "flow": "X (exports)",
     "frequency": "A (annual)",
     "period": "2014-2023",
     "valuation": "exporter-reported FOB, USD",
-    "note": "2024-2025 excluded: recent years are still being revised by reporters."
+    "note": "2024-2025 excluded: recent years are still being revised by reporters.",
+    "applies_to": "Describes the 25/08/2026 pull only (Tracks A, B, C: exports, FOB). The 15/09/2026 tracks (D, E1, E2) carry their own per-entry pull block, and E1/E2 are imports (flow M, CIF). Note added 23/09/2026."
   },
   "tracks": [
     {

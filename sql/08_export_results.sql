@@ -5,120 +5,67 @@
 -- reading this repository on GitHub — which is most readers — cannot see a
 -- single number the analysis produced without standing up a database and a
 -- ~90 MB load first. This file closes that gap by committing the outputs
--- alongside the queries that make them. (This header said "00-04" and "12 MB"
--- until 17/09/2026 — both were Phase 1 figures left behind when Phase 2 added
--- 06, 07 and four more raw CSVs.)
+-- alongside the queries that make them.
+--
+-- How it works (rebuilt 23/09/2026). Every result set is defined ONCE, as a
+-- view in the analysis file that owns it (v_track_a_* in 02, v_track_b_* in
+-- 03, and so on), and each line below only copies a view out. Until this
+-- date the file re-stated all 24 queries as one-line copies, up to 1,530
+-- characters each, and two had drifted from the queries they were named
+-- after: 07 Q2's cmd_desc lost the COALESCE added on 17/09/2026, and several
+-- Track A and B columns were rounded differently here than in 02/03. With
+-- the views there is nothing left to drift. The ORDER BY on each line is
+-- deliberate: a view's own ORDER BY is not guaranteed to survive a SELECT
+-- from it, and the CSVs must come out byte-identical run after run.
 --
 -- These CSVs are DERIVED, not source. data/raw/ is the input of record; if the
 -- two ever disagree, data/raw/ plus 00-07 wins. Regenerate rather than edit.
 --
--- Run from the repository root, after 00-07 (numbered last because it
--- reads every analysis track; renamed from 05 when Phase 2 added 06/07):
+-- Run from the repository root, after 00-07 — the views only exist once
+-- 02-07 have run:
 --   psql -d trade_analytics -v ON_ERROR_STOP=1 -f sql/08_export_results.sql
 --
 -- \copy paths are relative to the directory psql was launched from, and
 -- data/processed/ must already exist (git does not track empty directories,
--- so it is kept alive by the CSVs themselves).
+-- so it is kept alive by the CSVs themselves). 27 result sets: 24 until
+-- 23/09/2026, plus India's chapter contribution to growth (02 Q6),
+-- engineering's unit value with and without phones (03 Q6b) and the
+-- partner panel's import coverage by chapter (07 V5b).
 -- ============================================================
 
+-- Track A (sql/02)
+\copy (SELECT * FROM v_track_a_country_year_totals ORDER BY reporter_desc, ref_year) TO 'data/processed/track_a_country_year_totals.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_a_cagr ORDER BY cagr_pct DESC) TO 'data/processed/track_a_cagr.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_a_indexed_series ORDER BY reporter_desc, ref_year) TO 'data/processed/track_a_indexed_series.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_a_reporting_basis ORDER BY reporter_desc, ref_year) TO 'data/processed/track_a_reporting_basis.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_a_top10_chapters ORDER BY reporter_desc, rank_2023) TO 'data/processed/track_a_top10_chapters.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_a_india_chapter_change_2022_2023 ORDER BY direction, rank_on_side) TO 'data/processed/track_a_india_chapter_change_2022_2023.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_a_india_chapter_contribution ORDER BY rank_by_change) TO 'data/processed/track_a_india_chapter_contribution_2014_2023.csv' WITH (FORMAT csv, HEADER true)
 
--- Track A — country-year totals, the base series behind every trend claim,
--- with year-on-year growth alongside (02 Query 1 + Query 2 in one file). YoY
--- is computed on the unrounded total and LAG()ed within each reporter, so
--- the first year of every series is NULL — expected, not a gap.
-\copy (WITH yearly AS (SELECT reporter_desc, ref_year, SUM(fob_value) AS total_usd FROM clean_track_a_country_benchmark WHERE aggr_level = 2 GROUP BY 1,2) SELECT reporter_desc, ref_year, ROUND(total_usd/1e9, 3) AS total_export_value_usd_bn, ROUND(100.0*(total_usd - LAG(total_usd) OVER (PARTITION BY reporter_desc ORDER BY ref_year))/NULLIF(LAG(total_usd) OVER (PARTITION BY reporter_desc ORDER BY ref_year),0), 1) AS yoy_growth_pct FROM yearly ORDER BY reporter_desc, ref_year) TO 'data/processed/track_a_country_year_totals.csv' WITH (FORMAT csv, HEADER true)
+-- Track B (sql/03)
+\copy (SELECT * FROM v_track_b_sector_year_totals ORDER BY sector, ref_year) TO 'data/processed/track_b_sector_year_totals.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_b_sector_concentration_2023 ORDER BY hhi_2023 DESC) TO 'data/processed/track_b_sector_concentration_2023.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_b_cross_track_reconciliation ORDER BY sector, ref_year) TO 'data/processed/track_b_cross_track_reconciliation.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_b_sector_volume_vs_value ORDER BY sector) TO 'data/processed/track_b_sector_volume_vs_value.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_b_engineering_unit_value_mix ORDER BY ref_year) TO 'data/processed/track_b_engineering_unit_value_mix.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_b_petroleum_volume_series ORDER BY ref_year) TO 'data/processed/track_b_petroleum_volume_series.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_b_volume_coverage ORDER BY sector, ref_year) TO 'data/processed/track_b_volume_coverage.csv' WITH (FORMAT csv, HEADER true)
 
--- Track A — decade CAGR per country, with each country's own span shown so a
--- 4-year Bangladesh rate is never read as a 9-year one.
-\copy (WITH yearly AS (SELECT reporter_desc, reporter_iso, ref_year, SUM(fob_value) AS total_usd FROM clean_track_a_country_benchmark WHERE aggr_level = 2 GROUP BY 1,2,3), bounds AS (SELECT reporter_iso, MIN(ref_year) AS first_year, MAX(ref_year) AS last_year, COUNT(*) AS years_present FROM yearly GROUP BY 1) SELECT l.reporter_desc, b.first_year, b.last_year, b.years_present, ROUND(f.total_usd/1e9,3) AS first_year_bn, ROUND(l.total_usd/1e9,3) AS last_year_bn, ROUND(100.0*(POWER(l.total_usd/NULLIF(f.total_usd,0), 1.0/NULLIF(b.last_year-b.first_year,0))-1),2) AS cagr_pct FROM bounds b JOIN yearly f ON f.reporter_iso=b.reporter_iso AND f.ref_year=b.first_year JOIN yearly l ON l.reporter_iso=b.reporter_iso AND l.ref_year=b.last_year ORDER BY cagr_pct DESC) TO 'data/processed/track_a_cagr.csv' WITH (FORMAT csv, HEADER true)
+-- Track C (sql/04)
+\copy (SELECT * FROM v_track_c_partner_totals ORDER BY rank_2023) TO 'data/processed/track_c_partner_totals.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_c_partner_concentration ORDER BY ref_year) TO 'data/processed/track_c_partner_concentration.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_c_partner_rank_moves ORDER BY rank_2023 NULLS LAST) TO 'data/processed/track_c_partner_rank_moves.csv' WITH (FORMAT csv, HEADER true)
 
--- Track A — indexed series, each country rebased to 100 at its own first year.
--- This is the series behind the README chart.
-\copy (WITH yearly AS (SELECT reporter_desc, reporter_iso, ref_year, SUM(fob_value) AS total_usd FROM clean_track_a_country_benchmark WHERE aggr_level = 2 GROUP BY 1,2,3), based AS (SELECT reporter_desc, ref_year, total_usd, FIRST_VALUE(total_usd) OVER (PARTITION BY reporter_iso ORDER BY ref_year) AS base_usd, MIN(ref_year) OVER (PARTITION BY reporter_iso) AS base_year FROM yearly) SELECT reporter_desc, ref_year, base_year, ROUND(total_usd/1e9,3) AS total_bn, ROUND(100.0*total_usd/NULLIF(base_usd,0),1) AS index_base_100 FROM based ORDER BY reporter_desc, ref_year) TO 'data/processed/track_a_indexed_series.csv' WITH (FORMAT csv, HEADER true)
+-- Track D (sql/06)
+\copy (SELECT * FROM v_track_d_sector_partner_matrix_2023 ORDER BY sector, rank_in_sector) TO 'data/processed/track_d_sector_partner_matrix_2023.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_d_sector_partner_shift ORDER BY sector, shift_ppt DESC) TO 'data/processed/track_d_sector_partner_shift.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_d_top_products_by_market ORDER BY sector, partner_rank, product_rank) TO 'data/processed/track_d_top_products_by_market.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_d_sector_market_concentration ORDER BY sector, ref_year) TO 'data/processed/track_d_sector_market_concentration.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_d_sector_partner_cagr ORDER BY sector, cagr_pct DESC NULLS LAST) TO 'data/processed/track_d_sector_partner_cagr.csv' WITH (FORMAT csv, HEADER true)
 
--- Track A — reporting basis by country-year (02 V1a). RENAMED AND REBUILT
--- 17/09/2026: this was track_a_estimation_sensitivity.csv, whose estimated_pct
--- column read legacy_estimation_flag = 4 as "value estimated by Comtrade".
--- That flag is a net-weight code, not a value code (02 V1a sets out the
--- correction and the UNSD source), so the old column measured something the
--- project never wanted and the filename asserted something false.
--- pct_value_on_netwgt_est_rows is the honest version of the same measure;
--- pct_rows_is_aggregate is the construction change that actually bears on a
--- 2014-vs-2023 comparison.
-\copy (WITH by_country_year AS (SELECT reporter_desc, ref_year, SUM(fob_value) AS total_usd, COALESCE(SUM(fob_value) FILTER (WHERE is_net_wgt_estimated),0) AS netwgt_est_usd, COUNT(*) AS rows_all, COUNT(*) FILTER (WHERE is_aggregate) AS rows_aggregate, COUNT(*) FILTER (WHERE is_reported) AS rows_reported FROM clean_track_a_country_benchmark WHERE aggr_level = 2 GROUP BY 1,2) SELECT reporter_desc, ref_year, ROUND(total_usd/1e9,3) AS total_bn, ROUND(100.0*netwgt_est_usd/NULLIF(total_usd,0),1) AS pct_value_on_netwgt_est_rows, ROUND(100.0*rows_aggregate/NULLIF(rows_all,0),1) AS pct_rows_is_aggregate, ROUND(100.0*rows_reported/NULLIF(rows_all,0),1) AS pct_rows_is_reported FROM by_country_year ORDER BY reporter_desc, ref_year) TO 'data/processed/track_a_reporting_basis.csv' WITH (FORMAT csv, HEADER true)
-
--- Track A — top 10 HS2 chapters per country, ranked on 2023 value.
-\copy (WITH chapter_totals AS (SELECT reporter_desc, cmd_code, (ARRAY_AGG(cmd_desc ORDER BY ref_year DESC))[1] AS cmd_desc, SUM(fob_value) FILTER (WHERE ref_year = 2023) AS value_2023_usd, SUM(fob_value) AS value_2014_2023_usd FROM clean_track_a_country_benchmark WHERE aggr_level = 2 GROUP BY 1,2), ranked AS (SELECT ct.*, ROW_NUMBER() OVER (PARTITION BY reporter_desc ORDER BY value_2023_usd DESC NULLS LAST, value_2014_2023_usd DESC) AS rnk FROM chapter_totals ct) SELECT reporter_desc, rnk AS rank_2023, cmd_code, cmd_desc, ROUND(value_2023_usd/1e9,3) AS value_2023_bn, ROUND(value_2014_2023_usd/1e9,3) AS value_2014_2023_bn FROM ranked WHERE rnk <= 10 ORDER BY reporter_desc, rnk) TO 'data/processed/track_a_top10_chapters.csv' WITH (FORMAT csv, HEADER true)
-
--- Track A — India's ten largest chapter falls and rises, 2022 -> 2023 (02 Q5).
--- Added 17/09/2026: finding 3 quotes the petroleum, gems and iron & steel
--- declines, which were previously in no committed result set.
-\copy (WITH ic AS (SELECT cmd_code, (ARRAY_AGG(cmd_desc ORDER BY ref_year DESC))[1] AS cmd_desc, SUM(fob_value) FILTER (WHERE ref_year = 2022) AS v22, SUM(fob_value) FILTER (WHERE ref_year = 2023) AS v23 FROM clean_track_a_country_benchmark WHERE reporter_iso = 'IND' AND aggr_level = 2 GROUP BY 1), m AS (SELECT ic.*, COALESCE(v23,0)-COALESCE(v22,0) AS chg, ROW_NUMBER() OVER (ORDER BY COALESCE(v23,0)-COALESCE(v22,0) ASC, cmd_code) AS fr, ROW_NUMBER() OVER (ORDER BY COALESCE(v23,0)-COALESCE(v22,0) DESC, cmd_code) AS rr FROM ic) SELECT CASE WHEN fr <= 10 THEN 'fall' ELSE 'rise' END AS direction, CASE WHEN fr <= 10 THEN fr ELSE rr END AS rank_on_side, cmd_code, cmd_desc, ROUND(v22/1e9,2) AS value_2022_bn, ROUND(v23/1e9,2) AS value_2023_bn, ROUND(chg/1e9,2) AS change_bn FROM m WHERE fr <= 10 OR rr <= 10 ORDER BY direction, rank_on_side) TO 'data/processed/track_a_india_chapter_change_2022_2023.csv' WITH (FORMAT csv, HEADER true)
-
--- Track B — sector-year totals for India's five focus sectors.
-\copy (SELECT sector, ref_year, ROUND(SUM(fob_value)/1e9,3) AS sector_value_usd_bn FROM clean_track_b_india_sector_detail WHERE aggr_level = 6 AND partner_code = 0 GROUP BY 1,2 ORDER BY 1,2) TO 'data/processed/track_b_sector_year_totals.csv' WITH (FORMAT csv, HEADER true)
-
--- Track B — 2023 product concentration per sector (top-5 share and HHI).
-\copy (WITH product_2023 AS (SELECT sector, cmd_code, SUM(fob_value) AS value_2023_usd FROM clean_track_b_india_sector_detail WHERE aggr_level = 6 AND partner_code = 0 AND ref_year = 2023 GROUP BY 1,2), shares AS (SELECT sector, cmd_code, value_2023_usd, value_2023_usd/NULLIF(SUM(value_2023_usd) OVER (PARTITION BY sector),0) AS share, ROW_NUMBER() OVER (PARTITION BY sector ORDER BY value_2023_usd DESC, cmd_code) AS rnk FROM product_2023), pa AS (SELECT sector, COUNT(DISTINCT cmd_code) AS hs6_products_all_years FROM clean_track_b_india_sector_detail WHERE aggr_level = 6 AND partner_code = 0 GROUP BY 1) SELECT s.sector, COUNT(*) AS hs6_products_2023, MAX(pa.hs6_products_all_years) AS hs6_products_all_years, ROUND(100.0*SUM(s.share) FILTER (WHERE s.rnk <= 5),1) AS top5_share_pct, ROUND(SUM(s.share*s.share)*10000,0) AS hhi_2023 FROM shares s JOIN pa USING (sector) GROUP BY s.sector ORDER BY hhi_2023 DESC) TO 'data/processed/track_b_sector_concentration_2023.csv' WITH (FORMAT csv, HEADER true)
-
--- Track B — cross-track reconciliation (03 V5). Track B's HS6 sector totals
--- against Track A's HS2 chapter rollup for the same sector-years.
-\copy (WITH track_b_sector AS (SELECT sector, ref_year, SUM(fob_value) AS b_value_usd FROM clean_track_b_india_sector_detail WHERE aggr_level = 6 AND partner_code = 0 GROUP BY 1,2), track_a_sector AS (SELECT CASE WHEN cmd_code='27' THEN 'petroleum_products' WHEN cmd_code='30' THEN 'pharmaceuticals' WHEN cmd_code='71' THEN 'gems_jewellery' WHEN cmd_code IN ('84','85') THEN 'engineering_machinery' WHEN cmd_code BETWEEN '50' AND '63' THEN 'textiles' END AS sector, ref_year, SUM(fob_value) AS a_value_usd FROM clean_track_a_country_benchmark WHERE reporter_iso='IND' AND cmd_code IN ('27','30','71','84','85','50','51','52','53','54','55','56','57','58','59','60','61','62','63') GROUP BY 1,2) SELECT b.sector, b.ref_year, ROUND(b.b_value_usd/1e9,3) AS track_b_bn, ROUND(a.a_value_usd/1e9,3) AS track_a_bn, ROUND(100.0*(b.b_value_usd-a.a_value_usd)/NULLIF(a.a_value_usd,0),2) AS pct_diff FROM track_b_sector b JOIN track_a_sector a USING (sector, ref_year) ORDER BY b.sector, b.ref_year) TO 'data/processed/track_b_cross_track_reconciliation.csv' WITH (FORMAT csv, HEADER true)
-
--- Track C — partner totals and share of the 20-partner panel.
-\copy (WITH partner_totals AS (SELECT partner_desc, SUM(fob_value) FILTER (WHERE ref_year = 2023) AS value_2023_usd, SUM(fob_value) AS value_2014_2023_usd FROM clean_track_c_india_partner_view WHERE aggr_level = 2 GROUP BY 1) SELECT partner_desc, ROW_NUMBER() OVER (ORDER BY value_2023_usd DESC NULLS LAST, value_2014_2023_usd DESC) AS rank_2023, ROUND(value_2023_usd/1e9,3) AS value_2023_bn, ROUND(100.0*value_2023_usd/NULLIF(SUM(value_2023_usd) OVER (),0),1) AS pct_of_panel_2023, ROUND(value_2014_2023_usd/1e9,3) AS value_2014_2023_bn FROM partner_totals ORDER BY rank_2023) TO 'data/processed/track_c_partner_totals.csv' WITH (FORMAT csv, HEADER true)
-
--- Track C — partner concentration over time, with the bounded whole-market
--- HHI estimate (04 Q4). hhi_panel alone is NOT band-comparable; the bounds are.
-\copy (WITH partner_yearly AS (SELECT partner_desc, ref_year, SUM(fob_value) AS value_usd FROM clean_track_c_india_partner_view WHERE aggr_level = 2 GROUP BY 1,2), shares AS (SELECT ref_year, partner_desc, value_usd/NULLIF(SUM(value_usd) OVER (PARTITION BY ref_year),0) AS share, ROW_NUMBER() OVER (PARTITION BY ref_year ORDER BY value_usd DESC, partner_desc) AS rnk FROM partner_yearly), panel_hhi AS (SELECT ref_year, SUM(share) FILTER (WHERE rnk <= 5) AS top5_share, SUM(share*share)*10000 AS hhi_panel, SUM(value_usd) AS panel_value_usd FROM shares JOIN partner_yearly USING (ref_year, partner_desc) GROUP BY ref_year), india_world AS (SELECT ref_year, SUM(fob_value) AS world_value_usd FROM clean_track_a_country_benchmark WHERE reporter_iso='IND' AND aggr_level=2 GROUP BY 1), coverage AS (SELECT p.ref_year, p.top5_share, p.hhi_panel, p.panel_value_usd/NULLIF(w.world_value_usd,0) AS c FROM panel_hhi p JOIN india_world w USING (ref_year)) SELECT ref_year, ROUND(100.0*top5_share,1) AS top5_partner_share_pct, ROUND(hhi_panel,0) AS hhi_panel, ROUND(100.0*c,1) AS panel_coverage_pct, ROUND(hhi_panel*POWER(c,2),0) AS hhi_true_lower, ROUND(hhi_panel*POWER(c,2)+POWER(1-c,2)*10000,0) AS hhi_true_upper FROM coverage ORDER BY ref_year) TO 'data/processed/track_c_partner_concentration.csv' WITH (FORMAT csv, HEADER true)
-
--- Track C — partner rank moves, 2014 vs 2023 (04 Q5a). Added 17/09/2026:
--- finding 9 ("the Netherlands climbed from 8th to 3rd") cited Q5a, which 08
--- did not export, so the claim had no committed result set behind it.
-\copy (WITH py AS (SELECT partner_desc, ref_year, SUM(fob_value) AS v FROM clean_track_c_india_partner_view WHERE aggr_level = 2 AND ref_year IN (2014, 2023) GROUP BY 1,2), r AS (SELECT partner_desc, ref_year, v, ROW_NUMBER() OVER (PARTITION BY ref_year ORDER BY v DESC, partner_desc) AS rnk FROM py) SELECT partner_desc, MAX(rnk) FILTER (WHERE ref_year=2014) AS rank_2014, MAX(rnk) FILTER (WHERE ref_year=2023) AS rank_2023, MAX(rnk) FILTER (WHERE ref_year=2014) - MAX(rnk) FILTER (WHERE ref_year=2023) AS rank_improvement, ROUND(MAX(v) FILTER (WHERE ref_year=2014)/1e9,3) AS value_2014_bn, ROUND(MAX(v) FILTER (WHERE ref_year=2023)/1e9,3) AS value_2023_bn FROM r GROUP BY 1 ORDER BY rank_2023 NULLS LAST) TO 'data/processed/track_c_partner_rank_moves.csv' WITH (FORMAT csv, HEADER true)
-
-
--- ============================================================
--- Phase 2 (15/09/2026): Tracks D, E and the Track B volume queries.
--- Each \copy re-states the numbered query in 03 / 06 / 07 it is named after.
--- ============================================================
-
--- Track B — volume vs value per sector, 2014 -> 2023 (03 Q6). The
--- volume_flag column is the gate: gems & jewellery is LOW COVERAGE.
-\copy (WITH ep AS (SELECT sector, ref_year, SUM(fob_value) AS value_usd, SUM(fob_value) FILTER (WHERE net_wgt > 0) AS vw, SUM(net_wgt) FILTER (WHERE net_wgt > 0) AS kg FROM clean_track_b_india_sector_detail WHERE aggr_level = 6 AND partner_code = 0 AND ref_year IN (2014, 2023) GROUP BY 1,2), wide AS (SELECT sector, MAX(value_usd) FILTER (WHERE ref_year=2014) v14, MAX(value_usd) FILTER (WHERE ref_year=2023) v23, MAX(vw) FILTER (WHERE ref_year=2014) vw14, MAX(vw) FILTER (WHERE ref_year=2023) vw23, MAX(kg) FILTER (WHERE ref_year=2014) kg14, MAX(kg) FILTER (WHERE ref_year=2023) kg23 FROM ep GROUP BY 1) SELECT sector, ROUND(v14/1e9,2) AS value_2014_bn, ROUND(v23/1e9,2) AS value_2023_bn, ROUND(kg14/1e9,3) AS mn_tonnes_2014, ROUND(kg23/1e9,3) AS mn_tonnes_2023, ROUND(vw14/NULLIF(kg14,0),3) AS usd_per_kg_2014, ROUND(vw23/NULLIF(kg23,0),3) AS usd_per_kg_2023, ROUND(100.0*(POWER(v23/NULLIF(v14,0),1.0/9)-1),2) AS value_cagr_pct, ROUND(100.0*(POWER(kg23/NULLIF(kg14,0),1.0/9)-1),2) AS volume_cagr_pct, ROUND(100.0*(kg23/NULLIF(kg14,0)-1),1) AS volume_change_pct, ROUND(100.0*((vw23/NULLIF(kg23,0))/NULLIF(vw14/NULLIF(kg14,0),0)-1),1) AS unit_value_change_pct, ROUND(100.0*vw14/NULLIF(v14,0),1) AS value_coverage_2014_pct, ROUND(100.0*vw23/NULLIF(v23,0),1) AS value_coverage_2023_pct, CASE WHEN vw14/NULLIF(v14,0) < 0.8 OR vw23/NULLIF(v23,0) < 0.8 THEN 'LOW COVERAGE — no volume claim' ELSE 'ok' END AS volume_flag FROM wide ORDER BY sector) TO 'data/processed/track_b_sector_volume_vs_value.csv' WITH (FORMAT csv, HEADER true)
-
--- Track B — petroleum products year series: tonnes, USD, USD/kg, indexed (03 Q7).
-\copy (WITH yearly AS (SELECT ref_year, SUM(fob_value) AS value_usd, SUM(fob_value) FILTER (WHERE net_wgt > 0) AS vw, SUM(net_wgt) FILTER (WHERE net_wgt > 0) AS kg FROM clean_track_b_india_sector_detail WHERE aggr_level = 6 AND partner_code = 0 AND sector = 'petroleum_products' GROUP BY 1), based AS (SELECT *, vw/NULLIF(kg,0) AS upk, FIRST_VALUE(value_usd) OVER (ORDER BY ref_year) bv, FIRST_VALUE(kg) OVER (ORDER BY ref_year) bk, FIRST_VALUE(vw/NULLIF(kg,0)) OVER (ORDER BY ref_year) bu FROM yearly) SELECT ref_year, ROUND(value_usd/1e9,1) AS value_bn, ROUND(kg/1e9,1) AS mn_tonnes, ROUND(upk,3) AS usd_per_kg, ROUND(100.0*value_usd/NULLIF(bv,0),1) AS value_index, ROUND(100.0*kg/NULLIF(bk,0),1) AS volume_index, ROUND(100.0*upk/NULLIF(bu,0),1) AS unit_value_index FROM based ORDER BY ref_year) TO 'data/processed/track_b_petroleum_volume_series.csv' WITH (FORMAT csv, HEADER true)
-
--- Track B — volume coverage per sector-year (03 Q8), the gate on the two above.
-\copy (SELECT sector, ref_year, COUNT(*) AS hs6_rows, COUNT(*) FILTER (WHERE net_wgt > 0) AS rows_with_weight, ROUND(100.0*SUM(fob_value) FILTER (WHERE net_wgt > 0)/NULLIF(SUM(fob_value),0),1) AS value_coverage_pct, ROUND(100.0*COUNT(*) FILTER (WHERE net_wgt > 0 AND is_net_wgt_estimated)/NULLIF(COUNT(*) FILTER (WHERE net_wgt > 0),0),1) AS weight_estimated_rows_pct, ROUND(100.0*SUM(net_wgt) FILTER (WHERE net_wgt > 0 AND is_net_wgt_estimated)/NULLIF(SUM(net_wgt) FILTER (WHERE net_wgt > 0),0),1) AS weight_estimated_kg_pct FROM clean_track_b_india_sector_detail WHERE aggr_level = 6 AND partner_code = 0 GROUP BY 1,2 ORDER BY 1,2) TO 'data/processed/track_b_volume_coverage.csv' WITH (FORMAT csv, HEADER true)
-
--- Track D — sector x partner crosstab, 2023 (06 Q1). Shares are of the
--- sector's 20-partner panel, not of India's world exports (06 V4).
-\copy (WITH sp AS (SELECT sector, partner_desc, SUM(fob_value) AS v FROM clean_track_d_india_partner_sector WHERE aggr_level = 6 AND ref_year = 2023 GROUP BY 1,2) SELECT sector, partner_desc, ROW_NUMBER() OVER (PARTITION BY sector ORDER BY v DESC, partner_desc) AS rank_in_sector, ROUND(v/1e9,3) AS value_2023_bn, ROUND(100.0*v/NULLIF(SUM(v) OVER (PARTITION BY sector),0),1) AS pct_of_sector_panel FROM sp ORDER BY sector, rank_in_sector) TO 'data/processed/track_d_sector_partner_matrix_2023.csv' WITH (FORMAT csv, HEADER true)
-
--- Track D — sector x partner share shift, 2014 vs 2023 (06 Q2).
-\copy (WITH y AS (SELECT sector, partner_desc, ref_year, SUM(fob_value) AS v FROM clean_track_d_india_partner_sector WHERE aggr_level = 6 AND ref_year IN (2014, 2023) GROUP BY 1,2,3), s AS (SELECT sector, partner_desc, ref_year, 100.0*v/NULLIF(SUM(v) OVER (PARTITION BY sector, ref_year),0) AS sh FROM y) SELECT sector, partner_desc, ROUND(MAX(sh) FILTER (WHERE ref_year=2014),1) AS share_2014_pct, ROUND(MAX(sh) FILTER (WHERE ref_year=2023),1) AS share_2023_pct, ROUND(COALESCE(MAX(sh) FILTER (WHERE ref_year=2023),0)-COALESCE(MAX(sh) FILTER (WHERE ref_year=2014),0),1) AS shift_ppt FROM s GROUP BY 1,2 ORDER BY sector, shift_ppt DESC) TO 'data/processed/track_d_sector_partner_shift.csv' WITH (FORMAT csv, HEADER true)
-
--- Track D — top 5 HS6 products per (sector, top-3 partner), 2023 (06 Q3).
-\copy (WITH pr AS (SELECT sector, partner_desc, SUM(fob_value) AS pv, ROW_NUMBER() OVER (PARTITION BY sector ORDER BY SUM(fob_value) DESC, partner_desc) AS prk FROM clean_track_d_india_partner_sector WHERE aggr_level = 6 AND ref_year = 2023 GROUP BY 1,2), p AS (SELECT d.sector, d.partner_desc, d.cmd_code, d.cmd_desc, SUM(d.fob_value) AS v FROM clean_track_d_india_partner_sector d JOIN pr USING (sector, partner_desc) WHERE d.aggr_level = 6 AND d.ref_year = 2023 AND pr.prk <= 3 GROUP BY 1,2,3,4), r AS (SELECT p.*, pr.prk, ROW_NUMBER() OVER (PARTITION BY p.sector, p.partner_desc ORDER BY p.v DESC, p.cmd_code) AS rk, 100.0*p.v/NULLIF(pr.pv,0) AS pct FROM p JOIN pr USING (sector, partner_desc)) SELECT sector, prk AS partner_rank, partner_desc, rk AS product_rank, cmd_code, cmd_desc, ROUND(v/1e6,1) AS value_2023_mn, ROUND(pct,1) AS pct_of_partner_sector FROM r WHERE rk <= 5 ORDER BY sector, prk, rk) TO 'data/processed/track_d_top_products_by_market.csv' WITH (FORMAT csv, HEADER true)
-
--- Track D — market concentration per sector per year (06 Q4). Trend only;
--- HHI bands are not applied to a panel (06 assumption 6).
-\copy (WITH y AS (SELECT sector, ref_year, partner_desc, SUM(fob_value) AS v FROM clean_track_d_india_partner_sector WHERE aggr_level = 6 GROUP BY 1,2,3), s AS (SELECT sector, ref_year, v/NULLIF(SUM(v) OVER (PARTITION BY sector, ref_year),0) AS sh, ROW_NUMBER() OVER (PARTITION BY sector, ref_year ORDER BY v DESC, partner_desc) AS rk FROM y) SELECT sector, ref_year, ROUND(100.0*SUM(sh) FILTER (WHERE rk <= 3),1) AS top3_partner_share_pct, ROUND(SUM(sh*sh)*10000,0) AS hhi_panel, COUNT(*) FILTER (WHERE sh > 0) AS partners_with_trade FROM s GROUP BY 1,2 ORDER BY 1,2) TO 'data/processed/track_d_sector_market_concentration.csv' WITH (FORMAT csv, HEADER true)
-
--- Track D — CAGR 2014 -> 2023 per (sector, partner) (06 Q5).
-\copy (WITH y AS (SELECT sector, partner_desc, ref_year, SUM(fob_value) AS v FROM clean_track_d_india_partner_sector WHERE aggr_level = 6 AND ref_year IN (2014, 2023) GROUP BY 1,2,3), p AS (SELECT sector, partner_desc, MAX(v) FILTER (WHERE ref_year=2014) v14, MAX(v) FILTER (WHERE ref_year=2023) v23 FROM y GROUP BY 1,2) SELECT sector, partner_desc, ROUND(v14/1e6,1) AS value_2014_mn, ROUND(v23/1e6,1) AS value_2023_mn, ROUND(100.0*(POWER(v23/NULLIF(v14,0),1.0/9)-1),2) AS cagr_pct FROM p ORDER BY sector, cagr_pct DESC NULLS LAST) TO 'data/processed/track_d_sector_partner_cagr.csv' WITH (FORMAT csv, HEADER true)
-
--- Track E — country trade balance, year by year (07 Q1). FOB exports minus
--- CIF imports (07 assumption 1).
-\copy (WITH x AS (SELECT reporter_iso, reporter_desc, ref_year, SUM(fob_value) AS ex FROM clean_track_a_country_benchmark WHERE aggr_level = 2 GROUP BY 1,2,3), m AS (SELECT reporter_iso, ref_year, SUM(cif_value) AS im FROM clean_track_e_country_imports WHERE aggr_level = 2 GROUP BY 1,2) SELECT x.reporter_desc, x.ref_year, ROUND(x.ex/1e9,1) AS exports_bn, ROUND(m.im/1e9,1) AS imports_bn, ROUND((x.ex-m.im)/1e9,1) AS balance_bn, ROUND(100.0*(x.ex-m.im)/NULLIF(x.ex+m.im,0),1) AS balance_pct_of_trade, ROUND(100.0*x.ex/NULLIF(m.im,0),1) AS export_cover_pct FROM x JOIN m USING (reporter_iso, ref_year) ORDER BY 1,2) TO 'data/processed/track_e_country_trade_balance.csv' WITH (FORMAT csv, HEADER true)
-
--- Track E — India's chapter balance, 2023: 10 largest deficits + 10 largest surpluses (07 Q2).
-\copy (WITH x AS (SELECT cmd_code, cmd_desc, SUM(fob_value) AS ex FROM clean_track_a_country_benchmark WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023 GROUP BY 1,2), m AS (SELECT cmd_code, SUM(cif_value) AS im FROM clean_track_e_country_imports WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023 GROUP BY 1), bal AS (SELECT COALESCE(x.cmd_code, m.cmd_code) AS cmd_code, x.cmd_desc, COALESCE(x.ex,0) AS ex, COALESCE(m.im,0) AS im, COALESCE(x.ex,0)-COALESCE(m.im,0) AS b FROM x FULL OUTER JOIN m USING (cmd_code)), r AS (SELECT bal.*, ROW_NUMBER() OVER (ORDER BY b ASC, cmd_code) dr, ROW_NUMBER() OVER (ORDER BY b DESC, cmd_code) sr FROM bal) SELECT CASE WHEN dr <= 10 THEN 'deficit' ELSE 'surplus' END AS side, CASE WHEN dr <= 10 THEN dr ELSE sr END AS rank_on_side, cmd_code, cmd_desc, ROUND(ex/1e9,2) AS exports_bn, ROUND(im/1e9,2) AS imports_bn, ROUND(b/1e9,2) AS balance_bn FROM r WHERE dr <= 10 OR sr <= 10 ORDER BY side, rank_on_side) TO 'data/processed/track_e_india_chapter_balance_2023.csv' WITH (FORMAT csv, HEADER true)
-
--- Track E — India's bilateral balance with the 20 partners, 2014 vs 2023 (07 Q3).
-\copy (WITH x AS (SELECT partner_code, partner_desc, ref_year, SUM(fob_value) AS ex FROM clean_track_c_india_partner_view WHERE aggr_level = 2 AND ref_year IN (2014, 2023) GROUP BY 1,2,3), m AS (SELECT partner_code, ref_year, SUM(cif_value) AS im FROM clean_track_e_india_partner_imports WHERE aggr_level = 2 AND ref_year IN (2014, 2023) GROUP BY 1,2), j AS (SELECT x.partner_desc, x.ref_year, x.ex, m.im, x.ex-m.im AS b FROM x JOIN m USING (partner_code, ref_year)) SELECT partner_desc, ROUND(MAX(ex) FILTER (WHERE ref_year=2023)/1e9,2) AS exports_2023_bn, ROUND(MAX(im) FILTER (WHERE ref_year=2023)/1e9,2) AS imports_2023_bn, ROUND(MAX(b) FILTER (WHERE ref_year=2014)/1e9,2) AS balance_2014_bn, ROUND(MAX(b) FILTER (WHERE ref_year=2023)/1e9,2) AS balance_2023_bn, ROUND((MAX(b) FILTER (WHERE ref_year=2023)-MAX(b) FILTER (WHERE ref_year=2014))/1e9,2) AS balance_change_bn FROM j GROUP BY 1 ORDER BY balance_2023_bn) TO 'data/processed/track_e_india_partner_balance.csv' WITH (FORMAT csv, HEADER true)
-
--- Track E — India's import basket, top 10 HS2 chapters, 2014 vs 2023 share (07 Q4).
-\copy (WITH y AS (SELECT cmd_code, ref_year, SUM(cif_value) AS im, (ARRAY_AGG(cmd_desc))[1] AS cmd_desc FROM clean_track_e_country_imports WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year IN (2014, 2023) GROUP BY 1,2), s AS (SELECT cmd_code, cmd_desc, ref_year, im, 100.0*im/NULLIF(SUM(im) OVER (PARTITION BY ref_year),0) AS sh FROM y), r AS (SELECT cmd_code, (ARRAY_AGG(cmd_desc ORDER BY ref_year DESC))[1] AS cmd_desc, MAX(im) FILTER (WHERE ref_year=2023) im23, MAX(sh) FILTER (WHERE ref_year=2014) s14, MAX(sh) FILTER (WHERE ref_year=2023) s23 FROM s GROUP BY 1) SELECT ROW_NUMBER() OVER (ORDER BY im23 DESC NULLS LAST, cmd_code) AS rank_2023, cmd_code, cmd_desc, ROUND(im23/1e9,2) AS imports_2023_bn, ROUND(s14,1) AS share_2014_pct, ROUND(s23,1) AS share_2023_pct, ROUND(COALESCE(s23,0)-COALESCE(s14,0),1) AS shift_ppt FROM r ORDER BY rank_2023 LIMIT 10) TO 'data/processed/track_e_india_import_mix.csv' WITH (FORMAT csv, HEADER true)
+-- Track E (sql/07)
+\copy (SELECT * FROM v_track_e_country_trade_balance ORDER BY reporter_desc, ref_year) TO 'data/processed/track_e_country_trade_balance.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_e_india_chapter_balance_2023 ORDER BY side, rank_on_side) TO 'data/processed/track_e_india_chapter_balance_2023.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_e_india_partner_balance ORDER BY balance_2023_bn) TO 'data/processed/track_e_india_partner_balance.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_e_india_import_mix ORDER BY rank_2023) TO 'data/processed/track_e_india_import_mix.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_e_panel_import_coverage_2023 ORDER BY rank_by_imports) TO 'data/processed/track_e_panel_import_coverage_2023.csv' WITH (FORMAT csv, HEADER true)
