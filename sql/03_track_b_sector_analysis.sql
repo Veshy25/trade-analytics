@@ -11,9 +11,9 @@
 -- five sector names (27 / 30 / 71 / 84-85 / 50-63 — see the sector table in
 -- data/raw/README.md). Every other column comes straight from Comtrade.
 --
--- NOTE: sql/08_export_results.sql re-states several of the queries below in
--- order to write them out as CSVs. If you change a query here, rerun 08 so the
--- committed files under data/processed/ do not silently go stale.
+-- NOTE on views (23/09/2026): every result set exported to data/processed/ is
+-- defined once here as a view (v_track_b_*), and sql/08 only copies it out —
+-- see 02's header for why. If you change a view, rerun 08.
 --
 -- Assumptions made here (flagging before running, not after):
 --   1. Sector and product totals sum only aggr_level = 6 rows (true HS6
@@ -72,20 +72,42 @@
 --      far as Comtrade's unit-value assumptions hold. Row share and kg share
 --      diverge most where it matters most, so never quote the row figure as
 --      the tonnage figure.
+--
+--      TWO MORE LIMITS ON READING Q6 (added 23/09/2026).
+--      (a) Tonnes are summed over weight-bearing rows only, so when coverage
+--          moves between the endpoint years the tonnage change moves with it.
+--          Q6 now also carries a coverage-adjusted tonnage (tonnes scaled up
+--          by 1 / value coverage), which assumes the unweighed rows ship at
+--          the same USD/kg as the weighed ones. For textiles, coverage fell
+--          97.8% -> 93.0% and the change in tonnes goes from -14.9% raw to
+--          -10.5% adjusted: the direction holds, the size does not. The same
+--          coverage gap is why value change != tonnes change x unit value
+--          change in Q6 (engineering: 1.781 x 1.448 = 2.579 against a value
+--          ratio of 2.727; the ratio between them is exactly the coverage
+--          ratio 96.2 / 91.0).
+--      (b) A sector's USD/kg is a MIX-WEIGHTED average across hundreds of
+--          products, not a price. It rises when the mix shifts toward
+--          heavier-value goods even if no single price moves. Engineering is
+--          the case in point — see Q6b.
 
 
 -- ============================================================
 -- Query 1: sector export value trend, by year
+--          Exported as data/processed/track_b_sector_year_totals.csv.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_b_sector_year_totals;
+CREATE VIEW v_track_b_sector_year_totals AS
 SELECT
     sector,
     ref_year,
-    SUM(fob_value) AS total_export_value_usd
+    ROUND(SUM(fob_value) / 1e9, 3) AS sector_value_usd_bn
 FROM clean_track_b_india_sector_detail
 WHERE aggr_level = 6
   AND partner_code = 0
 GROUP BY sector, ref_year
 ORDER BY sector, ref_year;
+
+SELECT * FROM v_track_b_sector_year_totals;
 
 
 -- ============================================================
@@ -205,6 +227,10 @@ WITH product_totals AS (
         -- split them and truncated value_2014_2023_usd to the rows sharing
         -- the latest wording — fixed 15/09/2026; one top-10 row was affected
         -- (petroleum 270750: 3.58bn -> 3.62bn, itself a 2017 rewording).
+        -- Grouping on the code fixes rewordings but not code CHANGES: where
+        -- an edition split or retired a code, value_2014_2023_usd covers only
+        -- the years that code existed (02 assumption 7). The 2023 ranking is
+        -- unaffected; the full-period column is per-code, not per-product.
         (ARRAY_AGG(cmd_desc ORDER BY ref_year DESC))[1]  AS cmd_desc,
         SUM(fob_value) FILTER (WHERE ref_year = 2023) AS value_2023_usd,
         SUM(fob_value)                                AS value_2014_2023_usd
@@ -216,10 +242,13 @@ WITH product_totals AS (
 ranked AS (
     SELECT
         pt.*,
-        -- ROW_NUMBER(), not RANK(), matching 02 Q3. Products that stopped
-        -- being exported before 2023 have a NULL value_2023_usd and all tie
-        -- on it — 37 such products in engineering/machinery and 37 in
-        -- textiles. RANK() would give every one of them the same rank, and a
+        -- ROW_NUMBER(), not RANK(), matching 02 Q3. Codes with no 2023 line
+        -- have a NULL value_2023_usd and all tie on it — 37 such codes in
+        -- engineering/machinery and 37 in textiles. Most are not products
+        -- India stopped exporting: 32 and 30 of them last appear in 2016 or
+        -- 2021, the year before an HS edition retired or split the code
+        -- (02 assumption 7). This said "products that stopped being
+        -- exported" until 23/09/2026. RANK() would give every one of them the same rank, and a
         -- "<= 10" filter placed on a tie block returns the whole block. The
         -- full-period tie-break also makes the order deterministic between
         -- runs rather than dependent on scan order.
@@ -247,27 +276,34 @@ ORDER BY sector, rank_in_sector_2023;
 -- Query 5: product concentration within each sector, 2023
 --           top-5 HS6 share and Herfindahl-Hirschman Index (HHI)
 --
--- HHI = sum of squared percentage shares, 0-10000 scale:
---   < 1500 unconcentrated | 1500-2500 moderate | > 2500 concentrated.
+-- HHI = sum of squared percentage shares, 0-10000 scale. The bands usually
+-- quoted — < 1500 unconcentrated | 1500-2500 moderate | > 2500 highly
+-- concentrated — are the 2010 US Horizontal Merger Guidelines' thresholds,
+-- an antitrust heuristic borrowed here, not a trade standard. The 2023 US
+-- Merger Guidelines (18/12/2023) replaced them with a single > 1800 "highly
+-- concentrated" line. Neither is applied as a verdict in this file.
 -- A sector that is a single HS2 chapter (gems & jewellery, petroleum,
 -- pharmaceuticals) will score high by construction — worth stating next to
 -- the number. Confirmed empirically: these three post the highest HHI of
 -- the five sectors (pharmaceuticals highest at 5751, ahead of petroleum's
 -- 5238 and gems & jewellery's 3831).
 --
--- hs6_products_2023 counts products carrying a 2023 line, not every product
--- the sector has ever held — the CTE filters to ref_year = 2023, so a product
--- that stopped being exported before 2023 is correctly absent from a 2023
--- concentration measure. The two counts differ: engineering 826 vs 863
--- all-years, textiles 784 vs 821, pharmaceuticals 43 vs 53. Quote the 2023
--- count alongside the 2023 HHI; the all-years figure is context, not a
--- denominator for this index. Both counts are now returned as columns
--- (17/09/2026) — the all-years figure was quoted in key_findings.md finding 6
--- while existing only in this comment, which is exactly the kind of
--- untraceable number the project claims not to have.
+-- hs6_products_2023 counts codes carrying a 2023 line — within one year and
+-- one HS edition a code is a product, so this is the right denominator for a
+-- 2023 index. hs6_codes_all_years is NOT a product count: it counts distinct
+-- codes across three HS editions (2012, 2017, 2022), so a product whose code
+-- was split or renumbered is counted more than once (02 assumption 7).
+-- Engineering has 826 codes in 2023 and 863 across the decade, textiles 784
+-- vs 821, pharmaceuticals 43 vs 53 — and most of each gap is edition churn,
+-- not discontinued exports. The column was named hs6_products_all_years, and
+-- key_findings.md finding 6 read it as "37 more products", until 23/09/2026.
+-- It is kept (renamed) because the gap itself is the evidence of the churn.
+-- Exported as data/processed/track_b_sector_concentration_2023.csv.
 -- ============================================================
-WITH product_all_years AS (
-    SELECT sector, COUNT(DISTINCT cmd_code) AS hs6_products_all_years
+DROP VIEW IF EXISTS v_track_b_sector_concentration_2023;
+CREATE VIEW v_track_b_sector_concentration_2023 AS
+WITH codes_all_years AS (
+    SELECT sector, COUNT(DISTINCT cmd_code) AS hs6_codes_all_years
     FROM clean_track_b_india_sector_detail
     WHERE aggr_level = 6 AND partner_code = 0
     GROUP BY sector
@@ -301,20 +337,27 @@ shares AS (
 SELECT
     s.sector,
     COUNT(*)                                               AS hs6_products_2023,
-    MAX(pa.hs6_products_all_years)                         AS hs6_products_all_years,
+    MAX(ca.hs6_codes_all_years)                            AS hs6_codes_all_years,
     ROUND(100.0 * SUM(s.share) FILTER (WHERE s.rnk <= 5), 1) AS top5_share_pct,
     ROUND(SUM(s.share * s.share) * 10000, 0)               AS hhi_2023
 FROM shares s
-JOIN product_all_years pa USING (sector)
+JOIN codes_all_years ca USING (sector)
 GROUP BY s.sector
 ORDER BY hhi_2023 DESC;
+
+SELECT * FROM v_track_b_sector_concentration_2023;
 
 
 -- ============================================================
 -- Query 6: volume vs value, 2014 -> 2023, per sector (assumption 7)
 --          How much of each sector's decade growth is tonnes, and how much
 --          is price. Unit value is USD per kg over weight-bearing rows only.
+--          The last three columns (added 23/09/2026) scale tonnes by value
+--          coverage — assumption 7(a); read them beside the raw tonnes, not
+--          instead of them. Exported as track_b_sector_volume_vs_value.csv.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_b_sector_volume_vs_value;
+CREATE VIEW v_track_b_sector_volume_vs_value AS
 WITH ep AS (
     SELECT
         sector,
@@ -337,6 +380,15 @@ wide AS (
         MAX(net_wgt_kg)        FILTER (WHERE ref_year = 2023) AS kg_2023
     FROM ep
     GROUP BY sector
+),
+adj AS (
+    -- tonnes / value coverage = tonnes if every row shipped at the weighed
+    -- rows' USD/kg
+    SELECT
+        wide.*,
+        kg_2014 * value_2014 / NULLIF(vw_2014, 0) AS kg_adj_2014,
+        kg_2023 * value_2023 / NULLIF(vw_2023, 0) AS kg_adj_2023
+    FROM wide
 )
 SELECT
     sector,
@@ -355,14 +407,82 @@ SELECT
     ROUND(100.0 * vw_2023 / NULLIF(value_2023, 0), 1)                      AS value_coverage_2023_pct,
     CASE WHEN vw_2014 / NULLIF(value_2014, 0) < 0.8
            OR vw_2023 / NULLIF(value_2023, 0) < 0.8
-         THEN 'LOW COVERAGE — no volume claim' ELSE 'ok' END               AS volume_flag
-FROM wide
+         THEN 'LOW COVERAGE — no volume claim' ELSE 'ok' END               AS volume_flag,
+    ROUND(kg_adj_2014 / 1e9, 3)                                            AS mn_tonnes_cov_adj_2014,
+    ROUND(kg_adj_2023 / 1e9, 3)                                            AS mn_tonnes_cov_adj_2023,
+    ROUND(100.0 * (kg_adj_2023 / NULLIF(kg_adj_2014, 0) - 1), 1)           AS volume_change_cov_adj_pct
+FROM adj
 ORDER BY sector;
+
+SELECT * FROM v_track_b_sector_volume_vs_value;
+
+-- ============================================================
+-- Query 6b: engineering's unit value with and without mobile phones
+--           (added 23/09/2026, assumption 7(b)).
+--
+--           Engineering's USD/kg rose 44.8% over the decade, which finding 17
+--           read as "moving up the value chain". One product line carries
+--           most of it. Mobile phones — 851712 until 2021, split into 851713
+--           (smartphones) and 851714 (other) in HS 2022 — went from USD
+--           0.56bn to 14.29bn at roughly USD 1,000/kg, against ~12 USD/kg for
+--           the rest of the sector. Excluding them from BOTH years (all three
+--           codes, so the edition change does not bias the comparison), the
+--           sector's unit value rises 11.43 -> 12.72 USD/kg, +11.3%.
+--           So the rise is mostly a shift in mix toward phones, not higher
+--           prices across the basket. (The cold audit of 23/09/2026 quoted
+--           +8.4%, which removes phones from 2023 but leaves them in 2014.)
+--           Exported as track_b_engineering_unit_value_mix.csv.
+-- ============================================================
+DROP VIEW IF EXISTS v_track_b_engineering_unit_value_mix;
+CREATE VIEW v_track_b_engineering_unit_value_mix AS
+WITH base AS (
+    SELECT
+        ref_year,
+        cmd_code IN ('851712', '851713', '851714') AS is_phone,
+        fob_value,
+        net_wgt
+    FROM clean_track_b_india_sector_detail
+    WHERE aggr_level = 6 AND partner_code = 0
+      AND sector = 'engineering_machinery'
+      AND ref_year IN (2014, 2023)
+),
+yearly AS (
+    SELECT
+        ref_year,
+        SUM(fob_value)                                            AS value_usd,
+        SUM(fob_value) FILTER (WHERE is_phone)                    AS phone_value_usd,
+        SUM(fob_value) FILTER (WHERE net_wgt > 0)                 AS vw_all,
+        SUM(net_wgt)   FILTER (WHERE net_wgt > 0)                 AS kg_all,
+        SUM(fob_value) FILTER (WHERE net_wgt > 0 AND NOT is_phone) AS vw_ex,
+        SUM(net_wgt)   FILTER (WHERE net_wgt > 0 AND NOT is_phone) AS kg_ex
+    FROM base
+    GROUP BY ref_year
+)
+SELECT
+    ref_year,
+    ROUND(value_usd / 1e9, 2)                                   AS sector_value_bn,
+    ROUND(phone_value_usd / 1e9, 2)                             AS phone_value_bn,
+    ROUND(100.0 * phone_value_usd / NULLIF(value_usd, 0), 1)    AS phone_share_pct,
+    ROUND(vw_all / NULLIF(kg_all, 0), 3)                        AS usd_per_kg_all,
+    ROUND(vw_ex  / NULLIF(kg_ex, 0), 3)                         AS usd_per_kg_ex_phones,
+    ROUND(100.0 * ((vw_all / NULLIF(kg_all, 0))
+          / NULLIF(FIRST_VALUE(vw_all / NULLIF(kg_all, 0)) OVER (ORDER BY ref_year), 0) - 1), 1)
+                                                                AS unit_value_change_all_pct,
+    ROUND(100.0 * ((vw_ex / NULLIF(kg_ex, 0))
+          / NULLIF(FIRST_VALUE(vw_ex / NULLIF(kg_ex, 0)) OVER (ORDER BY ref_year), 0) - 1), 1)
+                                                                AS unit_value_change_ex_phones_pct
+FROM yearly
+ORDER BY ref_year;
+
+SELECT * FROM v_track_b_engineering_unit_value_mix;
 
 -- ============================================================
 -- Query 7: petroleum products, year by year — tonnes, USD, USD/kg, and each
 --          indexed to 2014 = 100. The 2022 spike in three columns.
+--          Exported as track_b_petroleum_volume_series.csv.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_b_petroleum_volume_series;
+CREATE VIEW v_track_b_petroleum_volume_series AS
 WITH yearly AS (
     SELECT
         ref_year,
@@ -393,6 +513,8 @@ SELECT
 FROM based
 ORDER BY ref_year;
 
+SELECT * FROM v_track_b_petroleum_volume_series;
+
 -- ============================================================
 -- Query 8: volume coverage per sector per year — the gate on Q6/Q7.
 --          Share of sector value on rows with a populated net_wgt, and TWO
@@ -410,7 +532,10 @@ ORDER BY ref_year;
 --          price, and a volume-versus-price conclusion drawn from it is
 --          partly circular. The row-share column is kept only so the two can
 --          be compared; it was the only one here until 17/09/2026.
+--          Exported as track_b_volume_coverage.csv.
 -- ============================================================
+DROP VIEW IF EXISTS v_track_b_volume_coverage;
+CREATE VIEW v_track_b_volume_coverage AS
 SELECT
     sector,
     ref_year,
@@ -427,6 +552,8 @@ WHERE aggr_level = 6 AND partner_code = 0
 GROUP BY sector, ref_year
 ORDER BY sector, ref_year;
 
+SELECT * FROM v_track_b_volume_coverage;
+
 
 -- ============================================================
 -- Validation — run before trusting the queries above
@@ -435,6 +562,17 @@ ORDER BY sector, ref_year;
 -- V1. Partner coverage. Expect exactly one row: World (partner_code = 0).
 --     If named partners appear, the pull scope changed and the
 --     partner_code = 0 filter above would be silently dropping real data.
+--     Asserted since 23/09/2026.
+DO $$
+DECLARE n bigint;
+BEGIN
+    SELECT COUNT(*) INTO n FROM clean_track_b_india_sector_detail WHERE partner_code <> 0;
+    IF n <> 0 THEN
+        RAISE EXCEPTION '03 V1: % Track B rows have a partner other than World', n;
+    END IF;
+    RAISE NOTICE '03 V1 PASSED: every Track B row is India -> World.';
+END $$;
+
 SELECT partner_code, partner_desc, COUNT(*) AS row_count
 FROM clean_track_b_india_sector_detail
 GROUP BY partner_code, partner_desc
@@ -474,8 +612,16 @@ ORDER BY years_present, sector;
 -- V5. Cross-track reconciliation. Track A holds India's HS2 chapter values
 --     to World. Summing the Track A chapters behind each sector should land
 --     close to the Track B sector totals for the same year. Small gaps are
---     expected (HS6 detail vs HS2 rollup, differing estimation); large ones
---     are a flag to investigate before publishing.
+--     expected (HS6 detail vs HS2 rollup); large ones are a flag to
+--     investigate before publishing. Exported as
+--     track_b_cross_track_reconciliation.csv, at 2 dp — the -2.46% that
+--     finding 10 quotes. (The printed query rounded to 1 dp until
+--     23/09/2026, so it showed -2.5 while the finding cited it for -2.46.)
+--
+--     At build time: worst -2.462% (engineering/machinery 2022), 44 of 50
+--     sector-years within 0.005%, 8 identical to the dollar.
+DROP VIEW IF EXISTS v_track_b_cross_track_reconciliation;
+CREATE VIEW v_track_b_cross_track_reconciliation AS
 WITH track_b_sector AS (
     SELECT sector, ref_year, SUM(fob_value) AS b_value_usd
     FROM clean_track_b_india_sector_detail
@@ -503,13 +649,29 @@ track_a_sector AS (
 SELECT
     b.sector,
     b.ref_year,
-    b.b_value_usd,
-    a.a_value_usd,
-    ROUND(100.0 * (b.b_value_usd - a.a_value_usd) / NULLIF(a.a_value_usd, 0), 1) AS pct_diff
+    ROUND(b.b_value_usd / 1e9, 3)                                                AS track_b_bn,
+    ROUND(a.a_value_usd / 1e9, 3)                                                AS track_a_bn,
+    ROUND(100.0 * (b.b_value_usd - a.a_value_usd) / NULLIF(a.a_value_usd, 0), 2) AS pct_diff
 FROM track_b_sector b
 -- Inner join: a sector-year in one track but not the other would be dropped
 -- from the reconciliation rather than flagged by it — the one place a silent
--- skip would be worst. A no-op here (both tracks hold all 50 sector-years, and
--- the row count below proves it), but stated rather than assumed.
+-- skip would be worst. A no-op here: both tracks hold all 50 sector-years,
+-- and the assertion below checks that the join returns all 50.
 JOIN track_a_sector a USING (sector, ref_year)
 ORDER BY b.sector, b.ref_year;
+
+SELECT * FROM v_track_b_cross_track_reconciliation;
+
+-- V5 assertion (added 23/09/2026): all 50 sector-years reconcile, and none
+-- by more than 2.5%. The tolerance is the published claim, not a fitted
+-- number — finding 10 says "within 2.5%" — so a change that breaks it has
+-- to change the finding too.
+DO $$
+DECLARE n bigint; worst numeric;
+BEGIN
+    SELECT COUNT(*), MAX(ABS(pct_diff)) INTO n, worst FROM v_track_b_cross_track_reconciliation;
+    IF n <> 50 OR worst > 2.5 THEN
+        RAISE EXCEPTION '03 V5: % sector-years reconciled (expected 50), worst |divergence| % percent', n, worst;
+    END IF;
+    RAISE NOTICE '03 V5 PASSED: 50 sector-years reconcile Track B to Track A within 2.5 percent (worst % percent).', worst;
+END $$;

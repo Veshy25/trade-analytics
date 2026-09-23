@@ -14,18 +14,27 @@ external WITS anchor, which is cited to its source and is not derived here.
   applied. The 2022 global commodity spike is therefore *inside* these numbers:
   part of what reads as growth is price, not volume, and petroleum is where
   that distortion is largest.
-- **Bangladesh has 2015–2018 only** — four years, no 2023. WITS likewise
-  carries no Bangladesh total after the mid-2010s, so this is a gap in the
-  source rather than in the pull (`sql/02` assumption 2). One caveat on the
-  labelling: WITS reports the same value this project holds as 2015 under the
-  year 2016, and that discrepancy is unresolved. Its growth rate spans three
-  years either way, and is not comparable to a nine-year rate without saying so.
+- **Bangladesh has 2015–2018 only** — four years, no 2023. WITS carries
+  nothing for Bangladesh after 2015 either, so the missing recent years are a
+  gap in the source rather than in the pull (`sql/02` assumption 2). WITS and
+  this project agree on the year of the value they share (2015); until
+  23/09/2026 this note said WITS labelled it 2016, which was a misreading of
+  the WITS page. Bangladesh's growth rate spans three years and is not
+  comparable to a nine-year rate without saying so.
 - **Track C shares are share-of-panel, not share-of-world.** The 20 partner
   markets cover 61.9%–64.4% of India's exports, so a partner at "27.8%" holds
   27.8% of the tracked panel, not of India's global exports. The same applies
   to Track D (57–70% of each sector's exports **in 2023**, `sql/06` V4 — over
   all fifty sector-years the range is 52.3–71.3%) and to Track E2 (50–58% of
   India's imports, `sql/07` V5).
+- **The panel is a selection, not India's top 20 — and it was chosen for
+  exports.** No selection rule survives in the project's records; it holds
+  India's largest markets, all four South Asian neighbours whatever their size
+  (the Maldives is 0.2% of it) and Viet Nam. Reused for imports, it covers
+  54.7% of India's 2023 imports overall but only **33.9% of mineral fuels and
+  37.8% of precious stones and metals** (`sql/07` V5b), so energy and gold
+  suppliers outside the twenty are missing. Every partner ranking below —
+  bilateral balances above all — is a ranking *within the panel*.
 - **Balances are FOB exports minus CIF imports.** Imports are valued including
   freight and insurance; exports are not. That is how published merchandise
   balances are built, but it overstates every deficit here by the freight
@@ -36,9 +45,10 @@ external WITS anchor, which is cited to its source and is not derived here.
   the two pulls; textiles (0.18%), pharmaceuticals (0.97%) and gems &
   jewellery (1.95%) stay within 2%; engineering/machinery in 2022 runs to
   −11.5%. Eleven of the 1,000 partner-years checked exceed 1% — ten
-  engineering 2022, one gems 2022. That pattern is a Comtrade data property,
-  not pull-date drift: it is the same sector-year where Track B already
-  diverges −2.46% from Track A (finding 10).
+  engineering 2022, one gems 2022. That points to a Comtrade data property
+  rather than pull-date drift: Track B diverges from Track A in the same
+  sector-year (finding 10), and those two come from the *same* pull. It is an
+  inference, not a proof — no series was pulled on both dates.
 
 ---
 
@@ -46,10 +56,21 @@ external WITS anchor, which is cited to its source and is not derived here.
 
 > Over 2014–2023 India's exports compounded at **3.46% a year**, reaching
 > **USD 431.4bn**. Vietnam — a smaller exporter than India in 2014 — compounded
-> at **9.96%** and more than doubled. The gap is not a bad decade for India so
-> much as a structural one: India's growth is concentrated in a commodity
-> (petroleum, 20.7% of 2023 exports) whose value moves with world prices, while
-> Vietnam's is concentrated in manufactured goods.
+> at **9.96%** and more than doubled. The two paths look different in kind: a
+> fifth of India's basket is mineral fuels (20.7% of 2023 exports), which ties
+> much of its value to world energy prices, and India's series swung hardest of
+> the four — down 16.7% in 2015 and 14.8% in 2020, up 43.3% in 2021 — while
+> Vietnam's, led by electronics (HS 85, 37.6% of its 2023 exports), grew every
+> year to 2022. But India's *growth* was not an oil story: of the USD 113.9bn
+> it added over the decade, machinery and electronics (HS 84–85) supplied
+> 34.3% and petroleum 23.7%.
+
+> [!summary] If you read nothing else
+> - **India grew slowest of the four**: 3.46% a year, against Vietnam's 9.96% (finding 1).
+> - **The path was volatile, not steady**: −18% to 2016, then +74% to the 2022 peak (finding 2); fuels, a fifth of exports, carried 43% of the 2023 fall (findings 3–4).
+> - **Engineering led India's sector growth**, 61% of the five focus sectors' net gain, and the US took a growing share of it (findings 5, 15).
+> - **India runs a USD 241bn deficit**, 55% of it in mineral fuels; pharma is the largest surplus chapter (findings 16, 18).
+> - **Read every share as a share of a panel, and every volume as partly Comtrade-estimated** — the two caveats that constrain the most findings (preamble, finding 17).
 
 ![Indexed export trend, four countries](indexed_export_trend.png)
 
@@ -68,6 +89,11 @@ Bangladesh compounded at 8.08%, but over 2015–2018 only.
 | **India** | 2014 | 2023 | 317.5 | **431.4** | **3.46%** |
 
 *Source: `sql/02` Query 4 · `data/processed/track_a_cagr.csv`*
+
+Headline sources: growth contribution by chapter, `sql/02` Query 6 ·
+`data/processed/track_a_india_chapter_contribution_2014_2023.csv`; Vietnam's
+HS 85 share, `track_a_top10_chapters.csv` against `track_a_country_year_totals.csv`;
+year-on-year moves, `track_a_country_year_totals.csv`.
 
 Indexed to each country's own base year, 2023 stands at **235 for Vietnam,
 144 for China, 136 for India**. Vietnam's exports grew **135% against India's
@@ -137,17 +163,24 @@ limitation, not an oversight.
 | 5 | 30 | Pharmaceutical products | 21.3 | 4.9% |
 | 6 | 87 | Vehicles | 20.8 | 4.8% |
 
-This is the mechanism behind finding 1. A fifth of the export book prices off
-world energy markets, which is why India's series swings hardest in both 2020
-and 2022 while Vietnam's climbs steadily through both. Finding 17 adds the
-volume side: across the whole decade, petroleum's growth was tonnes, not price.
+This is the mechanism behind finding 2's volatility, not behind finding 1's
+slow growth. A fifth of the export book prices off world energy markets, which
+is why India's series swings hardest in both 2020 and 2022 while Vietnam's
+climbs steadily through both. It is a *level* share: petroleum's share of the
+decade's *growth* is similar (23.7%, the largest single chapter), and
+machinery and electronics together added more (34.3%, `sql/02` Query 6).
+Finding 17 adds the volume side: across the whole decade, petroleum's growth
+was tonnes, not price — as far as Comtrade's estimated tonnage can show it.
 
 *Source: `sql/02` Query 3 · `data/processed/track_a_top10_chapters.csv`*
 
-## 5. Within the five focus sectors, the growth is entirely in engineering
+## 5. Within the five focus sectors, engineering led the growth
 
 **Engineering/machinery compounded at 11.79%, nearly tripling from USD 22.6bn
-to 61.6bn.** Two of the five sectors *shrank* in nominal terms.
+to 61.6bn** — USD 39.0bn of the five sectors' USD 64.0bn net increase (61%).
+Petroleum added 27.0bn and pharmaceuticals 9.6bn; two of the five sectors
+*shrank* in nominal terms. (Titled "the growth is entirely in engineering"
+until 23/09/2026, which the table below never supported.)
 
 | Sector | 2014 USD bn | 2023 USD bn | CAGR |
 |---|---:|---:|---:|
@@ -184,16 +217,20 @@ partly by construction — a definition artefact as much as a market fact.
 Textiles (14 chapters) and engineering (2) are not comparable to them without
 that qualification.
 
-`hs6_products_2023` counts products with a 2023 line, which is the correct
-denominator for a 2023 index but is **not** the sector's full product count —
-engineering holds 863 products across the decade and textiles 821, 37 more each
-than appear in 2023. Both counts are columns in the CSV below
-(`hs6_products_2023`, `hs6_products_all_years`); until 17/09/2026 the all-years
-figure was quoted here while existing only in a SQL comment.
+`hs6_products_2023` counts HS6 codes with a 2023 line — within one year and
+one HS edition, a code is a product, so this is the right denominator for a
+2023 index. It is **not** comparable to a decade-wide count. Engineering shows
+863 distinct codes across 2014–2023 and textiles 821, but those span three HS
+editions, and editions split, merge and retire codes: 32 of engineering's 37
+"missing" codes and 30 of textiles' 37 last appear in 2016 or 2021, the year
+before an edition change. They are mostly renumbered products, not products
+India stopped exporting. The CSV column is now `hs6_codes_all_years` to say
+so; until 23/09/2026 it was `hs6_products_all_years` and this paragraph read
+it as "37 more products".
 
 *Source: `sql/03` Query 5 · `data/processed/track_b_sector_concentration_2023.csv`*
 
-## 7. India's export markets are unconcentrated — provably, not just apparently
+## 7. India's export markets are never highly concentrated, and on any realistic reading are low
 
 The 20-partner panel returns **HHI 1,180 in 2023**, but that number is computed
 on a panel covering only 63.1% of India's exports, so it overstates
@@ -208,11 +245,22 @@ Rescaling against Track A's India→World total brackets the true figure:
 | **True HHI, lower bound** | 386 | **470** |
 | **True HHI, upper bound** | 1,839 | **1,831** |
 
-The upper bound assumes the entire unobserved 37% is a *single* hidden partner —
-absurd, but it is a genuine ceiling. Even then the figure peaks at 1,889 (2022)
-and never approaches the 2,500 "concentrated" threshold. **India's export
-markets are unconcentrated under any assumption about the unobserved third**,
-which is a stronger claim than the panel figure alone can support.
+The upper bound assumes the entire unobserved 37% is a *single* hidden
+partner — one country taking about twice the USA's 17.6% of India's exports.
+That is implausible, but it is a genuine ceiling, and it peaks at 1,889 (2022).
+The lower bound, 386–481 across the decade, assumes the residual is spread
+thinly across many markets.
+
+What that supports depends on whose bands you use — they are antitrust
+heuristics from US merger review, borrowed, not a trade standard. On the 2010
+US guidelines' bands (under 1,500 unconcentrated, 1,500–2,500 moderate, over
+2,500 highly concentrated), the ceiling sits in the *moderate* band every year
+and never reaches *highly concentrated*. The 2023 US Merger Guidelines replaced
+those bands with a single 1,800 line, which the ceiling crosses in 2014–2016,
+2022 and 2023. So: **never highly concentrated on the 2010 bands under any
+assumption, and low under any realistic one.** Until 23/09/2026 this finding
+said "unconcentrated under any assumption", which its own upper bound did not
+support.
 
 *Source: `sql/04` Query 4 · `data/processed/track_c_partner_concentration.csv`*
 
@@ -236,11 +284,14 @@ the top-1 share is the right one.
 
 *Source: `sql/04` Query 3 · `data/processed/track_c_partner_totals.csv`*
 
-## 9. The Netherlands is the decade's biggest mover
+## 9. The Netherlands made the largest gain after the USA
 
 **The Netherlands climbed from 8th to 3rd** in India's partner table between
-2014 and 2023, reaching USD 23.1bn. Italy, Nepal and Indonesia each rose five
-places from lower starting positions.
+2014 and 2023, adding USD 16.3bn to reach 23.1bn — the largest value gain of
+any partner after the USA (+33.1bn). By places it shares the biggest climb,
+five, with Italy, Nepal and Indonesia; the biggest moves were falls, Sri Lanka
+down nine places and Viet Nam eight. (Titled "the decade's biggest mover" until
+23/09/2026.)
 
 *Source: `sql/04` Query 5a · `data/processed/track_c_partner_rank_moves.csv`*
 
@@ -260,8 +311,11 @@ sector should reproduce the Track B sector totals.
 machinery, 2022), with mean divergence −0.25% or tighter in every sector. The
 second-worst is −1.05%.
 
-This is the project's strongest internal control: two independently pulled
-datasets, at different granularities, agree to within a rounding error.
+This is the project's strongest internal control: two datasets pulled
+separately (from the same source, on the same day), at different
+granularities, agree within 2.5% in every sector-year — within 0.005% in 44 of
+the 50, and to the dollar in 8. The worst gap, −2.46%, is USD 1.33bn. (This
+said "independently pulled … within a rounding error" until 23/09/2026.)
 
 *Source: `sql/03` V5 · `data/processed/track_b_cross_track_reconciliation.csv`*
 
@@ -298,10 +352,14 @@ weight only, `6` = both. Neither that document nor the 2019 methodology guide
 describes any flag for an estimated value.
 
 The data confirms it without the document. On Track B, which carries the flag
-and both modern booleans, flag 2 rows are exactly the quantity-only-estimated
-rows (162), flag 4 exactly the net-weight-only rows (3,776) and flag 6 exactly
-the both-estimated rows (6,656) — no exceptions. `sql/02` V1a now asserts the
-same containment on Track A rather than describing it.
+and both modern booleans, every flag-2 row (162) is quantity-only estimated,
+every flag-4 row (3,776) net-weight-only and every flag-6 row (6,656) both.
+The reverse does not hold: 2,905 flag-0 rows are estimated too (2
+quantity-only, 1,187 net-weight-only, 1,716 both) — the flag was never
+back-filled for them, the same one-way pattern as Track A's 552 rows. `sql/02`
+V1a asserts the flag-to-boolean direction on Track A rather than describing
+it. (Until 23/09/2026 this paragraph said "exactly … no exceptions", true in
+one direction only.)
 
 And the part that settles it: **`netWgt` on the HS2 tracks holds no positive
 value at all** — blank on 48.3% of Track A rows and exactly `0` on the other
@@ -367,8 +425,10 @@ Because the panel covers only 57.0% of India's pharma exports to the world
 could contain more US trade but not less. Four of the five sectors have the USA
 as their largest market; petroleum is the exception.
 
-What the USA buys is packaged medicaments (HS 300490, 300420, 300410 — the top
-three products), not bulk actives.
+What the USA buys under this sector is packaged medicaments (HS 300490,
+300420, 300410 — the top three products). Whether it also buys India's bulk
+active ingredients this data cannot say: those sit mostly in HS 29 (organic
+chemicals), outside the pharmaceuticals sector as defined here (HS 30 only).
 
 ![Sector × partner heatmap, 2023](sector_partner_heatmap_2023.png)
 
@@ -398,23 +458,29 @@ Netherlands. Comtrade records the declared partner.
 
 *Source: `sql/06` Query 2 · `data/processed/track_d_sector_partner_shift.csv`*
 
-## 15. Every sector except gems and pharma concentrated further into the USA
+## 15. Engineering and textiles concentrated into the USA; gems shifted toward it; petroleum concentrated into the Netherlands
 
 **Engineering's panel HHI rose from 998 to 1,745 and textiles' from 1,287 to
 1,857** between 2014 and 2023, in both cases because the USA's share grew by
 12–13 points. The top-3 share rose from 42.5% to 56.2% for engineering and
-51.6% to 57.9% for textiles. Gems (3,472 → 3,240) and pharma (4,134 → 3,991)
-eased slightly from much higher levels; they were already two-market and
-one-market books.
+51.6% to 57.9% for textiles.
+
+Gems' HHI eased (3,472 → 3,240) but not because it moved away from the USA:
+the USA's share *rose* 32.5% → 44.8%, the fifth-largest shift in the data,
+while the UAE's fell faster (47.6% → 33.4%). Petroleum's HHI rose too
+(1,175 → 1,406), but into the Netherlands (7.3% → 28.5%), with the USA
+roughly flat (+0.7 points). Pharma (4,134 → 3,991) eased slightly from a
+one-market book. (Titled "every sector except gems and pharma concentrated
+further into the USA" until 23/09/2026 — wrong for gems and for petroleum.)
 
 These are panel HHIs and are not scored against the usual bands — the panel is
 not the whole market (`sql/06` assumption 6). The direction is what the data
 supports: the manufactured-goods sectors are becoming more US-dependent, not
 less.
 
-*Source: `sql/06` Query 4 · `data/processed/track_d_sector_market_concentration.csv`*
+*Source: `sql/06` Queries 2 and 4 · `data/processed/track_d_sector_market_concentration.csv`, `track_d_sector_partner_shift.csv`*
 
-## 16. India runs a structural deficit that widened from USD 142bn to 241bn; Vietnam swung to surplus
+## 16. India runs a structural deficit that widened from USD 142bn to 241bn; Vietnam widened its surplus
 
 **India imported USD 672.1bn in 2023 against exports of 431.4bn — a deficit
 of USD 240.7bn, 21.8% of total trade.** The deficit was USD 141.8bn in 2014
@@ -430,8 +496,10 @@ down from 69.1% in 2014.
 | India | −141.8 | **−240.7** | −21.8% |
 | Bangladesh | −16.3 *(2015)* | −40.4 *(2018)* | −33.5% *(2018)* |
 
-Vietnam is the contrast case again: roughly balanced in 2014, it has run a
-surplus every year since 2016 and reached +27.6bn in 2023. It did this with
+Vietnam is the contrast case again: a small surplus in 2014 (+2.4bn), a
+deficit in 2015 (−3.8bn), and a surplus every year since 2016, reaching
++27.6bn in 2023. (This finding said Vietnam "swung to surplus" until
+23/09/2026; it was already in surplus in 2014.) It did this with
 imports growing almost as fast as exports — it is not import substitution, it
 is an export base that grew faster than the country's own demand.
 
@@ -473,28 +541,51 @@ story, and the value chart alone cannot show it.
 
 ![Petroleum: value, volume, unit value indexed](petroleum_volume_vs_value.png)
 
-| Sector | Tonnes 2014→2023 | Unit value 2014→2023 | Value CAGR | Volume CAGR | Tonnage Comtrade-estimated, 2014 → 2023 | Reading |
-|---|---:|---:|---:|---:|---:|---|
-| Petroleum products | +49.0% | −5.5% | 4.1% | 4.5% | 95.3% → 95.3% | all volume, on estimated weight |
-| Pharmaceuticals | +78.1% | +2.6% | 6.9% | 6.6% | 97.1% → 100.0% | all volume, on estimated weight |
-| Engineering / machinery | +78.1% | +44.8% | 11.8% | 6.6% | 69.2% → 90.8% | volume *and* price — moving up the value chain |
-| Textiles | −14.9% | −0.9% | −1.3% | −1.8% | 30.6% → 57.1% | a real decline in tonnes, and the least estimated of the five |
-| Gems & jewellery | — | — | −2.2% | — | 91.1% → 99.9% | **no volume claim**: weight covers only 40% of 2014 value |
+| Sector | Tonnes 2014→2023 | Coverage-adjusted | Unit value 2014→2023 | Value CAGR | Volume CAGR | Tonnage Comtrade-estimated, 2014 → 2023 | Reading |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Petroleum products | +49.0% | +51.6% | −5.5% | 4.1% | 4.5% | 95.3% → 95.3% | all volume, on estimated weight |
+| Pharmaceuticals | +78.1% | +78.1% | +2.6% | 6.9% | 6.6% | 97.1% → 100.0% | all volume, on the most-estimated weight of the four |
+| Engineering / machinery | +78.1% | +88.3% | +44.8% | 11.8% | 6.6% | 69.2% → 90.8% | volume, plus a mix shift toward phones — see below |
+| Textiles | −14.9% | −10.5% | −0.9% | −1.3% | −1.8% | 30.6% → 57.1% | a decline in tonnes, and the least estimated of the five |
+| Gems & jewellery | — | — | — | −2.2% | — | 91.1% → 99.9% | **no volume claim**: weight covers only 40% of 2014 value |
 
-The estimation column is why textiles is the sector where the volume reading is
-most trustworthy and petroleum the one where it is least, which is the reverse
-of what their coverage percentages alone would suggest.
+**Two limits on reading this table** (added 23/09/2026):
+
+- **Tonnes are summed only over rows that carry a weight.** When that coverage
+  moves between the endpoint years, so does the tonnage change. The
+  coverage-adjusted column scales tonnes up by each year's value coverage,
+  assuming the unweighed rows ship at the same USD/kg as the weighed ones. It
+  is also why value change ≠ tonnes change × unit-value change in the table
+  (engineering: 1.781 × 1.448 = 2.579 against a value ratio of 2.727 — the
+  gap is exactly the coverage ratio, 96.2% / 91.0%).
+- **A sector's USD/kg is a mix-weighted average, not a price.** Engineering's
+  +44.8% was read here as "moving up the value chain". Most of it is one
+  product line: mobile phones (851712, split into 851713/851714 in HS 2022)
+  went from USD 0.56bn in 2014 to 14.29bn in 2023 — 23.2% of the sector — at
+  roughly USD 1,000/kg against about 12 for the rest. Excluding phones from
+  both years, the sector's unit value rose **11.43 → 12.72 USD/kg, +11.3%**
+  (`sql/03` Q6b). The rise is mainly a shift in *what* India exports, not
+  higher prices across the basket.
+
+The estimation column ranks trustworthiness. Textiles is the sector where the
+volume reading is most trustworthy (30.6% → 57.1% of tonnage estimated);
+pharmaceuticals is where it is least (97.1% → 100.0%), with petroleum close
+behind (95.3% in both years) — the reverse of what their coverage percentages
+alone would suggest. (Until 23/09/2026 this paragraph named petroleum as the
+least trustworthy, against its own table.)
 
 Textiles is the one sector where the volume data changes the reading most:
-5.86 million tonnes in 2023 against 6.89 in 2014, and no year after 2018 back
-above the 2014 level except 2021. That is a shrinking physical export, not a
-nominal artefact.
+5.86 million tonnes in 2023 against 6.89 in 2014 (−14.9%), and no year after
+2018 back above the 2014 level except 2021. Adjusted for the fall in weight
+coverage (97.8% → 93.0%), the decline is nearer −10.5%. Either way it is a
+shrinking physical export, not a nominal artefact; the size is less certain
+than the direction.
 
 Gems & jewellery is excluded on coverage (`sql/03` Q8): only 40% of its 2014
 value sits on rows with a net weight, and weight is a poor measure of gems in
 any case. The row is in the CSV, flagged.
 
-*Source: `sql/03` Queries 6–8 · `data/processed/track_b_sector_volume_vs_value.csv`, `track_b_petroleum_volume_series.csv`, `track_b_volume_coverage.csv`*
+*Source: `sql/03` Queries 6–8 · `data/processed/track_b_sector_volume_vs_value.csv`, `track_b_engineering_unit_value_mix.csv`, `track_b_petroleum_volume_series.csv`, `track_b_volume_coverage.csv`*
 
 ## 18. Half of India's deficit is one chapter, and the surplus chapters are small
 
@@ -521,15 +612,24 @@ the CSV below on 17/09/2026, having been published as 65.3 and 310.9.
 
 *Source: `sql/07` Query 2 · `data/processed/track_e_india_chapter_balance_2023.csv`*
 
-## 19. The China deficit more than doubled to USD 106bn; the USA and Netherlands are the surplus markets
+## 19. The China deficit more than doubled to USD 106bn; within the panel, the USA and Netherlands are the surplus markets
 
 **India's bilateral deficit with China was USD 105.7bn in 2023 — 122.0bn
 imported, 16.3bn exported — up from 44.8bn in 2014.** It is 44% of India's
-total deficit and larger than the next four bilateral deficits combined
-(Saudi Arabia −23.8, Indonesia −16.6, Japan −13.7, Germany −8.5).
+total deficit. **Among the twenty partners in the panel**, it is larger than
+the next four bilateral deficits combined (Saudi Arabia −23.8, Indonesia
+−16.6, Japan −13.7, Germany −8.5).
+
+That ranking stops at the panel's edge, and the panel was chosen for exports
+(preamble). It covers only 33.9% of India's 2023 fuel imports and 37.8% of its
+precious-stone and metal imports (`sql/07` V5b), so large energy and gold
+suppliers are outside it, and their bilateral deficits with India are not in
+this data. "Larger than the next four" should not be read as a statement about
+India's partners in general. (Until 23/09/2026 this finding made that
+comparison without the qualifier.)
 
 On the other side, **the USA (+33.7bn) and the Netherlands (+20.7bn)** are the
-two large surplus markets. The Netherlands surplus is petroleum (finding 14).
+two large surplus markets in the panel. The Netherlands surplus is petroleum (finding 14).
 The UAE flipped from a +5.6bn surplus in 2014 to a −4.5bn deficit in 2023, and
 Vietnam from +3.7bn to −4.0bn.
 
@@ -543,10 +643,11 @@ Vietnam from +3.7bn to −4.0bn.
 | USA | 75.8 | 42.1 | +22.3 | **+33.7** | +11.4 |
 
 The 20 partners cover 50–58% of India's imports (`sql/07` V5), lower than the
-export-side panel — India's import sources are more dispersed than its export
-markets.
+export-side panel — partly because India's import sources are more dispersed
+than its export markets, and partly because the panel was never chosen to
+capture them.
 
-*Source: `sql/07` Query 3 · `data/processed/track_e_india_partner_balance.csv`*
+*Source: `sql/07` Query 3 and V5b · `data/processed/track_e_india_partner_balance.csv`, `track_e_panel_import_coverage_2023.csv`*
 
 ## 20. India's import basket is shifting from fuel to electronics
 
@@ -563,9 +664,9 @@ same chapters India is trying to export.
 
 ## Corrections kept visible
 
-Three corrections are recorded here rather than quietly applied. Two of them
-(the second and third) were found by an external cold audit of the published
-repository on 16/09/2026 and closed on 17/09/2026.
+Four corrections are recorded here rather than quietly applied. The second and
+third were found by a cold audit of the published repository on 16/09/2026 and
+closed on 17/09/2026; the fourth by a second cold audit on 23/09/2026.
 
 **1. HS descriptions change between HS editions, and one Phase 1 query grouped
 on them.** `sql/02` Query 3 grouped by `cmd_code, cmd_desc` across all ten
@@ -602,6 +703,25 @@ meaning was inferred from its name and its distribution looking plausible,
 instead of from UN Comtrade's own field documentation, which defines both
 precisely and was not consulted until an auditor did.
 
+**4. Several headline claims said more than the evidence.** None of the
+arithmetic was wrong — a second cold audit re-derived about 150 figures and
+found every one correct — but the words around them went further than the
+numbers. The headline said India's growth was "concentrated in" petroleum,
+quoting its 20.7% *level* share; its share of the decade's *growth* is 23.7%,
+and machinery and electronics together supplied more (34.3%). Finding 7 said
+India's markets were "unconcentrated under any assumption" when its own upper
+bound sits in the moderate band. Finding 15's title was wrong for gems and
+petroleum; finding 5's "entirely in engineering" was 61%; finding 17 read a
+phone-driven mix shift as "moving up the value chain", ranked petroleum rather
+than pharma as its least trustworthy volume series, and overstated textiles'
+tonnage decline by about four points. Finding 6 counted HS6 *codes* across
+three HS editions as products, and finding 19 ranked bilateral deficits
+without saying the panel was chosen for exports and misses most fuel and gold
+suppliers. Each is corrected in place, with the old wording noted where it
+stood. The lesson is the counterpart of the third correction's: that one was
+a misread field, these were honest numbers carried one step past what they
+show.
+
 ## What this analysis does not answer
 
 Stated as scope, not discovered as gaps:
@@ -615,6 +735,12 @@ Stated as scope, not discovered as gaps:
   Vietnam's surplus is made of.
 - **Partner × sector for imports.** Track D is exports. "Where does India's
   machinery come from" would need a fifth pull.
+- **Bilateral balances outside the panel.** The twenty partners were chosen
+  for exports and cover a third of India's fuel imports; India's balances with
+  the energy and gold suppliers outside them are not measured here.
+- **Product trends across HS editions.** HS6 codes are split, merged and
+  retired at each edition (2017, 2022). No concordance is applied, so
+  product-level claims stay within one edition.
 - **Gems & jewellery volume.** Excluded on coverage; see finding 17.
 - **Why.** This is a descriptive analysis. It establishes what happened and
   quantifies it; it does not model causes.
