@@ -1,0 +1,50 @@
+table 'D Sector Partner Matrix 2023'
+	lineageTag: d-spm
+
+	column sector
+		dataType: string
+		lineageTag: d-spm-sector
+		summarizeBy: none
+		sourceColumn: sector
+
+	column partner_desc
+		dataType: string
+		lineageTag: d-spm-partner
+		summarizeBy: none
+		sourceColumn: partner_desc
+
+	column rank_in_sector
+		dataType: int64
+		formatString: 0
+		lineageTag: d-spm-rank
+		summarizeBy: sum
+		sourceColumn: rank_in_sector
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_2023_bn
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: d-spm-value
+		summarizeBy: sum
+		sourceColumn: value_2023_bn
+
+	column pct_of_sector_panel
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: d-spm-pct
+		summarizeBy: sum
+		sourceColumn: pct_of_sector_panel
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'D Sector Partner Matrix 2023' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_d_sector_partner_matrix_2023.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"sector", type text}, {"partner_desc", type text}, {"rank_in_sector", Int64.Type}, {"value_2023_bn", type number}, {"pct_of_sector_panel", type number}})
+				in
+					Typed
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "trade_analytics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1035d610-5d16-4ef4-9d8f-d722052a2f89"
+  }
+}

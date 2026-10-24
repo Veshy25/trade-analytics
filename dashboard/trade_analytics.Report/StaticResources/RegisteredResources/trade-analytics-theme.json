@@ -1,0 +1,82 @@
+{
+  "name": "trade-analytics-theme",
+  "dataColors": [
+    "#D55E00",
+    "#0072B2",
+    "#009E73",
+    "#CC79A7",
+    "#E69F00",
+    "#56B4E9",
+    "#8E44AD",
+    "#2C3E50"
+  ],
+  "foreground": "#1F2937",
+  "foregroundNeutralSecondary": "#4B5563",
+  "foregroundNeutralTertiary": "#6B7280",
+  "background": "#FFFFFF",
+  "backgroundLight": "#F3F4F6",
+  "backgroundNeutral": "#E5E7EB",
+  "tableAccent": "#D55E00",
+  "good": "#15803D",
+  "neutral": "#6B7280",
+  "bad": "#B3261E",
+  "maximum": "#15803D",
+  "center": "#9CA3AF",
+  "minimum": "#B3261E",
+  "null": "#E5E7EB",
+  "textClasses": {
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#1F2937"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 28,
+      "color": "#111827"
+    },
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 16,
+      "color": "#111827"
+    },
+    "header": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 14,
+      "color": "#111827"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            }
+          }
+        ],
+        "border": [
+          {
+            "show": false
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#FAFAFA"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

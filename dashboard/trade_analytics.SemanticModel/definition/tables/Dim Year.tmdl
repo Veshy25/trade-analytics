@@ -1,0 +1,31 @@
+table 'Dim Year'
+	lineageTag: dim-year
+
+	measure 'Selected Year' = SELECTEDVALUE('Dim Year'[Year], BLANK())
+		displayFolder: Utility
+		lineageTag: m-selected-year
+
+	column Year
+		lineageTag: f078b06d-33ba-484f-8db3-86e8358c677b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Label'
+		lineageTag: 4a0300ee-966b-4137-9c54-f99db369372d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year Label]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim Year' = calculated
+		mode: import
+		source =
+				ADDCOLUMNS (
+					SELECTCOLUMNS ( GENERATESERIES ( 2014, 2023, 1 ), "Year", [Value] ),
+					"Year Label", FORMAT ( [Year], "0" )
+				)
+

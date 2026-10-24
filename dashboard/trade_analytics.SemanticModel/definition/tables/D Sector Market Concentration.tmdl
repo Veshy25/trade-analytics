@@ -1,0 +1,55 @@
+table 'D Sector Market Concentration'
+	lineageTag: d-smc
+
+	column sector
+		dataType: string
+		lineageTag: d-smc-sector
+		summarizeBy: none
+		sourceColumn: sector
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: d-smc-year
+		summarizeBy: none
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column top3_partner_share_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: d-smc-t3
+		summarizeBy: sum
+		sourceColumn: top3_partner_share_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column hhi_panel
+		dataType: double
+		formatString: #,##0
+		lineageTag: d-smc-hhi
+		summarizeBy: sum
+		sourceColumn: hhi_panel
+
+		annotation SummarizationSetBy = Automatic
+
+	column partners_with_trade
+		dataType: int64
+		formatString: 0
+		lineageTag: d-smc-pwt
+		summarizeBy: sum
+		sourceColumn: partners_with_trade
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'D Sector Market Concentration' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_d_sector_market_concentration.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"sector", type text}, {"ref_year", Int64.Type}, {"top3_partner_share_pct", type number}, {"hhi_panel", type number}, {"partners_with_trade", Int64.Type}})
+				in
+					Typed
+

@@ -1,0 +1,47 @@
+table 'Dim Sector'
+	lineageTag: dim-sector
+
+	measure 'Selected Sector' = SELECTEDVALUE('Dim Sector'[Sector Display], "All sectors")
+		displayFolder: Utility
+		lineageTag: m-selected-sector
+
+	column Sector
+		lineageTag: 2bfd31d2-1ae6-44e9-9db9-6d2f75368c94
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Sector]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sector Display'
+		lineageTag: 1b0f512c-0308-4c6b-bb89-593b4b9e5a0f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Sector Display]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sector Sort'
+		lineageTag: 414e37a6-a424-4137-bcdb-38955064f8ef
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Sector Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim Sector' = calculated
+		mode: import
+		source =
+				DATATABLE (
+					"Sector", STRING,
+					"Sector Display", STRING,
+					"Sector Sort", INTEGER,
+					{
+						{ "petroleum_products",    "Petroleum Products",       1 },
+						{ "engineering_machinery", "Engineering & Machinery",  2 },
+						{ "textiles",              "Textiles",                 3 },
+						{ "gems_jewellery",        "Gems & Jewellery",         4 },
+						{ "pharmaceuticals",       "Pharmaceuticals",          5 }
+					}
+				)
+
