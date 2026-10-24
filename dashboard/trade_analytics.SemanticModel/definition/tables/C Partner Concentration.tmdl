@@ -1,0 +1,67 @@
+table 'C Partner Concentration'
+	lineageTag: c-pc
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: c-pc-year
+		summarizeBy: none
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column top5_partner_share_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: c-pc-t5
+		summarizeBy: sum
+		sourceColumn: top5_partner_share_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column hhi_panel
+		dataType: double
+		formatString: #,##0
+		lineageTag: c-pc-hp
+		summarizeBy: sum
+		sourceColumn: hhi_panel
+
+		annotation SummarizationSetBy = Automatic
+
+	column panel_coverage_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: c-pc-cov
+		summarizeBy: sum
+		sourceColumn: panel_coverage_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column hhi_true_lower
+		dataType: double
+		formatString: #,##0
+		lineageTag: c-pc-tl
+		summarizeBy: sum
+		sourceColumn: hhi_true_lower
+
+		annotation SummarizationSetBy = Automatic
+
+	column hhi_true_upper
+		dataType: double
+		formatString: #,##0
+		lineageTag: c-pc-tu
+		summarizeBy: sum
+		sourceColumn: hhi_true_upper
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'C Partner Concentration' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_c_partner_concentration.csv"), [Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"ref_year", Int64.Type}, {"top5_partner_share_pct", type number}, {"hhi_panel", type number}, {"panel_coverage_pct", type number}, {"hhi_true_lower", type number}, {"hhi_true_upper", type number}})
+				in
+					Typed
+

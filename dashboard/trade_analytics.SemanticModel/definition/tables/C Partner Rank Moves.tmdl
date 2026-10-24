@@ -1,0 +1,60 @@
+table 'C Partner Rank Moves'
+	lineageTag: c-prm
+
+	column partner_desc
+		dataType: string
+		lineageTag: c-prm-partner
+		summarizeBy: none
+		sourceColumn: partner_desc
+
+	column rank_2014
+		dataType: int64
+		formatString: 0
+		lineageTag: c-prm-r2014
+		summarizeBy: sum
+		sourceColumn: rank_2014
+
+		annotation SummarizationSetBy = Automatic
+
+	column rank_2023
+		dataType: int64
+		formatString: 0
+		lineageTag: c-prm-r2023
+		summarizeBy: sum
+		sourceColumn: rank_2023
+
+		annotation SummarizationSetBy = Automatic
+
+	column rank_improvement
+		dataType: int64
+		formatString: +0;-0
+		lineageTag: c-prm-impr
+		summarizeBy: sum
+		sourceColumn: rank_improvement
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_2014_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: c-prm-v2014
+		summarizeBy: sum
+		sourceColumn: value_2014_bn
+
+	column value_2023_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: c-prm-v2023
+		summarizeBy: sum
+		sourceColumn: value_2023_bn
+
+	partition 'C Partner Rank Moves' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_c_partner_rank_moves.csv"), [Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"partner_desc", type text}, {"rank_2014", Int64.Type}, {"rank_2023", Int64.Type}, {"rank_improvement", Int64.Type}, {"value_2014_bn", type number}, {"value_2023_bn", type number}})
+				in
+					Typed
+

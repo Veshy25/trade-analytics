@@ -1,0 +1,83 @@
+table 'A Top10 Chapters'
+	lineageTag: a-top10
+
+	measure 'Chapter Value bn' =
+			VAR IsBangladesh = [Selected Country Key] = "Bangladesh"
+			RETURN
+				IF (
+					IsBangladesh,
+					SUM ( 'A Top10 Chapters'[value_2014_2023_bn] ),
+					SUM ( 'A Top10 Chapters'[value_2023_bn] )
+				)
+		formatString: #,##0.0
+		displayFolder: Benchmark
+		lineageTag: m-chapter-value-bn
+
+	measure 'Chapter Chart Title' =
+			VAR C = [Selected Country]
+			RETURN
+				IF (
+					[Selected Country Key] = "Bangladesh",
+					"Top 10 export chapters — " & C & " (ranked on 2014–2018 total, USD bn)",
+					"Top 10 export chapters — " & C & " (2023, USD bn)"
+				)
+		displayFolder: Benchmark
+		lineageTag: m-chapter-chart-title
+
+	column reporter_desc
+		dataType: string
+		lineageTag: a-top10-reporter
+		summarizeBy: none
+		sourceColumn: reporter_desc
+
+	column rank_2023
+		dataType: int64
+		formatString: 0
+		lineageTag: a-top10-rank
+		summarizeBy: sum
+		sourceColumn: rank_2023
+
+		annotation SummarizationSetBy = Automatic
+
+	column cmd_code
+		dataType: string
+		lineageTag: a-top10-cmd-code
+		summarizeBy: none
+		sourceColumn: cmd_code
+
+	column cmd_desc
+		dataType: string
+		lineageTag: a-top10-cmd-desc
+		summarizeBy: none
+		sourceColumn: cmd_desc
+
+	column value_2023_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-top10-v2023
+		summarizeBy: sum
+		sourceColumn: value_2023_bn
+
+	column value_2014_2023_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-top10-vfull
+		summarizeBy: sum
+		sourceColumn: value_2014_2023_bn
+
+	column rank_basis
+		dataType: string
+		lineageTag: a-top10-rank-basis
+		summarizeBy: none
+		sourceColumn: rank_basis
+
+	partition 'A Top10 Chapters' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_a_top10_chapters.csv"), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"reporter_desc", type text}, {"rank_2023", Int64.Type}, {"cmd_code", type text}, {"cmd_desc", type text}, {"value_2023_bn", type number}, {"value_2014_2023_bn", type number}, {"rank_basis", type text}})
+				in
+					Typed
+

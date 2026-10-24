@@ -1,0 +1,48 @@
+table 'D Sector Partner CAGR'
+	lineageTag: d-spc
+
+	column sector
+		dataType: string
+		lineageTag: d-spc-sector
+		summarizeBy: none
+		sourceColumn: sector
+
+	column partner_desc
+		dataType: string
+		lineageTag: d-spc-partner
+		summarizeBy: none
+		sourceColumn: partner_desc
+
+	column value_2014_mn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: d-spc-v2014
+		summarizeBy: sum
+		sourceColumn: value_2014_mn
+
+	column value_2023_mn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: d-spc-v2023
+		summarizeBy: sum
+		sourceColumn: value_2023_mn
+
+	column cagr_pct
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: d-spc-cagr
+		summarizeBy: sum
+		sourceColumn: cagr_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'D Sector Partner CAGR' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_d_sector_partner_cagr.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"sector", type text}, {"partner_desc", type text}, {"value_2014_mn", type number}, {"value_2023_mn", type number}, {"cagr_pct", type number}})
+				in
+					Typed
+

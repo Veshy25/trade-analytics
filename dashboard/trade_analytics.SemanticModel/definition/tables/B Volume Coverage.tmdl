@@ -1,0 +1,73 @@
+table 'B Volume Coverage'
+	lineageTag: b-vc
+
+	column sector
+		dataType: string
+		lineageTag: b-vc-sector
+		summarizeBy: none
+		sourceColumn: sector
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: b-vc-year
+		summarizeBy: none
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column hs6_rows
+		dataType: int64
+		formatString: #,##0
+		lineageTag: b-vc-rows
+		summarizeBy: sum
+		sourceColumn: hs6_rows
+
+		annotation SummarizationSetBy = Automatic
+
+	column rows_with_weight
+		dataType: int64
+		formatString: #,##0
+		lineageTag: b-vc-rww
+		summarizeBy: sum
+		sourceColumn: rows_with_weight
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_coverage_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vc-vcov
+		summarizeBy: sum
+		sourceColumn: value_coverage_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column weight_estimated_rows_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vc-werp
+		summarizeBy: sum
+		sourceColumn: weight_estimated_rows_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column weight_estimated_kg_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vc-wekp
+		summarizeBy: sum
+		sourceColumn: weight_estimated_kg_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'B Volume Coverage' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_b_volume_coverage.csv"), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"sector", type text}, {"ref_year", Int64.Type}, {"hs6_rows", Int64.Type}, {"rows_with_weight", Int64.Type}, {"value_coverage_pct", type number}, {"weight_estimated_rows_pct", type number}, {"weight_estimated_kg_pct", type number}})
+				in
+					Typed
+

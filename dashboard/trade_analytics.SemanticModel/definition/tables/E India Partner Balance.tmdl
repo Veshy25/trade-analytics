@@ -1,0 +1,54 @@
+table 'E India Partner Balance'
+	lineageTag: e-ipb
+
+	column partner_desc
+		dataType: string
+		lineageTag: e-ipb-partner
+		summarizeBy: none
+		sourceColumn: partner_desc
+
+	column exports_2023_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: e-ipb-exp
+		summarizeBy: sum
+		sourceColumn: exports_2023_bn
+
+	column imports_2023_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: e-ipb-imp
+		summarizeBy: sum
+		sourceColumn: imports_2023_bn
+
+	column balance_2014_bn
+		dataType: double
+		formatString: +#,##0.0;-#,##0.0
+		lineageTag: e-ipb-b2014
+		summarizeBy: sum
+		sourceColumn: balance_2014_bn
+
+	column balance_2023_bn
+		dataType: double
+		formatString: +#,##0.0;-#,##0.0
+		lineageTag: e-ipb-b2023
+		summarizeBy: sum
+		sourceColumn: balance_2023_bn
+
+	column balance_change_bn
+		dataType: double
+		formatString: +#,##0.0;-#,##0.0
+		lineageTag: e-ipb-bchg
+		summarizeBy: sum
+		sourceColumn: balance_change_bn
+
+	partition 'E India Partner Balance' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_e_india_partner_balance.csv"), [Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"partner_desc", type text}, {"exports_2023_bn", type number}, {"imports_2023_bn", type number}, {"balance_2014_bn", type number}, {"balance_2023_bn", type number}, {"balance_change_bn", type number}})
+				in
+					Typed
+

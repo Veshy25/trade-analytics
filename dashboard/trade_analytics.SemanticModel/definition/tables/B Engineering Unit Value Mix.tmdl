@@ -1,0 +1,81 @@
+table 'B Engineering Unit Value Mix'
+	lineageTag: b-euvm
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: b-euvm-year
+		summarizeBy: sum
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column sector_value_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-euvm-sv
+		summarizeBy: sum
+		sourceColumn: sector_value_bn
+
+	column phone_value_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-euvm-pv
+		summarizeBy: sum
+		sourceColumn: phone_value_bn
+
+	column phone_share_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-euvm-ps
+		summarizeBy: sum
+		sourceColumn: phone_share_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column usd_per_kg_all
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: b-euvm-upk-all
+		summarizeBy: sum
+		sourceColumn: usd_per_kg_all
+
+		annotation SummarizationSetBy = Automatic
+
+	column usd_per_kg_ex_phones
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: b-euvm-upk-ex
+		summarizeBy: sum
+		sourceColumn: usd_per_kg_ex_phones
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_value_change_all_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-euvm-uva
+		summarizeBy: sum
+		sourceColumn: unit_value_change_all_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_value_change_ex_phones_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-euvm-uve
+		summarizeBy: sum
+		sourceColumn: unit_value_change_ex_phones_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'B Engineering Unit Value Mix' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_b_engineering_unit_value_mix.csv"), [Delimiter=",", Columns=8, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"ref_year", Int64.Type}, {"sector_value_bn", type number}, {"phone_value_bn", type number}, {"phone_share_pct", type number}, {"usd_per_kg_all", type number}, {"usd_per_kg_ex_phones", type number}, {"unit_value_change_all_pct", type number}, {"unit_value_change_ex_phones_pct", type number}})
+				in
+					Typed
+

@@ -1,0 +1,52 @@
+table 'D Sector Partner Shift'
+	lineageTag: d-sps
+
+	column sector
+		dataType: string
+		lineageTag: d-sps-sector
+		summarizeBy: none
+		sourceColumn: sector
+
+	column partner_desc
+		dataType: string
+		lineageTag: d-sps-partner
+		summarizeBy: none
+		sourceColumn: partner_desc
+
+	column share_2014_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: d-sps-s2014
+		summarizeBy: sum
+		sourceColumn: share_2014_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column share_2023_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: d-sps-s2023
+		summarizeBy: sum
+		sourceColumn: share_2023_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column shift_ppt
+		dataType: double
+		formatString: +#,##0.0;-#,##0.0
+		lineageTag: d-sps-shift
+		summarizeBy: sum
+		sourceColumn: shift_ppt
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'D Sector Partner Shift' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_d_sector_partner_shift.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"sector", type text}, {"partner_desc", type text}, {"share_2014_pct", type number}, {"share_2023_pct", type number}, {"shift_ppt", type number}})
+				in
+					Typed
+

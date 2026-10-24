@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "Benchmark",
+  "displayName": "Benchmark",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "visualInteractions": [
+    {
+      "source": "v02slicer",
+      "target": "v03kpiindia",
+      "type": "NoFilter"
+    },
+    {
+      "source": "v02slicer",
+      "target": "v04kpichina",
+      "type": "NoFilter"
+    },
+    {
+      "source": "v02slicer",
+      "target": "v01title",
+      "type": "DataFilter"
+    },
+    {
+      "source": "v02slicer",
+      "target": "v08bartop10",
+      "type": "NoFilter"
+    },
+    {
+      "source": "v02slicer",
+      "target": "v06kpibangladesh",
+      "type": "NoFilter"
+    },
+    {
+      "source": "v02slicer",
+      "target": "v05kpivietnam",
+      "type": "NoFilter"
+    }
+  ]
+}
