@@ -1,0 +1,91 @@
+table 'A CAGR'
+	lineageTag: a-cagr
+
+	measure 'CAGR pct' = SELECTEDVALUE('A CAGR'[cagr_pct])
+		formatString: #,##0.00
+		displayFolder: Benchmark
+		lineageTag: m-cagr-pct
+
+	measure 'CAGR Label' =
+			VAR C = SELECTEDVALUE ( 'A CAGR'[cagr_pct] )
+			VAR F = SELECTEDVALUE ( 'A CAGR'[first_year] )
+			VAR L = SELECTEDVALUE ( 'A CAGR'[last_year] )
+			RETURN
+				IF (
+					ISBLANK ( C ),
+					BLANK (),
+					FORMAT ( C, "0.00" ) & "% (" & FORMAT ( F, "0" ) & "–" & FORMAT ( L, "0" ) & ")"
+				)
+		displayFolder: Benchmark
+		lineageTag: m-cagr-label
+
+	column reporter_desc
+		dataType: string
+		lineageTag: a-cagr-reporter
+		summarizeBy: none
+		sourceColumn: reporter_desc
+
+	column first_year
+		dataType: int64
+		formatString: 0
+		lineageTag: a-cagr-first-year
+		summarizeBy: sum
+		sourceColumn: first_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_year
+		dataType: int64
+		formatString: 0
+		lineageTag: a-cagr-last-year
+		summarizeBy: sum
+		sourceColumn: last_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column years_present
+		dataType: int64
+		formatString: 0
+		lineageTag: a-cagr-years-present
+		summarizeBy: sum
+		sourceColumn: years_present
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_year_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-cagr-first-bn
+		summarizeBy: sum
+		sourceColumn: first_year_bn
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_year_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-cagr-last-bn
+		summarizeBy: sum
+		sourceColumn: last_year_bn
+
+		annotation SummarizationSetBy = Automatic
+
+	column cagr_pct
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: a-cagr-cagr-pct
+		summarizeBy: sum
+		sourceColumn: cagr_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'A CAGR' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_a_cagr.csv"), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"reporter_desc", type text}, {"first_year", Int64.Type}, {"last_year", Int64.Type}, {"years_present", Int64.Type}, {"first_year_bn", type number}, {"last_year_bn", type number}, {"cagr_pct", type number}})
+				in
+					Typed
+

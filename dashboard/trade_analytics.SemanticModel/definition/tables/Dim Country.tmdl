@@ -1,0 +1,59 @@
+table 'Dim Country'
+	lineageTag: dim-country
+
+	measure 'Selected Country' = SELECTEDVALUE('Dim Country'[Country Display], "All countries")
+		displayFolder: Utility
+		lineageTag: m-selected-country
+
+	measure 'Selected Country Key' = SELECTEDVALUE('Dim Country'[Country], BLANK())
+		displayFolder: Utility
+		lineageTag: m-selected-country-key
+
+	column Country
+		lineageTag: 085ab8ec-577f-45c6-b973-ea7572d34f95
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Country]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Country Display'
+		lineageTag: 334482b0-f5e4-472f-b410-5639957e8512
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Country Display]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is India'
+		lineageTag: 41faaca7-e33b-427a-ba20-4340bba0c37b
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Is India]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Country Sort'
+		lineageTag: ecaf2296-cd86-47c8-af6c-6f49e087fa1a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Country Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim Country' = calculated
+		mode: import
+		source =
+				DATATABLE (
+					"Country", STRING,
+					"Country Display", STRING,
+					"Is India", INTEGER,
+					"Country Sort", INTEGER,
+					{
+						{ "India",      "India",      1, 1 },
+						{ "China",      "China",      0, 2 },
+						{ "Viet Nam",   "Vietnam",    0, 3 },
+						{ "Bangladesh", "Bangladesh", 0, 4 }
+					}
+				)
+

@@ -1,0 +1,54 @@
+table 'A Country Year Totals'
+	lineageTag: a-cyt
+
+	measure 'Total Exports bn' = SUM('A Country Year Totals'[total_export_value_usd_bn])
+		formatString: #,##0.0
+		displayFolder: Benchmark
+		lineageTag: m-total-exports-bn
+
+	measure 'YoY Growth pct' = SELECTEDVALUE('A Country Year Totals'[yoy_growth_pct])
+		formatString: #,##0.00
+		displayFolder: Benchmark
+		lineageTag: m-yoy-growth-pct
+
+	column reporter_desc
+		dataType: string
+		lineageTag: a-cyt-reporter
+		summarizeBy: none
+		sourceColumn: reporter_desc
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: a-cyt-year
+		summarizeBy: none
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_export_value_usd_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-cyt-total
+		summarizeBy: sum
+		sourceColumn: total_export_value_usd_bn
+
+	column yoy_growth_pct
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: a-cyt-yoy
+		summarizeBy: sum
+		sourceColumn: yoy_growth_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'A Country Year Totals' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_a_country_year_totals.csv"), [Delimiter=",", Columns=4, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"reporter_desc", type text}, {"ref_year", Int64.Type}, {"total_export_value_usd_bn", type number}, {"yoy_growth_pct", type number}})
+				in
+					Typed
+

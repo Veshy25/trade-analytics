@@ -1,0 +1,55 @@
+table 'B Sector Concentration 2023'
+	lineageTag: b-sc
+
+	column sector
+		dataType: string
+		lineageTag: b-sc-sector
+		summarizeBy: none
+		sourceColumn: sector
+
+	column hs6_products_2023
+		dataType: int64
+		formatString: #,##0
+		lineageTag: b-sc-products
+		summarizeBy: sum
+		sourceColumn: hs6_products_2023
+
+		annotation SummarizationSetBy = Automatic
+
+	column hs6_codes_all_years
+		dataType: int64
+		formatString: #,##0
+		lineageTag: b-sc-codes
+		summarizeBy: sum
+		sourceColumn: hs6_codes_all_years
+
+		annotation SummarizationSetBy = Automatic
+
+	column top5_share_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-sc-top5
+		summarizeBy: sum
+		sourceColumn: top5_share_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column hhi_2023
+		dataType: double
+		formatString: #,##0
+		lineageTag: b-sc-hhi
+		summarizeBy: sum
+		sourceColumn: hhi_2023
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'B Sector Concentration 2023' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_b_sector_concentration_2023.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"sector", type text}, {"hs6_products_2023", Int64.Type}, {"hs6_codes_all_years", Int64.Type}, {"top5_share_pct", type number}, {"hhi_2023", type number}})
+				in
+					Typed
+

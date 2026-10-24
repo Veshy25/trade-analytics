@@ -1,0 +1,53 @@
+table 'Dim Partner'
+	lineageTag: dim-partner
+
+	measure 'Selected Partner' = SELECTEDVALUE('Dim Partner'[Partner Display], "All partners")
+		displayFolder: Utility
+		lineageTag: m-selected-partner
+
+	column Partner
+		lineageTag: d8c22879-448e-4614-a482-37cf740597f6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Partner]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Partner Display'
+		lineageTag: b2696ef9-a6e3-4e17-8616-a5900f3c54c0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Partner Display]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim Partner' = calculated
+		mode: import
+		source =
+				DATATABLE (
+					"Partner", STRING,
+					"Partner Display", STRING,
+					{
+						{ "USA",                  "USA" },
+						{ "United Arab Emirates", "United Arab Emirates" },
+						{ "Netherlands",          "Netherlands" },
+						{ "China",                "China" },
+						{ "United Kingdom",       "United Kingdom" },
+						{ "Singapore",            "Singapore" },
+						{ "Bangladesh",           "Bangladesh" },
+						{ "Germany",              "Germany" },
+						{ "Saudi Arabia",         "Saudi Arabia" },
+						{ "Italy",                "Italy" },
+						{ "Indonesia",            "Indonesia" },
+						{ "Japan",                "Japan" },
+						{ "France",               "France" },
+						{ "Malaysia",             "Malaysia" },
+						{ "Nepal",                "Nepal" },
+						{ "Belgium",              "Belgium" },
+						{ "Sri Lanka",            "Sri Lanka" },
+						{ "South Africa",         "South Africa" },
+						{ "Viet Nam",             "Vietnam" },
+						{ "Maldives",             "Maldives" }
+					}
+				)
+

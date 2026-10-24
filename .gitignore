@@ -11,3 +11,10 @@ __pycache__/
 # Editors
 .vscode/
 .idea/
+
+# Power BI Desktop local cache — regenerated on open
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
+# Compiled Power BI file — shipped as a GitHub Release asset, never committed
+*.pbix

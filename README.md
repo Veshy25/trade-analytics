@@ -1,6 +1,6 @@
 # International Trade Analytics: India's Export Profile (2014–2023)
 
-A SQL-driven analysis of India's merchandise trade over the past decade — exports benchmarked against three comparator economies (China, Bangladesh, Vietnam), then where each sector's exports go, imports and trade balance, and volume against value — sourced directly from the UN Comtrade API. Built as a portfolio project in PostgreSQL, with Python for the charts.
+A SQL-driven analysis of India's merchandise trade over the past decade — exports benchmarked against three comparator economies (China, Bangladesh, Vietnam), then where each sector's exports go, imports and trade balance, and volume against value — sourced directly from the UN Comtrade API. Built as a portfolio project in PostgreSQL, with Python for the charts and a Power BI dashboard.
 
 **→ [Read the findings](insights/key_findings.md)** — twenty findings with the numbers, caveats attached.
 
@@ -45,6 +45,10 @@ Most validation here is self-consistency; one check is not. India's 2023 exports
 
 ```
 trade-analytics/
+├── dashboard/                  # Power BI project (PBIP) — page 1 of 5 so far
+│   ├── trade_analytics.pbip            # Open this in Power BI Desktop
+│   ├── trade_analytics.Report/         # Report (PBIR): one JSON file per page and visual
+│   └── trade_analytics.SemanticModel/  # Data model (TMDL): tables, relationships, measures
 ├── data/
 │   ├── raw/                    # Raw CSV output from the two UN Comtrade API pulls — all loaded by sql/00
 │   │   ├── README.md               # Provenance, exact API parameters, data dictionary
@@ -121,9 +125,13 @@ shasum -a 256 data/raw/*.csv        # compare against data/raw/pull_manifest.jso
 
 Tracks are reconciled against each other — Track B sums to within 2.46% of Track A across all 50 sector-years. Results are committed as CSVs in `data/processed/` and written up in **[`insights/key_findings.md`](insights/key_findings.md)**.
 
+## Dashboard
+
+A Power BI report on the committed results, saved as a Power BI project (PBIP) so the data model (TMDL) and every visual (JSON) can be read here without Power BI. **Page 1, Benchmark, is built** — each country's CAGR, the indexed trend, India's top ten chapters and where its decade growth came from; four more pages are planned. Open `dashboard/trade_analytics.pbip` in Power BI Desktop (it reads `data/processed/` from `main`, so nothing needs running first), or download the `.pbix` from the [latest release](https://github.com/Veshy25/trade-analytics/releases/latest).
+
 ## Tech stack
 
-PostgreSQL 18 · pgAdmin 4 · Python (UN Comtrade API pull, matplotlib charts) · Power BI (dashboard in progress, not yet published)
+PostgreSQL 18 · pgAdmin 4 · Python (UN Comtrade API pull, matplotlib charts) · Power BI (PBIP: TMDL model, PBIR report)
 
 ## About this project
 

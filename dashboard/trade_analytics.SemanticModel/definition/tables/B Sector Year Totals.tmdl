@@ -1,0 +1,35 @@
+table 'B Sector Year Totals'
+	lineageTag: b-syt
+
+	column sector
+		dataType: string
+		lineageTag: b-syt-sector
+		summarizeBy: none
+		sourceColumn: sector
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: b-syt-year
+		summarizeBy: none
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column sector_value_usd_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-syt-value
+		summarizeBy: sum
+		sourceColumn: sector_value_usd_bn
+
+	partition 'B Sector Year Totals' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_b_sector_year_totals.csv"), [Delimiter=",", Columns=3, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"sector", type text}, {"ref_year", Int64.Type}, {"sector_value_usd_bn", type number}})
+				in
+					Typed
+

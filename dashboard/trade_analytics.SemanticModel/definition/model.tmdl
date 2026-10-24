@@ -1,0 +1,48 @@
+model Model
+	culture: en-GB
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-GB
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["A CAGR","A Country Year Totals","A Indexed Series","A Top10 Chapters","A Chapter Change 2022 2023","A Reporting Basis","A India Chapter Contribution","B Sector Year Totals","B Sector Concentration 2023","B Volume vs Value","B Engineering Unit Value Mix","B Petroleum Volume Series","B Volume Coverage","B Cross Track Reconciliation","C Partner Totals","C Partner Concentration","C Partner Rank Moves","D Sector Partner Matrix 2023","D Sector Partner Shift","D Sector Partner CAGR","D Sector Market Concentration","D Top Products By Market","E Country Trade Balance","E India Chapter Balance 2023","E India Partner Balance","E India Import Mix","E Panel Import Coverage 2023"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table 'A CAGR'
+ref table 'A Country Year Totals'
+ref table 'A Indexed Series'
+ref table 'A Top10 Chapters'
+ref table 'A Chapter Change 2022 2023'
+ref table 'A Reporting Basis'
+ref table 'A India Chapter Contribution'
+ref table 'B Sector Year Totals'
+ref table 'B Sector Concentration 2023'
+ref table 'B Volume vs Value'
+ref table 'B Engineering Unit Value Mix'
+ref table 'B Petroleum Volume Series'
+ref table 'B Volume Coverage'
+ref table 'B Cross Track Reconciliation'
+ref table 'C Partner Totals'
+ref table 'C Partner Concentration'
+ref table 'C Partner Rank Moves'
+ref table 'D Sector Partner Matrix 2023'
+ref table 'D Sector Partner Shift'
+ref table 'D Sector Partner CAGR'
+ref table 'D Sector Market Concentration'
+ref table 'D Top Products By Market'
+ref table 'E Country Trade Balance'
+ref table 'E India Chapter Balance 2023'
+ref table 'E India Partner Balance'
+ref table 'E India Import Mix'
+ref table 'E Panel Import Coverage 2023'
+ref table 'Dim Country'
+ref table 'Dim Year'
+ref table 'Dim Sector'
+ref table 'Dim Partner'
+
+ref cultureInfo en-GB
+

@@ -1,0 +1,51 @@
+table 'B Cross Track Reconciliation'
+	lineageTag: b-ctr
+
+	column sector
+		dataType: string
+		lineageTag: b-ctr-sector
+		summarizeBy: none
+		sourceColumn: sector
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: b-ctr-year
+		summarizeBy: none
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column track_b_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-ctr-tb
+		summarizeBy: sum
+		sourceColumn: track_b_bn
+
+	column track_a_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-ctr-ta
+		summarizeBy: sum
+		sourceColumn: track_a_bn
+
+	column pct_diff
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: b-ctr-pct
+		summarizeBy: sum
+		sourceColumn: pct_diff
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'B Cross Track Reconciliation' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_b_cross_track_reconciliation.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"sector", type text}, {"ref_year", Int64.Type}, {"track_b_bn", type number}, {"track_a_bn", type number}, {"pct_diff", type number}})
+				in
+					Typed
+

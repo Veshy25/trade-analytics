@@ -1,0 +1,5 @@
+# Power BI dashboard — store exactly as Power BI Desktop writes it
+# PBIP text files are CRLF; no line-ending conversion, so blobs stay byte-identical to the working files
+dashboard/** -text
+# Binary report file — no diffs, no merges, no conversion
+*.pbix binary

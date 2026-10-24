@@ -1,0 +1,63 @@
+table 'A Chapter Change 2022 2023'
+	lineageTag: a-chg
+
+	column direction
+		dataType: string
+		lineageTag: a-chg-direction
+		summarizeBy: none
+		sourceColumn: direction
+
+	column rank_on_side
+		dataType: int64
+		formatString: 0
+		lineageTag: a-chg-rank
+		summarizeBy: sum
+		sourceColumn: rank_on_side
+
+		annotation SummarizationSetBy = Automatic
+
+	column cmd_code
+		dataType: string
+		lineageTag: a-chg-cmd-code
+		summarizeBy: none
+		sourceColumn: cmd_code
+
+	column cmd_desc
+		dataType: string
+		lineageTag: a-chg-cmd-desc
+		summarizeBy: none
+		sourceColumn: cmd_desc
+
+	column value_2022_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-chg-v2022
+		summarizeBy: sum
+		sourceColumn: value_2022_bn
+
+	column value_2023_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-chg-v2023
+		summarizeBy: sum
+		sourceColumn: value_2023_bn
+
+		annotation SummarizationSetBy = Automatic
+
+	column change_bn
+		dataType: double
+		formatString: +#,##0.0;-#,##0.0
+		lineageTag: a-chg-change
+		summarizeBy: sum
+		sourceColumn: change_bn
+
+	partition 'A Chapter Change 2022 2023' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_a_india_chapter_change_2022_2023.csv"), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"direction", type text}, {"rank_on_side", Int64.Type}, {"cmd_code", type text}, {"cmd_desc", type text}, {"value_2022_bn", type number}, {"value_2023_bn", type number}, {"change_bn", type number}})
+				in
+					Typed
+

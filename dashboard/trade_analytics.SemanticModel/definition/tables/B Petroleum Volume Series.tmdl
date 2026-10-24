@@ -1,0 +1,76 @@
+table 'B Petroleum Volume Series'
+	lineageTag: b-pvs
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: b-pvs-year
+		summarizeBy: none
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-pvs-value
+		summarizeBy: sum
+		sourceColumn: value_bn
+
+		annotation SummarizationSetBy = Automatic
+
+	column mn_tonnes
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-pvs-tonnes
+		summarizeBy: sum
+		sourceColumn: mn_tonnes
+
+		annotation SummarizationSetBy = Automatic
+
+	column usd_per_kg
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: b-pvs-upk
+		summarizeBy: sum
+		sourceColumn: usd_per_kg
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_index
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-pvs-vi
+		summarizeBy: sum
+		sourceColumn: value_index
+
+		annotation SummarizationSetBy = Automatic
+
+	column volume_index
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-pvs-voli
+		summarizeBy: sum
+		sourceColumn: volume_index
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_value_index
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-pvs-uvi
+		summarizeBy: sum
+		sourceColumn: unit_value_index
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'B Petroleum Volume Series' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_b_petroleum_volume_series.csv"), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"ref_year", Int64.Type}, {"value_bn", type number}, {"mn_tonnes", type number}, {"usd_per_kg", type number}, {"value_index", type number}, {"volume_index", type number}, {"unit_value_index", type number}})
+				in
+					Typed
+

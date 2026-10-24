@@ -1,0 +1,58 @@
+table 'A Indexed Series'
+	lineageTag: a-idx
+
+	measure 'Export Index' = SELECTEDVALUE('A Indexed Series'[index_base_100])
+		formatString: #,##0.0
+		displayFolder: Benchmark
+		lineageTag: m-export-index
+
+	column reporter_desc
+		dataType: string
+		lineageTag: a-idx-reporter
+		summarizeBy: none
+		sourceColumn: reporter_desc
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: a-idx-year
+		summarizeBy: none
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column base_year
+		dataType: int64
+		formatString: 0
+		lineageTag: a-idx-base-year
+		summarizeBy: sum
+		sourceColumn: base_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-idx-total-bn
+		summarizeBy: sum
+		sourceColumn: total_bn
+
+	column index_base_100
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-idx-index
+		summarizeBy: sum
+		sourceColumn: index_base_100
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'A Indexed Series' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_a_indexed_series.csv"), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"reporter_desc", type text}, {"ref_year", Int64.Type}, {"base_year", Int64.Type}, {"total_bn", type number}, {"index_base_100", type number}})
+				in
+					Typed
+

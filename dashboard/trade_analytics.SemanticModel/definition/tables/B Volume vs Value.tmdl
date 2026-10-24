@@ -1,0 +1,150 @@
+table 'B Volume vs Value'
+	lineageTag: b-vvv
+
+	column sector
+		dataType: string
+		lineageTag: b-vvv-sector
+		summarizeBy: none
+		sourceColumn: sector
+
+	column value_2014_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-v2014
+		summarizeBy: sum
+		sourceColumn: value_2014_bn
+
+	column value_2023_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-v2023
+		summarizeBy: sum
+		sourceColumn: value_2023_bn
+
+		annotation SummarizationSetBy = Automatic
+
+	column mn_tonnes_2014
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-t2014
+		summarizeBy: sum
+		sourceColumn: mn_tonnes_2014
+
+	column mn_tonnes_2023
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-t2023
+		summarizeBy: sum
+		sourceColumn: mn_tonnes_2023
+
+	column usd_per_kg_2014
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: b-vvv-upk2014
+		summarizeBy: sum
+		sourceColumn: usd_per_kg_2014
+
+		annotation SummarizationSetBy = Automatic
+
+	column usd_per_kg_2023
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: b-vvv-upk2023
+		summarizeBy: sum
+		sourceColumn: usd_per_kg_2023
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_cagr_pct
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: b-vvv-vcagr
+		summarizeBy: sum
+		sourceColumn: value_cagr_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column volume_cagr_pct
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: b-vvv-volcagr
+		summarizeBy: sum
+		sourceColumn: volume_cagr_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column volume_change_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-volchg
+		summarizeBy: sum
+		sourceColumn: volume_change_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_value_change_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-uvchg
+		summarizeBy: sum
+		sourceColumn: unit_value_change_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_coverage_2014_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-cov2014
+		summarizeBy: sum
+		sourceColumn: value_coverage_2014_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_coverage_2023_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-cov2023
+		summarizeBy: sum
+		sourceColumn: value_coverage_2023_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column volume_flag
+		dataType: string
+		lineageTag: b-vvv-flag
+		summarizeBy: none
+		sourceColumn: volume_flag
+
+	column mn_tonnes_cov_adj_2014
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-ca2014
+		summarizeBy: sum
+		sourceColumn: mn_tonnes_cov_adj_2014
+
+	column mn_tonnes_cov_adj_2023
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-ca2023
+		summarizeBy: sum
+		sourceColumn: mn_tonnes_cov_adj_2023
+
+	column volume_change_cov_adj_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: b-vvv-cachg
+		summarizeBy: sum
+		sourceColumn: volume_change_cov_adj_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'B Volume vs Value' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_b_sector_volume_vs_value.csv"), [Delimiter=",", Columns=17, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"sector", type text}, {"value_2014_bn", type number}, {"value_2023_bn", type number}, {"mn_tonnes_2014", type number}, {"mn_tonnes_2023", type number}, {"usd_per_kg_2014", type number}, {"usd_per_kg_2023", type number}, {"value_cagr_pct", type number}, {"volume_cagr_pct", type number}, {"volume_change_pct", type number}, {"unit_value_change_pct", type number}, {"value_coverage_2014_pct", type number}, {"value_coverage_2023_pct", type number}, {"volume_flag", type text}, {"mn_tonnes_cov_adj_2014", type number}, {"mn_tonnes_cov_adj_2023", type number}, {"volume_change_cov_adj_pct", type number}})
+				in
+					Typed
+

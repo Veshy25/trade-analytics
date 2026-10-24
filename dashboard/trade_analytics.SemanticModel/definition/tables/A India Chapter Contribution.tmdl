@@ -1,0 +1,79 @@
+table 'A India Chapter Contribution'
+	lineageTag: a-ichc
+
+	column rank_by_change
+		dataType: int64
+		formatString: 0
+		lineageTag: a-ichc-rank
+		summarizeBy: sum
+		sourceColumn: rank_by_change
+
+		annotation SummarizationSetBy = Automatic
+
+	column cmd_code
+		dataType: string
+		lineageTag: a-ichc-cmd-code
+		summarizeBy: none
+		sourceColumn: cmd_code
+
+	column cmd_desc
+		dataType: string
+		lineageTag: a-ichc-cmd-desc
+		summarizeBy: none
+		sourceColumn: cmd_desc
+
+	column value_2014_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-ichc-v2014
+		summarizeBy: sum
+		sourceColumn: value_2014_bn
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_2023_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-ichc-v2023
+		summarizeBy: sum
+		sourceColumn: value_2023_bn
+
+		annotation SummarizationSetBy = Automatic
+
+	column change_bn
+		dataType: double
+		formatString: +#,##0.0;-#,##0.0
+		lineageTag: a-ichc-change
+		summarizeBy: sum
+		sourceColumn: change_bn
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_of_net_change
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-ichc-pct-change
+		summarizeBy: sum
+		sourceColumn: pct_of_net_change
+
+		annotation SummarizationSetBy = Automatic
+
+	column share_2023_pct
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-ichc-share-2023
+		summarizeBy: sum
+		sourceColumn: share_2023_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'A India Chapter Contribution' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_a_india_chapter_contribution_2014_2023.csv"), [Delimiter=",", Columns=8, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"rank_by_change", Int64.Type}, {"cmd_code", type text}, {"cmd_desc", type text}, {"value_2014_bn", type number}, {"value_2023_bn", type number}, {"change_bn", type number}, {"pct_of_net_change", type number}, {"share_2023_pct", type number}})
+				in
+					Typed
+

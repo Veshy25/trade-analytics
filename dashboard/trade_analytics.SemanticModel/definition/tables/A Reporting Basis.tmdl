@@ -1,0 +1,102 @@
+table 'A Reporting Basis'
+	lineageTag: a-rb
+
+	measure 'Basis Switch Year' =
+			CALCULATE (
+				MIN ( 'A Reporting Basis'[ref_year] ),
+				'A Reporting Basis'[pct_rows_is_reported] = 0,
+				ALLEXCEPT ( 'A Reporting Basis', 'Dim Country'[Country] )
+			)
+		formatString: 0
+		displayFolder: Benchmark
+		lineageTag: m-basis-switch-year
+
+	measure 'Basis Label' =
+			VAR Y = [Basis Switch Year]
+			RETURN
+				IF (
+					ISBLANK ( Y ),
+					BLANK (),
+					"Directly reported to " & FORMAT ( Y - 1, "0" )
+						& "; Comtrade rollup from " & FORMAT ( Y, "0" )
+				)
+		displayFolder: Benchmark
+		lineageTag: m-basis-label
+
+	column reporter_desc
+		dataType: string
+		lineageTag: a-rb-reporter
+		summarizeBy: none
+		sourceColumn: reporter_desc
+
+	column ref_year
+		dataType: int64
+		formatString: 0
+		lineageTag: a-rb-year
+		summarizeBy: none
+		sourceColumn: ref_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_bn
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-rb-total
+		summarizeBy: sum
+		sourceColumn: total_bn
+
+	column pct_value_on_netwgt_est_rows
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-rb-pct-value
+		summarizeBy: sum
+		sourceColumn: pct_value_on_netwgt_est_rows
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_rows_is_aggregate
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-rb-pct-agg
+		summarizeBy: sum
+		sourceColumn: pct_rows_is_aggregate
+
+		annotation SummarizationSetBy = Automatic
+
+	column pct_rows_is_reported
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: a-rb-pct-rep
+		summarizeBy: sum
+		sourceColumn: pct_rows_is_reported
+
+		annotation SummarizationSetBy = Automatic
+
+	column rows_flag4
+		dataType: int64
+		formatString: 0
+		lineageTag: a-rb-rows-flag4
+		summarizeBy: sum
+		sourceColumn: rows_flag4
+
+		annotation SummarizationSetBy = Automatic
+
+	column rows_netwgt_est
+		dataType: int64
+		formatString: 0
+		lineageTag: a-rb-rows-netwgt
+		summarizeBy: sum
+		sourceColumn: rows_netwgt_est
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'A Reporting Basis' = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/Veshy25/trade-analytics/main/data/processed/track_a_reporting_basis.csv"), [Delimiter=",", Columns=8, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+					Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Headers,{{"reporter_desc", type text}, {"ref_year", Int64.Type}, {"total_bn", type number}, {"pct_value_on_netwgt_est_rows", type number}, {"pct_rows_is_aggregate", type number}, {"pct_rows_is_reported", type number}, {"rows_flag4", Int64.Type}, {"rows_netwgt_est", Int64.Type}})
+				in
+					Typed
+

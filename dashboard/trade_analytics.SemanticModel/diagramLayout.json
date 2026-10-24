@@ -1,0 +1,425 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 204.23501902130533,
+            "y": 212.91324437650837
+          },
+          "nodeIndex": "A CAGR",
+          "nodeLineageTag": "a-cagr",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3351.5359886266797,
+            "y": 1101.427730547804
+          },
+          "nodeIndex": "A Chapter Change 2022 2023",
+          "nodeLineageTag": "a-chg",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 680.91935410589349,
+            "y": 740.29555805935752
+          },
+          "nodeIndex": "A Country Year Totals",
+          "nodeLineageTag": "a-cyt",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 337.91411791285049,
+            "y": 1015.3584717798572
+          },
+          "nodeIndex": "A Indexed Series",
+          "nodeLineageTag": "a-idx",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3635.5359886266797,
+            "y": 1089.427730547804
+          },
+          "nodeIndex": "A India Chapter Contribution",
+          "nodeLineageTag": "a-ichc",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 493.058949345569,
+            "y": -50
+          },
+          "nodeIndex": "A Reporting Basis",
+          "nodeLineageTag": "a-rb",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 744.84297017630706
+          },
+          "nodeIndex": "A Top10 Chapters",
+          "nodeLineageTag": "a-top10",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1469.1184393825358,
+            "y": 1195.2036840893611
+          },
+          "nodeIndex": "B Cross Track Reconciliation",
+          "nodeLineageTag": "b-ctr",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3919.5359886266797,
+            "y": 1089.427730547804
+          },
+          "nodeIndex": "B Engineering Unit Value Mix",
+          "nodeLineageTag": "b-euvm",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1038.3946478845792,
+            "y": 1931.5246796741649
+          },
+          "nodeIndex": "B Petroleum Volume Series",
+          "nodeLineageTag": "b-pvs",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1904.9177098545742,
+            "y": 2169.5709776407725
+          },
+          "nodeIndex": "B Sector Concentration 2023",
+          "nodeLineageTag": "b-sc",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1328.5704192110061,
+            "y": 1702.588125353265
+          },
+          "nodeIndex": "B Sector Year Totals",
+          "nodeLineageTag": "b-syt",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1616.5965264223223,
+            "y": 1887.2145799847253
+          },
+          "nodeIndex": "B Volume Coverage",
+          "nodeLineageTag": "b-vc",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2194.8658671562202,
+            "y": 2100.855461095608
+          },
+          "nodeIndex": "B Volume vs Value",
+          "nodeLineageTag": "b-vvv",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 605.43925032224229,
+            "y": 1293.9735300919597
+          },
+          "nodeIndex": "C Partner Concentration",
+          "nodeLineageTag": "c-pc",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3047.9897360398913,
+            "y": 1952.3333125426163
+          },
+          "nodeIndex": "C Partner Rank Moves",
+          "nodeLineageTag": "c-prm",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3117.5359886266806,
+            "y": 1697.7097651485958
+          },
+          "nodeIndex": "C Partner Totals",
+          "nodeLineageTag": "c-pt",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1469.1204954399814,
+            "y": 1448.5178475275225
+          },
+          "nodeIndex": "D Sector Market Concentration",
+          "nodeLineageTag": "d-smc",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2484.7623305669595,
+            "y": 1888.3627964489742
+          },
+          "nodeIndex": "D Sector Partner CAGR",
+          "nodeLineageTag": "d-spc",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2294.669188889241,
+            "y": 1633.7753042919392
+          },
+          "nodeIndex": "D Sector Partner Matrix 2023",
+          "nodeLineageTag": "d-spm",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2586.1735233738336,
+            "y": 1114.2851536753228
+          },
+          "nodeIndex": "D Sector Partner Shift",
+          "nodeLineageTag": "d-sps",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2582.5240269797023,
+            "y": 1370.1485318111984
+          },
+          "nodeIndex": "D Top Products By Market",
+          "nodeLineageTag": "d-tpbm",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 832.34253944295631,
+            "y": 1017.8804456693774
+          },
+          "nodeIndex": "Dim Country",
+          "nodeLineageTag": "dim-country",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2774.7622079593007,
+            "y": 1697.268006125337
+          },
+          "nodeIndex": "Dim Partner",
+          "nodeLineageTag": "dim-partner",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1906.2283045526565,
+            "y": 1739.5745453866862
+          },
+          "nodeIndex": "Dim Sector",
+          "nodeLineageTag": "dim-sector",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1067.3575987554996,
+            "y": 1306.5824970472997
+          },
+          "nodeIndex": "Dim Year",
+          "nodeLineageTag": "dim-year",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 339.89982774290104,
+            "y": 563.61456118830665
+          },
+          "nodeIndex": "E Country Trade Balance",
+          "nodeLineageTag": "e-ctb",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4203.53598862668,
+            "y": 1101.427730547804
+          },
+          "nodeIndex": "E India Chapter Balance 2023",
+          "nodeLineageTag": "e-icb",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4487.53598862668,
+            "y": 1101.427730547804
+          },
+          "nodeIndex": "E India Import Mix",
+          "nodeLineageTag": "e-iim",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2982.1435803113668,
+            "y": 1418.2062121700067
+          },
+          "nodeIndex": "E India Partner Balance",
+          "nodeLineageTag": "e-ipb",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4771.53598862668,
+            "y": 1113.427730547804
+          },
+          "nodeIndex": "E Panel Import Coverage 2023",
+          "nodeLineageTag": "e-pic",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}
