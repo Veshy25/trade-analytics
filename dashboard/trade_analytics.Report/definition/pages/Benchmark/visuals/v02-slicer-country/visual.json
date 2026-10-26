@@ -28,6 +28,7 @@
               },
               "queryRef": "Dim Country.Country Display",
               "nativeQueryRef": "Country Display",
+              "displayName": "Country",
               "active": true
             }
           ]

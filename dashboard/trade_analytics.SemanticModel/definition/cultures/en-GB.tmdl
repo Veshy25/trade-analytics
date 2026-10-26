@@ -1,2 +1,179 @@
 cultureInfo en-GB
 
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "dim_sector.sector_display": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Sector Display"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Sector": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.sector_value_2023_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Sector Value 2023 bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "2023 value (USD bn)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.sector_value_cagr_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Sector Value CAGR pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Value CAGR": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.volume_cagr_display": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Volume CAGR Display"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Volume CAGR": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.unit_value_change_display": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Unit Value Change Display"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Unit value change": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.sector_hhi_2023": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Sector HHI 2023"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "HHI 2023": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.sector_hhi_band": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Sector HHI Band"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Concentration": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.country_display": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Country Display"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Country": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

@@ -5,6 +5,76 @@ table 'Dim Sector'
 		displayFolder: Utility
 		lineageTag: m-selected-sector
 
+	measure 'Sector Value bn' = SUM ( 'B Sector Year Totals'[sector_value_usd_bn] )
+		formatString: #,##0.0
+		displayFolder: Sectors
+		lineageTag: m-sector-value-bn
+
+	measure 'Sector Value 2023 bn' = CALCULATE ( [Sector Value bn], 'Dim Year'[Year] = 2023 )
+		formatString: #,##0.0
+		displayFolder: Sectors
+		lineageTag: m-sector-value-2023-bn
+
+	measure 'Sector HHI 2023' = SELECTEDVALUE ( 'B Sector Concentration 2023'[hhi_2023] )
+		formatString: #,##0
+		displayFolder: Sectors
+		lineageTag: m-sector-hhi-2023
+
+	measure 'Sector HHI Band' =
+			VAR H = [Sector HHI 2023]
+			RETURN
+				SWITCH (
+					TRUE (),
+					ISBLANK ( H ), BLANK (),
+					H < 1500, "Unconcentrated",
+					H <= 2500, "Moderately concentrated",
+					"Highly concentrated"
+				)
+		displayFolder: Sectors
+		lineageTag: m-sector-hhi-band
+
+	measure 'Sector Value CAGR pct' = SELECTEDVALUE ( 'B Volume vs Value'[value_cagr_pct] )
+		formatString: 0.00\%
+		displayFolder: Sectors
+		lineageTag: m-sector-value-cagr
+
+	measure 'Sector Volume CAGR pct' = SELECTEDVALUE ( 'B Volume vs Value'[volume_cagr_pct] )
+		formatString: #,##0.00
+		displayFolder: Sectors
+		lineageTag: m-sector-volume-cagr
+
+	measure 'Volume Claim Allowed' =
+			VAR F = SELECTEDVALUE ( 'B Volume vs Value'[volume_flag] )
+			RETURN IF ( F = "ok", 1, 0 )
+		displayFolder: Sectors
+		lineageTag: m-volume-claim-allowed
+
+	measure 'Volume CAGR Display' =
+			IF (
+				NOT HASONEVALUE ( 'Dim Sector'[Sector] ),
+				BLANK (),
+				IF (
+					[Volume Claim Allowed] = 1,
+					FORMAT ( [Sector Volume CAGR pct], "0.00" ) & "%",
+					"n/a (low coverage)"
+				)
+			)
+		displayFolder: Sectors
+		lineageTag: m-volume-cagr-display
+
+	measure 'Unit Value Change Display' =
+			IF (
+				NOT HASONEVALUE ( 'Dim Sector'[Sector] ),
+				BLANK (),
+				IF (
+					[Volume Claim Allowed] = 1,
+					FORMAT ( SELECTEDVALUE ( 'B Volume vs Value'[unit_value_change_pct] ), "0.0" ) & "%",
+					"n/a (low coverage)"
+				)
+			)
+		displayFolder: Sectors
+		lineageTag: m-unit-value-change-display
+
 	column Sector
 		lineageTag: 2bfd31d2-1ae6-44e9-9db9-6d2f75368c94
 		summarizeBy: none
