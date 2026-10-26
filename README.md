@@ -45,7 +45,7 @@ Most validation here is self-consistency; one check is not. India's 2023 exports
 
 ```
 trade-analytics/
-├── dashboard/                  # Power BI project (PBIP) — page 1 of 5 so far
+├── dashboard/                  # Power BI project (PBIP) — pages 1–2 of 5 so far
 │   ├── trade_analytics.pbip            # Open this in Power BI Desktop
 │   ├── trade_analytics.Report/         # Report (PBIR): one JSON file per page and visual
 │   └── trade_analytics.SemanticModel/  # Data model (TMDL): tables, relationships, measures
@@ -127,7 +127,7 @@ Tracks are reconciled against each other — Track B sums to within 2.46% of Tra
 
 ## Dashboard
 
-A Power BI report on the committed results, saved as a Power BI project (PBIP) so the data model (TMDL) and every visual (JSON) can be read here without Power BI. **Page 1, Benchmark, is built** — each country's CAGR, the indexed trend, India's top ten chapters and where its decade growth came from; four more pages are planned. Open `dashboard/trade_analytics.pbip` in Power BI Desktop (it reads `data/processed/` from `main`, so nothing needs running first), or download the `.pbix` from the [latest release](https://github.com/Veshy25/trade-analytics/releases/latest).
+A Power BI report on the committed results, saved as a Power BI project (PBIP) so the data model (TMDL) and every visual (JSON) can be read here without Power BI. **Two pages are built.** Benchmark: each country's CAGR, the indexed trend, India's top ten chapters and where its decade growth came from. Sectors: the five focus sectors' value trend, growth against product concentration (HHI), and value, volume and concentration side by side. Three more pages are planned. Open `dashboard/trade_analytics.pbip` in Power BI Desktop (it reads `data/processed/` from `main`, so nothing needs running first), or download the `.pbix` from the [latest release](https://github.com/Veshy25/trade-analytics/releases/latest).
 
 ## Tech stack
 
