@@ -1,0 +1,213 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "p2table",
+  "position": {
+    "x": 24,
+    "y": 452,
+    "z": 4000,
+    "height": 252,
+    "width": 968,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Sector Display"
+                }
+              },
+              "queryRef": "Dim Sector.Sector Display",
+              "nativeQueryRef": "Sector Display",
+              "displayName": "Sector"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Sector Value 2023 bn"
+                }
+              },
+              "queryRef": "Dim Sector.Sector Value 2023 bn",
+              "nativeQueryRef": "Sector Value 2023 bn",
+              "displayName": "2023 value (USD bn)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Sector Value CAGR pct"
+                }
+              },
+              "queryRef": "Dim Sector.Sector Value CAGR pct",
+              "nativeQueryRef": "Sector Value CAGR pct",
+              "displayName": "Value CAGR"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Volume CAGR Display"
+                }
+              },
+              "queryRef": "Dim Sector.Volume CAGR Display",
+              "nativeQueryRef": "Volume CAGR Display",
+              "displayName": "Volume CAGR"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Unit Value Change Display"
+                }
+              },
+              "queryRef": "Dim Sector.Unit Value Change Display",
+              "nativeQueryRef": "Unit Value Change Display",
+              "displayName": "Unit value change"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Sector HHI 2023"
+                }
+              },
+              "queryRef": "Dim Sector.Sector HHI 2023",
+              "nativeQueryRef": "Sector HHI 2023",
+              "displayName": "HHI 2023"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Sector HHI Band"
+                }
+              },
+              "queryRef": "Dim Sector.Sector HHI Band",
+              "nativeQueryRef": "Sector HHI Band",
+              "displayName": "Concentration"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Dim Sector"
+                  }
+                },
+                "Property": "Sector Value 2023 bn"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "columnFormatting": [
+        {
+          "properties": {
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Right'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Volume CAGR Display"
+          }
+        },
+        {
+          "properties": {
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Right'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Unit Value Change Display"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Value, volume and concentration by sector'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
