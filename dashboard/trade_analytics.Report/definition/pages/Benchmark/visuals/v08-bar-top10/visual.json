@@ -39,14 +39,15 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "A Top10 Chapters"
+                      "Entity": "Dim Country"
                     }
                   },
-                  "Property": "Chapter Value bn"
+                  "Property": "Top 10 Value bn"
                 }
               },
-              "queryRef": "A Top10 Chapters.Chapter Value bn",
-              "nativeQueryRef": "Chapter Value bn"
+              "queryRef": "Dim Country.Top 10 Value bn",
+              "nativeQueryRef": "Top 10 Value bn",
+              "displayName": "Exports (USD bn)"
             }
           ]
         }
@@ -58,10 +59,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "A Top10 Chapters"
+                    "Entity": "Dim Country"
                   }
                 },
-                "Property": "Chapter Value bn"
+                "Property": "Top 10 Value bn"
               }
             },
             "direction": "Descending"
@@ -90,8 +91,13 @@
           "properties": {
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'Top 10 export chapters — India (2023, USD bn)'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "Top 10 Chart Title"
                 }
               }
             }
@@ -126,63 +132,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "f-top10-india",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Dim Country"
-              }
-            },
-            "Property": "Country"
-          }
-        },
-        "type": "Categorical",
-        "filter": {
-          "Version": 2,
-          "From": [
-            {
-              "Name": "d",
-              "Entity": "Dim Country",
-              "Type": 0
-            }
-          ],
-          "Where": [
-            {
-              "Condition": {
-                "In": {
-                  "Expressions": [
-                    {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Source": "d"
-                          }
-                        },
-                        "Property": "Country"
-                      }
-                    }
-                  ],
-                  "Values": [
-                    [
-                      {
-                        "Literal": {
-                          "Value": "'India'"
-                        }
-                      }
-                    ]
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        "howCreated": "User"
-      }
-    ]
   }
 }

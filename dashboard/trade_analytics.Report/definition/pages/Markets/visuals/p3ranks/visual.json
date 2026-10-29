@@ -1,0 +1,226 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "p3ranks",
+  "position": {
+    "x": 440,
+    "y": 384,
+    "z": 4000,
+    "height": 320,
+    "width": 552,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Partner"
+                    }
+                  },
+                  "Property": "Partner Display"
+                }
+              },
+              "queryRef": "Dim Partner.Partner Display",
+              "nativeQueryRef": "Partner Display",
+              "displayName": "Partner"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Partner"
+                    }
+                  },
+                  "Property": "Partner Rank 2014"
+                }
+              },
+              "queryRef": "Dim Partner.Partner Rank 2014",
+              "nativeQueryRef": "Partner Rank 2014",
+              "displayName": "Rank 2014"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Partner"
+                    }
+                  },
+                  "Property": "Partner Rank 2023"
+                }
+              },
+              "queryRef": "Dim Partner.Partner Rank 2023",
+              "nativeQueryRef": "Partner Rank 2023",
+              "displayName": "Rank 2023"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Partner"
+                    }
+                  },
+                  "Property": "Rank Improvement"
+                }
+              },
+              "queryRef": "Dim Partner.Rank Improvement",
+              "nativeQueryRef": "Rank Improvement",
+              "displayName": "Places"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Partner"
+                    }
+                  },
+                  "Property": "Partner Value Change bn"
+                }
+              },
+              "queryRef": "Dim Partner.Partner Value Change bn",
+              "nativeQueryRef": "Partner Value Change bn",
+              "displayName": "Change (USD bn)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Dim Partner"
+                  }
+                },
+                "Property": "Rank Improvement"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "FillRule": {
+                      "Input": {
+                        "Measure": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "Dim Partner"
+                            }
+                          },
+                          "Property": "Rank Improvement"
+                        }
+                      },
+                      "FillRule": {
+                        "linearGradient3": {
+                          "min": {
+                            "color": {
+                              "Literal": {
+                                "Value": "'#F4B6B0'"
+                              }
+                            }
+                          },
+                          "mid": {
+                            "color": {
+                              "Literal": {
+                                "Value": "'midColor'"
+                              }
+                            },
+                            "value": {
+                              "Literal": {
+                                "Value": "0D"
+                              }
+                            }
+                          },
+                          "max": {
+                            "color": {
+                              "Literal": {
+                                "Value": "'#B7DFC0'"
+                              }
+                            }
+                          },
+                          "nullColoringStrategy": {
+                            "strategy": {
+                              "Literal": {
+                                "Value": "'asZero'"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Dim Partner.Rank Improvement"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Partner rank, 2014 vs 2023'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

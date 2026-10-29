@@ -9,6 +9,43 @@ table 'Dim Country'
 		displayFolder: Utility
 		lineageTag: m-selected-country-key
 
+	measure 'Top 10 Country Key' = COALESCE ( [Selected Country Key], "India" )
+		displayFolder: Benchmark
+		lineageTag: m-top10-country-key
+
+	measure 'Top 10 Value bn' =
+			VAR K = [Top 10 Country Key]
+			RETURN
+				CALCULATE (
+					IF (
+						K = "Bangladesh",
+						SUM ( 'A Top10 Chapters'[value_2014_2023_bn] ),
+						SUM ( 'A Top10 Chapters'[value_2023_bn] )
+					),
+					REMOVEFILTERS ( 'Dim Country' ),
+					'Dim Country'[Country] = K
+				)
+		formatString: #,##0.0
+		displayFolder: Benchmark
+		lineageTag: m-top10-value-bn
+
+	measure 'Top 10 Chart Title' =
+			VAR K = [Top 10 Country Key]
+			VAR C =
+				CALCULATE (
+					SELECTEDVALUE ( 'Dim Country'[Country Display] ),
+					REMOVEFILTERS ( 'Dim Country' ),
+					'Dim Country'[Country] = K
+				)
+			RETURN
+				IF (
+					K = "Bangladesh",
+					"Top 10 export chapters — " & C & " (ranked on 2014–2018 total, USD bn)",
+					"Top 10 export chapters — " & C & " (2023, USD bn)"
+				)
+		displayFolder: Benchmark
+		lineageTag: m-top10-chart-title
+
 	column Country
 		lineageTag: 085ab8ec-577f-45c6-b973-ea7572d34f95
 		summarizeBy: none

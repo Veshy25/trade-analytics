@@ -45,8 +45,9 @@ Most validation here is self-consistency; one check is not. India's 2023 exports
 
 ```
 trade-analytics/
-├── dashboard/                  # Power BI project (PBIP) — pages 1–2 of 5 so far
+├── dashboard/                  # Power BI project (PBIP) — pages 1–3 of 5 so far
 │   ├── trade_analytics.pbip            # Open this in Power BI Desktop
+│   ├── screenshots/                    # One PNG per built page, shown under Dashboard below
 │   ├── trade_analytics.Report/         # Report (PBIR): one JSON file per page and visual
 │   └── trade_analytics.SemanticModel/  # Data model (TMDL): tables, relationships, measures
 ├── data/
@@ -127,7 +128,13 @@ Tracks are reconciled against each other — Track B sums to within 2.46% of Tra
 
 ## Dashboard
 
-A Power BI report on the committed results, saved as a Power BI project (PBIP) so the data model (TMDL) and every visual (JSON) can be read here without Power BI. **Two pages are built.** Benchmark: each country's CAGR, the indexed trend, India's top ten chapters and where its decade growth came from. Sectors: the five focus sectors' value trend, growth against product concentration (HHI), and value, volume and concentration side by side. Three more pages are planned. Open `dashboard/trade_analytics.pbip` in Power BI Desktop (it reads `data/processed/` from `main`, so nothing needs running first), or download the `.pbix` from the [latest release](https://github.com/Veshy25/trade-analytics/releases/latest).
+A Power BI report on the committed results, saved as a Power BI project (PBIP) so the data model (TMDL) and every visual (JSON) can be read here without Power BI. **Three pages are built.** Benchmark: each country's CAGR, the indexed trend, the top ten chapters of the country chosen in the slicer (India by default) and where India's decade growth came from. Sectors: the five focus sectors' value trend, growth against product concentration (HHI), and value, volume and concentration side by side. Markets: India's 2023 exports across the 20-partner panel, the panel's concentration (HHI) since 2014 with the range India's whole-market figure could fall in, and how each partner's rank moved between 2014 and 2023. Two more pages are planned. Open `dashboard/trade_analytics.pbip` in Power BI Desktop (it reads `data/processed/` from `main`, so nothing needs running first), or download the `.pbix` from the [latest release](https://github.com/Veshy25/trade-analytics/releases/latest).
+
+![Dashboard page 1: Benchmark](dashboard/screenshots/dashboard_page_1_benchmark.png)
+
+![Dashboard page 2: Sectors](dashboard/screenshots/dashboard_page_2_sectors.png)
+
+![Dashboard page 3: Markets](dashboard/screenshots/dashboard_page_3_markets.png)
 
 ## Tech stack
 
