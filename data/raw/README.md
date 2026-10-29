@@ -1,20 +1,29 @@
 # Raw data — provenance and dictionary
 
-The seven CSVs in this folder are the unmodified output of two UN Comtrade API
-pulls — three files on **25/08/2026** (Tracks A, B, C: exports) and four on
-**15/09/2026** (Tracks D, E1, E2: partner × sector, and imports). They are the
-*input* to the SQL cleaning phase, not something to hand-edit. Everything
-downstream — `sql/00` through `sql/08` — is reproducible from these files
-alone, with no API key and no network access. `sql/00` loads all seven before
-any analysis runs; there is no partial or phased load.
+> **The seven raw CSVs are not included (29/10/2026).** UN Comtrade's terms
+> require permission to republish its data unmodified. That permission has been
+> requested from the UN Statistics Division, and the files will be restored here
+> if it is given. This file and `pull_manifest.json` still describe them in
+> full: what was pulled, when, with which parameters, and the row count and
+> SHA-256 of every file.
 
-**The pull script itself is deliberately not published.** Comtrade revises
-figures after first publication, so a fresh pull would return different numbers
-and the repository's committed findings would no longer match what its code
-produces. Freezing the raw data — and publishing the checksums below — makes the
-analysis reproducible by construction. What the pull *did* is fully documented
-here and in `pull_manifest.json`, which is what reproducibility actually
-requires; being able to re-run it and get something else is not.
+The analysis ran on the unmodified output of two UN Comtrade API pulls — three
+files on **25/08/2026** (Tracks A, B, C: exports) and four on **15/09/2026**
+(Tracks D, E1, E2: partner × sector, and imports). They are the *input* to the
+SQL cleaning phase, not something to hand-edit; `sql/00` loads all seven before
+any analysis runs, and there is no partial or phased load.
+
+**To get them, repeat the pull.** The pull script is not published, but
+everything it did is documented: the exact API parameters per track (below and
+in `pull_manifest.json`), the post-pull sector filter and derived `sector`
+column on Tracks B and D, and the file names `sql/00` expects. It used the
+official `comtradeapicall` client with a free API key from the
+[Comtrade developer portal](https://comtradedeveloper.un.org). Comtrade revises
+figures after first publication, so a fresh pull returns Comtrade's data as it
+stands on that day, which may differ from the analysed pull; compare
+`shasum -a 256 *.csv` with the manifest to see whether it does. The committed
+results in `data/processed/` are the outputs of the analysed pull and remain the
+reference.
 
 ## Provenance
 
@@ -100,7 +109,7 @@ partner list; no response reached the API's 100,000-record cap, so no
 per-partner fallback was needed. It is delivered as **two files split by year
 range** because the single file came to 78.5 MB (74.9 MiB) — past GitHub's
 50 MiB warning threshold, though still under its 100 MiB hard limit. The two
-committed halves total the same 78.5 MB; `sql/00` loads both into one table.
+halves total the same 78.5 MB; `sql/00` loads both into one table.
 Sizes in this file are decimal MB throughout; until 23/09/2026 some were MiB,
 so the same bytes were quoted as both 74.9 and 78.5 MB.
 

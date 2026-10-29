@@ -21,3 +21,6 @@ __pycache__/
 
 # PDF export of the dashboard — kept locally as the screenshot source, never published.
 dashboard/*.pdf
+
+# Raw UN Comtrade extracts — not redistributed (see data/raw/README.md).
+data/raw/*.csv

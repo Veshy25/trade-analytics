@@ -2,6 +2,8 @@
 -- Raw staging tables for the UN Comtrade pull tracks — three from the
 -- 25/08/2026 pull (A, B, C) and three from the 15/09/2026 pull (D, E1, E2).
 -- Every CSV under data/raw/ is loaded here, before any analysis file runs.
+-- The CSVs are not included in the repository (UN Comtrade's terms); pull
+-- them first with the parameters in data/raw/README.md.
 -- Every column is TEXT on purpose: this is a raw landing zone, not the
 -- analysis-ready schema. Casting to proper types (int, numeric, boolean,
 -- date) and cleaning belongs in 01_data_cleaning.sql, not here.

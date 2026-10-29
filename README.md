@@ -2,6 +2,8 @@
 
 A SQL-driven analysis of India's merchandise trade over the past decade — exports benchmarked against three comparator economies (China, Bangladesh, Vietnam), then where each sector's exports go, imports and trade balance, and volume against value — sourced directly from the UN Comtrade API. Built as a portfolio project in PostgreSQL, with Python for the charts and a Power BI dashboard.
 
+> **Raw data not included (29/10/2026).** The seven raw UN Comtrade extracts this analysis was built on have been removed from the repository. UN Comtrade's terms require permission to republish its data unmodified, and that permission has been requested from the UN Statistics Division; the files will be restored if it is given. Everything else is here: the SQL, the 27 result tables in `data/processed/`, the findings, the charts and the Power BI dashboard, none of which need the raw files to read or open. To rebuild from scratch, pull the data yourself from the UN Comtrade API with a free key, using the exact parameters in [`data/raw/README.md`](data/raw/README.md).
+
 **→ [Read the findings](insights/key_findings.md)** — twenty findings with the numbers, caveats attached.
 
 ![Indexed export trend, four countries](insights/indexed_export_trend.png)
@@ -12,7 +14,7 @@ A SQL-driven analysis of India's merchandise trade over the past decade — expo
 
 **UN Comtrade API** (https://comtradeplus.un.org) — the UN Statistics Division's official repository of international merchandise trade statistics, built from member states' own customs declarations. Chosen over DGFT (India-only, narrower) and Kaggle mirrors (secondhand, unclear provenance) because it is primary international data, pulled programmatically, with documented reliability caveats rather than taken at face value.
 
-The data came from two pulls — exports on 25/08/2026, imports and the partner × sector detail on 15/09/2026. Parameters, dates, SHA-256 checksums and a column-by-column data dictionary are in **[`data/raw/README.md`](data/raw/README.md)** and [`data/raw/pull_manifest.json`](data/raw/pull_manifest.json). The pull script itself is not published: Comtrade revises figures after publication, so the raw CSVs are frozen and checksummed to keep the analysis reproducible on the exact data it was run on.
+The data came from two pulls — exports on 25/08/2026, imports and the partner × sector detail on 15/09/2026. Parameters, dates, SHA-256 checksums and a column-by-column data dictionary are in **[`data/raw/README.md`](data/raw/README.md)** and [`data/raw/pull_manifest.json`](data/raw/pull_manifest.json). The pull script is not published, and the raw CSVs it wrote are not included (see the note above); the exact parameters are documented so the pull can be repeated. Comtrade revises figures after publication, so a fresh pull may not match the analysed data byte for byte; the checksums in the manifest show whether it does.
 
 ### Scope
 
@@ -51,16 +53,9 @@ trade-analytics/
 │   ├── trade_analytics.Report/         # Report (PBIR): one JSON file per page and visual
 │   └── trade_analytics.SemanticModel/  # Data model (TMDL): tables, relationships, measures
 ├── data/
-│   ├── raw/                    # Raw CSV output from the two UN Comtrade API pulls — all loaded by sql/00
+│   ├── raw/                    # Where the UN Comtrade pull lands — the seven CSVs are not included
 │   │   ├── README.md               # Provenance, exact API parameters, data dictionary
-│   │   ├── pull_manifest.json      # Pull dates, parameters, row counts, SHA-256 per file
-│   │   ├── track_a_country_benchmark_hs2.csv               # 25/08/2026 pull
-│   │   ├── track_b_india_sector_detail_hs6.csv             #   "
-│   │   ├── track_c_india_partner_view_hs2.csv              #   "
-│   │   ├── track_d_india_partner_sector_hs6_2014_2018.csv  # 15/09/2026 pull — one track, two files (size)
-│   │   ├── track_d_india_partner_sector_hs6_2019_2023.csv  #   "
-│   │   ├── track_e_country_imports_hs2.csv                 #   "
-│   │   └── track_e_india_partner_imports_hs2.csv           #   "
+│   │   └── pull_manifest.json      # Pull dates, parameters, row counts, SHA-256 per file
 │   └── processed/              # Query outputs, committed so results are readable
 │       └── *.csv                   # 27 result sets — regenerate with sql/08
 ├── scripts/
@@ -86,7 +81,7 @@ trade-analytics/
 
 ## Reproducing the analysis
 
-Everything is committed: the seven raw CSVs, the eight SQL files and the chart script. You need PostgreSQL and `psql`; the optional chart step also needs Python with the versions pinned in `requirements.txt`. Run from the repository root — the `\copy` paths are relative to the working directory.
+The eight SQL files and the chart script are committed; the seven raw CSVs they start from are not (see the note at the top), so pull them first: a free [UN Comtrade API key](https://comtradedeveloper.un.org), the official `comtradeapicall` Python client, and the exact parameters, post-pull filter and file names in [`data/raw/README.md`](data/raw/README.md) and `pull_manifest.json`. Then you need PostgreSQL and `psql`; the optional chart step also needs Python with the versions pinned in `requirements.txt`. Run from the repository root — the `\copy` paths are relative to the working directory.
 
 ```bash
 createdb trade_analytics   # PostgreSQL 15+ (developed on 18)
@@ -104,11 +99,11 @@ pip3 install -r requirements.txt                                                
 python3 scripts/make_chart.py                                                    # optional: redraws the three charts
 ```
 
-Expected row counts after `01`: **3,282 / 16,976 / 18,956** (Tracks A/B/C) and **225,298 / 3,294 / 16,946** (Tracks D/E1/E2). `sql/01` asserts these, so a short or duplicated raw file stops the run there. A clean run prints **fourteen `PASSED` notices** across `01`–`07`, each a check that stops the run if the data stops matching what the findings say.
+Expected row counts after `01`: **3,282 / 16,976 / 18,956** (Tracks A/B/C) and **225,298 / 3,294 / 16,946** (Tracks D/E1/E2). `sql/01` asserts these, so a short or duplicated raw file stops the run there. A clean run prints **fourteen `PASSED` notices** across `01`–`07`, each a check that stops the run if the data stops matching what the findings say. A fresh pull reflects Comtrade's data on the day it runs; if figures have been revised since the analysed pull, these assertions are what will say so.
 
 **Run order matters.** `00` then `01` must run first. `02`–`07` create the result views and otherwise only read — and several read other tracks' tables, so run them all. `08` copies the views to `data/processed/` and runs last (there is no `05`; it was renamed `08`).
 
-**Verifying the inputs.** `data/raw/pull_manifest.json` carries a SHA-256 for each CSV:
+**Verifying the inputs.** `data/raw/pull_manifest.json` carries the row count and SHA-256 of each CSV the analysed pull wrote; a match means your pull returned exactly the same data:
 
 ```bash
 shasum -a 256 data/raw/*.csv        # compare against data/raw/pull_manifest.json
@@ -165,4 +160,4 @@ Feedback and corrections are genuinely welcome: open an issue.
 
 ## Licence
 
-[MIT](LICENSE) for the SQL, scripts and documentation — reuse freely, attribution appreciated. The underlying trade statistics in `data/raw/` are sourced from UN Comtrade and remain subject to UN Comtrade's terms of use.
+[MIT](LICENSE) for the SQL, scripts and documentation — reuse freely, attribution appreciated. The underlying trade statistics are sourced from UN Comtrade and remain subject to UN Comtrade's terms of use. The raw extracts are not redistributed here (see the note at the top); the derived results in `data/processed/` and the findings credit UN Comtrade as their source.
