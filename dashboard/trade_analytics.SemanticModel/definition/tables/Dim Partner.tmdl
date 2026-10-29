@@ -5,6 +5,63 @@ table 'Dim Partner'
 		displayFolder: Utility
 		lineageTag: m-selected-partner
 
+	measure 'Partner Value 2023 bn' = SUM ( 'C Partner Totals'[value_2023_bn] )
+		formatString: #,##0.0
+		displayFolder: Markets
+		lineageTag: m-partner-value-2023-bn
+
+	measure 'Partner Share of Panel pct' = SELECTEDVALUE ( 'C Partner Totals'[pct_of_panel_2023] )
+		formatString: 0.0\%
+		displayFolder: Markets
+		lineageTag: m-partner-share-of-panel
+
+	measure 'Panel HHI' = SELECTEDVALUE ( 'C Partner Concentration'[hhi_panel] )
+		formatString: #,##0
+		displayFolder: Markets
+		lineageTag: m-panel-hhi
+
+	measure 'Panel HHI Lower' = SELECTEDVALUE ( 'C Partner Concentration'[hhi_true_lower] )
+		formatString: #,##0
+		displayFolder: Markets
+		lineageTag: m-panel-hhi-lower
+
+	measure 'Panel HHI Upper' = SELECTEDVALUE ( 'C Partner Concentration'[hhi_true_upper] )
+		formatString: #,##0
+		displayFolder: Markets
+		lineageTag: m-panel-hhi-upper
+
+	measure 'Partner Rank 2014' = SELECTEDVALUE ( 'C Partner Rank Moves'[rank_2014] )
+		formatString: 0
+		displayFolder: Markets
+		lineageTag: m-partner-rank-2014
+
+	measure 'Partner Rank 2023' = SELECTEDVALUE ( 'C Partner Rank Moves'[rank_2023] )
+		formatString: 0
+		displayFolder: Markets
+		lineageTag: m-partner-rank-2023
+
+	measure 'Rank Improvement' = SELECTEDVALUE ( 'C Partner Rank Moves'[rank_improvement] )
+		formatString: +0;-0;0
+		displayFolder: Markets
+		lineageTag: m-rank-improvement
+
+	measure 'Partner Value 2014 bn' = SUM ( 'C Partner Rank Moves'[value_2014_bn] )
+		formatString: #,##0.0
+		displayFolder: Markets
+		lineageTag: m-partner-value-2014-bn
+
+	measure 'Partner Value Change bn' = SUM ( 'C Partner Rank Moves'[value_2023_bn] ) - SUM ( 'C Partner Rank Moves'[value_2014_bn] )
+		formatString: +#,##0.0;-#,##0.0;0.0
+		displayFolder: Markets
+		lineageTag: m-partner-value-change-bn
+
+	measure 'Partner Bar Colour' =
+			VAR R = SELECTEDVALUE ( 'C Partner Totals'[rank_2023] )
+			RETURN
+				IF ( ISBLANK ( R ), BLANK (), IF ( R <= 5, "#118DFF", "#B3B3B3" ) )
+		displayFolder: Markets
+		lineageTag: m-partner-bar-colour
+
 	column Partner
 		lineageTag: d8c22879-448e-4614-a482-37cf740597f6
 		summarizeBy: none

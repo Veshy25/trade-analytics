@@ -172,6 +172,246 @@ cultureInfo en-GB
 			          }
 			        }
 			      ]
+			    },
+			    "dim_partner.partner_value_2023_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Partner Value 2023 bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "2023 exports (USD bn)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_partner.partner_share_of_panel_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Partner Share of Panel pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% of panel (2023)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_partner.panel_hhi_upper": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Panel HHI Upper"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Upper bound": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_partner.panel_hhi": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Panel HHI"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Panel HHI (observed)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_partner.panel_hhi_lower": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Panel HHI Lower"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Lower bound": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_partner.partner_display": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Partner Display"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Partner": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_partner.partner_rank_2014": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Partner Rank 2014"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Rank 2014": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_partner.partner_rank_2023": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Partner Rank 2023"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Rank 2023": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_partner.rank_improvement": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Rank Improvement"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Places": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_partner.partner_value_2014_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Partner Value 2014 bn"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "dim_partner.partner_value_change_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Partner",
+			          "ConceptualProperty": "Partner Value Change bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Change (USD bn)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.top_10_value_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Top 10 Value bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Exports (USD bn)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
 			    }
 			  }
 			}
