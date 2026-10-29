@@ -18,3 +18,6 @@ __pycache__/
 
 # Compiled Power BI file — shipped as a GitHub Release asset, never committed
 *.pbix
+
+# PDF export of the dashboard — kept locally as the screenshot source, never published.
+dashboard/*.pdf
