@@ -1,0 +1,45 @@
+figure_id,figure,value,unit,cited_in
+02 S1a,Track B rows with flag 2,162,rows,finding 12
+02 S1b,of which quantity-only estimated,162,rows,finding 12
+02 S1c,Track B rows with flag 4,3776,rows,finding 12
+02 S1d,of which net-weight-only estimated,3776,rows,finding 12
+02 S1e,Track B rows with flag 6,6656,rows,finding 12
+02 S1f,of which both quantity and net weight estimated,6656,rows,finding 12
+02 S1g,Track B rows with flag 0 but an estimation boolean set,2905,rows,finding 12
+02 S1h,of which quantity-only,2,rows,finding 12
+02 S1i,of which net-weight-only,1187,rows,finding 12
+02 S1j,of which both,1716,rows,finding 12
+02 S2a,Track A rows with net weight blank,48.3,percent of rows,finding 12
+02 S2b,Track A rows with net weight exactly 0,51.7,percent of rows,finding 12
+02 S2c,Track A rows with positive net weight,0,rows,finding 12
+02 S3 China bn,"HS 99 exports 2014-2023, China",212.4,USD bn,"README, Data reliability"
+02 S3 China pct,"HS 99 share of decade exports, China",0.79,percent,"README, Data reliability"
+02 S3 India bn,"HS 99 exports 2014-2023, India",5.1,USD bn,"README, Data reliability"
+02 S3 India pct,"HS 99 share of decade exports, India",0.15,percent,"README, Data reliability"
+02 S3 Viet Nam bn,"HS 99 exports 2014-2023, Viet Nam",29.6,USD bn,"README, Data reliability"
+02 S3 Viet Nam pct,"HS 99 share of decade exports, Viet Nam",1.16,percent,"README, Data reliability"
+02 S4 engineering_machinery a,"Track B codes with no 2023 row, engineering_machinery",37,codes,sql/02 assumption 7
+02 S4 engineering_machinery b,"of which last seen in 2016 or 2021, engineering_machinery",32,codes,sql/02 assumption 7
+02 S4 pharmaceuticals a,"Track B codes with no 2023 row, pharmaceuticals",10,codes,sql/02 assumption 7
+02 S4 pharmaceuticals b,"of which last seen in 2016 or 2021, pharmaceuticals",8,codes,sql/02 assumption 7
+02 S4 textiles a,"Track B codes with no 2023 row, textiles",37,codes,sql/02 assumption 7
+02 S4 textiles b,"of which last seen in 2016 or 2021, textiles",30,codes,sql/02 assumption 7
+03 S5a,Sector-years where Track B equals Track A to the dollar,8,sector-years,finding 10
+03 S5b,Sector-years where Track B is within 0.005% of Track A,44,sector-years,finding 10
+03 S6 2014,"Textiles net weight, 2014",6.89,million tonnes,finding 17
+03 S6 2015,"Textiles net weight, 2015",6.61,million tonnes,finding 17
+03 S6 2016,"Textiles net weight, 2016",7.04,million tonnes,finding 17
+03 S6 2017,"Textiles net weight, 2017",6.53,million tonnes,finding 17
+03 S6 2018,"Textiles net weight, 2018",6.86,million tonnes,finding 17
+03 S6 2019,"Textiles net weight, 2019",6.22,million tonnes,finding 17
+03 S6 2020,"Textiles net weight, 2020",6.16,million tonnes,finding 17
+03 S6 2021,"Textiles net weight, 2021",7.52,million tonnes,finding 17
+03 S6 2022,"Textiles net weight, 2022",5.75,million tonnes,finding 17
+03 S6 2023,"Textiles net weight, 2023",5.86,million tonnes,finding 17
+03 S7a,HS6 codes in Tracks B/D reworded between consecutive years,73,codes,findings correction 2
+03 S7b,HS6 codes reworded in 2017 (HS 2017 edition),42,codes,findings correction 2
+03 S7c,HS6 codes reworded in 2022 (HS 2022 edition),34,codes,findings correction 2
+03 S7d,HS6 codes reworded in both 2017 and 2022,3,codes,findings correction 2
+06 S8a,Track D partner-years with the HS6 sum above the Track C chapter,332,partner-years,sql/06 V3 comment
+06 S8b,"Largest of those, as % of the chapter value",0.002,percent,sql/06 V3 comment
+06 S8c,"Largest of those, in USD",1,USD,sql/06 V3 comment

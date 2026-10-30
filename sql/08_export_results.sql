@@ -16,7 +16,9 @@
 -- Track A and B columns were rounded differently here than in 02/03. With
 -- the views there is nothing left to drift. The ORDER BY on each line is
 -- deliberate: a view's own ORDER BY is not guaranteed to survive a SELECT
--- from it, and the CSVs must come out byte-identical run after run.
+-- from it, and the CSVs must come out byte-identical run after run. So each
+-- ORDER BY is a unique key for its view (checked 29/10/2026: no ties in any
+-- of the 28); where the natural order can tie, a name column breaks it.
 --
 -- These CSVs are DERIVED, not source. data/raw/ is the input of record; if the
 -- two ever disagree, data/raw/ plus 00-07 wins. Regenerate rather than edit.
@@ -27,10 +29,12 @@
 --
 -- \copy paths are relative to the directory psql was launched from, and
 -- data/processed/ must already exist (git does not track empty directories,
--- so it is kept alive by the CSVs themselves). 27 result sets: 24 until
+-- so it is kept alive by the CSVs themselves). 28 result sets: 24 until
 -- 23/09/2026, plus India's chapter contribution to growth (02 Q6),
 -- engineering's unit value with and without phones (03 Q6b) and the
--- partner panel's import coverage by chapter (07 V5b).
+-- partner panel's import coverage by chapter (07 V5b); then, from
+-- 29/10/2026, supporting_figures.csv — the counts the findings and comments
+-- quote that no result set returns (02 S1–S4, 03 S5–S7, 06 S8).
 -- ============================================================
 
 -- Track A (sql/02)
@@ -58,7 +62,7 @@
 
 -- Track D (sql/06)
 \copy (SELECT * FROM v_track_d_sector_partner_matrix_2023 ORDER BY sector, rank_in_sector) TO 'data/processed/track_d_sector_partner_matrix_2023.csv' WITH (FORMAT csv, HEADER true)
-\copy (SELECT * FROM v_track_d_sector_partner_shift ORDER BY sector, shift_ppt DESC) TO 'data/processed/track_d_sector_partner_shift.csv' WITH (FORMAT csv, HEADER true)
+\copy (SELECT * FROM v_track_d_sector_partner_shift ORDER BY sector, shift_ppt DESC, partner_desc) TO 'data/processed/track_d_sector_partner_shift.csv' WITH (FORMAT csv, HEADER true)
 \copy (SELECT * FROM v_track_d_top_products_by_market ORDER BY sector, partner_rank, product_rank) TO 'data/processed/track_d_top_products_by_market.csv' WITH (FORMAT csv, HEADER true)
 \copy (SELECT * FROM v_track_d_sector_market_concentration ORDER BY sector, ref_year) TO 'data/processed/track_d_sector_market_concentration.csv' WITH (FORMAT csv, HEADER true)
 \copy (SELECT * FROM v_track_d_sector_partner_cagr ORDER BY sector, cagr_pct DESC NULLS LAST) TO 'data/processed/track_d_sector_partner_cagr.csv' WITH (FORMAT csv, HEADER true)
@@ -69,3 +73,6 @@
 \copy (SELECT * FROM v_track_e_india_partner_balance ORDER BY balance_2023_bn) TO 'data/processed/track_e_india_partner_balance.csv' WITH (FORMAT csv, HEADER true)
 \copy (SELECT * FROM v_track_e_india_import_mix ORDER BY rank_2023) TO 'data/processed/track_e_india_import_mix.csv' WITH (FORMAT csv, HEADER true)
 \copy (SELECT * FROM v_track_e_panel_import_coverage_2023 ORDER BY rank_by_imports) TO 'data/processed/track_e_panel_import_coverage_2023.csv' WITH (FORMAT csv, HEADER true)
+
+-- Supporting figures (sql/02, 03, 06)
+\copy (SELECT * FROM v_support_02 UNION ALL SELECT * FROM v_support_03 UNION ALL SELECT * FROM v_support_06 ORDER BY figure_id) TO 'data/processed/supporting_figures.csv' WITH (FORMAT csv, HEADER true)

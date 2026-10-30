@@ -17,8 +17,8 @@
 --
 -- Assumptions made here (flagging before running, not after):
 --   1. Sector and product totals sum only aggr_level = 6 rows (true HS6
---      product detail). The pull used cmdCode='AG6', so the table should be
---      almost entirely level 6; the filter guards against coarser level-2/4
+--      product detail). The pull used cmdCode='AG6', and every row is level
+--      6 (16,976 of 16,976, V2); the filter guards against coarser level-2/4
 --      rollup rows entering an HS6 sum. It is not the double-counting guard
 --      — that is the UNIQUE index declared in 01. Validation V2 shows the
 --      split.
@@ -57,12 +57,13 @@
 --
 --      HOW MUCH OF THE WEIGHT IS COMTRADE'S, NOT INDIA'S (added 17/09/2026).
 --      Coverage is not the only gate, and the more important one was missing.
---      Where a reporter files no net weight, Comtrade estimates it — and its
---      stated method (UNSD, "Quantity and Weight information in UN Comtrade",
---      October 2009) is to derive the missing weight FROM THE VALUE using
---      weighted or standard unit values. Estimated weight is therefore not an
---      independent measurement of volume; it is value divided by an assumed
---      price. Q8 reported only the share of ROWS flagged, which for petroleum
+--      Where a reporter files no net weight, Comtrade estimates it, by one of
+--      three methods (FAO, UNSD and ITC, "Trade data processing and validation
+--      methodology", 2019): a known conversion factor applied to a reported
+--      quantity, partially reported weights, or the VALUE divided by a
+--      standard unit value. Estimated weight is therefore not an independent
+--      measurement of volume, and where the last method applies it is value
+--      divided by an assumed price; the data does not say which was used. Q8 reported only the share of ROWS flagged, which for petroleum
 --      reads a comfortable 24-63%. Weighted by kilograms — the thing actually
 --      being summed — the share is 95.3% in 2014 and 95.3% in 2023, peaking
 --      at 99.7%, because the few estimated rows are the enormous ones. Q8 now
@@ -112,6 +113,7 @@ SELECT * FROM v_track_b_sector_year_totals;
 
 -- ============================================================
 -- Query 2: sector totals with year-on-year growth %
+-- (Exploratory: printed for inspection, not exported or cited in the findings.)
 --
 -- LAG() pulls each sector's prior-year total into the same row, scoped to
 -- that sector's own year sequence (PARTITION BY sector). The first year of
@@ -150,6 +152,7 @@ ORDER BY sector, ref_year;
 
 -- ============================================================
 -- Query 3a: sector composition — share of the 5-sector basket, 2014 vs 2023
+-- (Exploratory: printed for inspection, not exported or cited in the findings.)
 --            long form: one row per sector per year
 -- ============================================================
 WITH sector_yearly AS (
@@ -178,6 +181,7 @@ ORDER BY sector, ref_year;
 -- ============================================================
 -- Query 3b: same comparison, wide form — one row per sector with the
 --            2014 and 2023 shares side by side and the ppt shift
+-- (Exploratory: printed for inspection, not exported or cited in the findings.)
 -- ============================================================
 WITH sector_yearly AS (
     SELECT
@@ -214,6 +218,7 @@ ORDER BY ppt_change DESC;
 
 -- ============================================================
 -- Query 4: top 10 HS6 products within each sector
+-- (Exploratory: printed for inspection, not exported or cited in the findings.)
 --           ranked on 2023 value; full-period total shown alongside
 -- ============================================================
 WITH product_totals AS (
@@ -222,8 +227,8 @@ WITH product_totals AS (
         cmd_code,
         -- latest wording, not a GROUP BY key: 73 HS6 codes in this table
         -- were reworded across TWO editions — 42 at 2017 (HS 2017) and 34 at
-        -- 2022 (HS 2022), three codes in both (see 02 assumption 7; this
-        -- comment said "by HS 2022" until 17/09/2026). Grouping on cmd_desc
+        -- 2022 (HS 2022), three codes in both (02 assumption 7, S7).
+        -- Grouping on cmd_desc
         -- split them and truncated value_2014_2023_usd to the rows sharing
         -- the latest wording — fixed 15/09/2026; one top-10 row was affected
         -- (petroleum 270750: 3.58bn -> 3.62bn, itself a 2017 rewording).
@@ -247,8 +252,7 @@ ranked AS (
         -- engineering/machinery and 37 in textiles. Most are not products
         -- India stopped exporting: 32 and 30 of them last appear in 2016 or
         -- 2021, the year before an HS edition retired or split the code
-        -- (02 assumption 7). This said "products that stopped being
-        -- exported" until 23/09/2026. RANK() would give every one of them the same rank, and a
+        -- (02 assumption 7, S4). RANK() would give every one of them the same rank, and a
         -- "<= 10" filter placed on a tie block returns the whole block. The
         -- full-period tie-break also makes the order deterministic between
         -- runs rather than dependent on scan order.
@@ -295,9 +299,8 @@ ORDER BY sector, rank_in_sector_2023;
 -- was split or renumbered is counted more than once (02 assumption 7).
 -- Engineering has 826 codes in 2023 and 863 across the decade, textiles 784
 -- vs 821, pharmaceuticals 43 vs 53 — and most of each gap is edition churn,
--- not discontinued exports. The column was named hs6_products_all_years, and
--- key_findings.md finding 6 read it as "37 more products", until 23/09/2026.
--- It is kept (renamed) because the gap itself is the evidence of the churn.
+-- not discontinued exports. The column is kept because the gap itself is
+-- the evidence of the churn.
 -- Exported as data/processed/track_b_sector_concentration_2023.csv.
 -- ============================================================
 DROP VIEW IF EXISTS v_track_b_sector_concentration_2023;
@@ -526,12 +529,12 @@ SELECT * FROM v_track_b_petroleum_volume_series;
 --          10-million-tonne line alike; the kg share weights them by what is
 --          actually being summed. For petroleum the two diverge violently —
 --          28.9% of rows but 95.3% of tonnage in 2023 — because the estimated
---          rows are the big ones. Comtrade derives missing weight from value
---          via unit values (assumption 7), so a high kg share means the
---          "volume" series is substantially value divided by an assumed
---          price, and a volume-versus-price conclusion drawn from it is
+--          rows are the big ones. Comtrade can derive missing weight from value
+--          via standard unit values (assumption 7), so a high kg share means
+--          the "volume" series may be substantially value divided by an
+--          assumed price, and a volume-versus-price conclusion drawn from it is
 --          partly circular. The row-share column is kept only so the two can
---          be compared; it was the only one here until 17/09/2026.
+--          be compared.
 --          Exported as track_b_volume_coverage.csv.
 -- ============================================================
 DROP VIEW IF EXISTS v_track_b_volume_coverage;
@@ -619,9 +622,14 @@ ORDER BY years_present, sector;
 --     23/09/2026, so it showed -2.5 while the finding cited it for -2.46.)
 --
 --     At build time: worst -2.462% (engineering/machinery 2022), 44 of 50
---     sector-years within 0.005%, 8 identical to the dollar.
-DROP VIEW IF EXISTS v_track_b_cross_track_reconciliation;
-CREATE VIEW v_track_b_cross_track_reconciliation AS
+--     sector-years within 0.005%, 8 identical to the dollar (03 S5).
+--
+--     Two views: v_track_b_cross_track_usd holds the unrounded USD per
+--     sector-year, so S5 below can count exact matches; the exported view
+--     rounds it. Dropped with CASCADE so a re-run also clears the views
+--     built on it, which are recreated below.
+DROP VIEW IF EXISTS v_track_b_cross_track_usd CASCADE;
+CREATE VIEW v_track_b_cross_track_usd AS
 WITH track_b_sector AS (
     SELECT sector, ref_year, SUM(fob_value) AS b_value_usd
     FROM clean_track_b_india_sector_detail
@@ -646,32 +654,104 @@ track_a_sector AS (
                        '57','58','59','60','61','62','63')
     GROUP BY sector, ref_year
 )
-SELECT
-    b.sector,
-    b.ref_year,
-    ROUND(b.b_value_usd / 1e9, 3)                                                AS track_b_bn,
-    ROUND(a.a_value_usd / 1e9, 3)                                                AS track_a_bn,
-    ROUND(100.0 * (b.b_value_usd - a.a_value_usd) / NULLIF(a.a_value_usd, 0), 2) AS pct_diff
+SELECT b.sector, b.ref_year, b.b_value_usd, a.a_value_usd
 FROM track_b_sector b
 -- Inner join: a sector-year in one track but not the other would be dropped
 -- from the reconciliation rather than flagged by it — the one place a silent
 -- skip would be worst. A no-op here: both tracks hold all 50 sector-years,
 -- and the assertion below checks that the join returns all 50.
-JOIN track_a_sector a USING (sector, ref_year)
-ORDER BY b.sector, b.ref_year;
+JOIN track_a_sector a USING (sector, ref_year);
+
+DROP VIEW IF EXISTS v_track_b_cross_track_reconciliation;
+CREATE VIEW v_track_b_cross_track_reconciliation AS
+SELECT
+    sector,
+    ref_year,
+    ROUND(b_value_usd / 1e9, 3)                                              AS track_b_bn,
+    ROUND(a_value_usd / 1e9, 3)                                              AS track_a_bn,
+    ROUND(100.0 * (b_value_usd - a_value_usd) / NULLIF(a_value_usd, 0), 2) AS pct_diff
+FROM v_track_b_cross_track_usd
+ORDER BY sector, ref_year;
 
 SELECT * FROM v_track_b_cross_track_reconciliation;
 
--- V5 assertion (added 23/09/2026): all 50 sector-years reconcile, and none
--- by more than 2.5%. The tolerance is the published claim, not a fitted
--- number — finding 10 says "within 2.5%" — so a change that breaks it has
--- to change the finding too.
+-- V5 assertion: all 50 sector-years reconcile, and the worst divergence is
+-- the -2.46% that finding 10 and the README quote. It checks the quoted value
+-- itself (to its 2 dp), not a ceiling, so it fails if the worst gap moves in
+-- either direction — a change that breaks it has to change the finding too.
 DO $$
 DECLARE n bigint; worst numeric;
 BEGIN
     SELECT COUNT(*), MAX(ABS(pct_diff)) INTO n, worst FROM v_track_b_cross_track_reconciliation;
-    IF n <> 50 OR worst > 2.5 THEN
-        RAISE EXCEPTION '03 V5: % sector-years reconciled (expected 50), worst |divergence| % percent', n, worst;
+    IF n <> 50 OR worst <> 2.46 THEN
+        RAISE EXCEPTION '03 V5: % sector-years reconciled (expected 50), worst |divergence| % percent (expected 2.46)', n, worst;
     END IF;
-    RAISE NOTICE '03 V5 PASSED: 50 sector-years reconcile Track B to Track A within 2.5 percent (worst % percent).', worst;
+    RAISE NOTICE '03 V5 PASSED: 50 sector-years reconcile Track B to Track A, worst divergence % percent.', worst;
 END $$;
+
+
+-- ============================================================
+-- Supporting figures (S5–S7)
+--
+-- Counts quoted in the findings or in comments above that no result query
+-- returns. Each is defined here once and exported by sql/08, with S1–S4
+-- (sql/02) and S8 (sql/06), as data/processed/supporting_figures.csv.
+--
+-- S5. Finding 10: how many of the 50 sector-years reconcile exactly, and
+--     how many within 0.005% (unrounded USD, from v_track_b_cross_track_usd).
+-- S6. Finding 17: textiles tonnage, every year — 6.89 Mt in 2014, 5.86 in
+--     2023, and no year after 2018 above 2014 except 2021.
+-- S7. Correction 2 in the findings: HS6 codes in Tracks B or D whose
+--     description changes between consecutive years (73), the year the new
+--     wording first appears (2017: 42, 2022: 34), and codes reworded in both
+--     years (3). Track B and D agree on every code-year's description.
+-- ============================================================
+DROP VIEW IF EXISTS v_support_03;
+CREATE VIEW v_support_03 AS
+WITH recon AS (
+    SELECT
+        COUNT(*) FILTER (WHERE b_value_usd = a_value_usd)                                   AS exact,
+        COUNT(*) FILTER (WHERE ABS(100.0 * (b_value_usd - a_value_usd) / a_value_usd) < 0.005) AS within_0005
+    FROM v_track_b_cross_track_usd
+),
+textile_mt AS (
+    SELECT ref_year, ROUND(SUM(net_wgt) / 1e9, 2) AS mt
+    FROM clean_track_b_india_sector_detail
+    WHERE sector = 'textiles' AND aggr_level = 6
+    GROUP BY ref_year
+),
+code_desc AS (
+    SELECT DISTINCT cmd_code, ref_year, cmd_desc FROM clean_track_b_india_sector_detail
+    UNION
+    SELECT DISTINCT cmd_code, ref_year, cmd_desc FROM clean_track_d_india_partner_sector
+),
+changes AS (
+    SELECT cmd_code, ref_year
+    FROM (SELECT cmd_code, ref_year, cmd_desc,
+                 LAG(cmd_desc) OVER (PARTITION BY cmd_code ORDER BY ref_year) AS prev_desc
+          FROM code_desc) s
+    WHERE prev_desc IS NOT NULL AND cmd_desc <> prev_desc
+),
+reworded AS (
+    SELECT cmd_code,
+           BOOL_OR(ref_year = 2017) AS in_2017,
+           BOOL_OR(ref_year = 2022) AS in_2022
+    FROM changes
+    GROUP BY cmd_code
+)
+SELECT '03 S5a'::text AS figure_id, 'Sector-years where Track B equals Track A to the dollar'::text AS figure,
+       exact::numeric AS value, 'sector-years'::text AS unit, 'finding 10'::text AS cited_in FROM recon
+UNION ALL
+SELECT '03 S5b', 'Sector-years where Track B is within 0.005% of Track A', within_0005, 'sector-years', 'finding 10' FROM recon
+UNION ALL
+SELECT '03 S6 ' || ref_year, 'Textiles net weight, ' || ref_year, mt, 'million tonnes', 'finding 17' FROM textile_mt
+UNION ALL
+SELECT '03 S7a', 'HS6 codes in Tracks B/D reworded between consecutive years', COUNT(*), 'codes', 'findings correction 2' FROM reworded
+UNION ALL
+SELECT '03 S7b', 'HS6 codes reworded in 2017 (HS 2017 edition)', COUNT(*) FILTER (WHERE in_2017), 'codes', 'findings correction 2' FROM reworded
+UNION ALL
+SELECT '03 S7c', 'HS6 codes reworded in 2022 (HS 2022 edition)', COUNT(*) FILTER (WHERE in_2022), 'codes', 'findings correction 2' FROM reworded
+UNION ALL
+SELECT '03 S7d', 'HS6 codes reworded in both 2017 and 2022', COUNT(*) FILTER (WHERE in_2017 AND in_2022), 'codes', 'findings correction 2' FROM reworded;
+
+SELECT * FROM v_support_03 ORDER BY figure_id;
