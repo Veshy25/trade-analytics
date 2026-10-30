@@ -20,9 +20,10 @@ Bangladesh is drawn dashed because it has 2015-2018 only (Track A assumption
 2); a solid line would imply a decade series it does not have.
 
 Chart 2 — petroleum products: value, tonnes and USD/kg, each indexed to
-2014 = 100. Three lines on one axis is the point: it shows the 2015-2020
-value collapse was price (tonnes held) and the 2014-2023 growth was volume
-(unit value ended below where it started). 03 Q7.
+2014 = 100. Three lines on one axis is the point: it shows the value
+collapses of 2015 and 2020 were mostly price (value fell 49.6% and 38.0%,
+tonnes 14.6% and 16.8%) and the 2014-2023 growth was volume (unit value
+ended below where it started). 03 Q7.
 
 Chart 3 — sector x partner heatmap, 2023: each sector's 20-partner panel
 split by partner, share of the sector's panel. Rows are sectors, columns the
@@ -199,7 +200,7 @@ def chart_sector_partner_heatmap() -> None:
     mat = (df.pivot(index="sector", columns="partner_desc", values="pct_of_sector_panel")
              .reindex(index=sector_order, columns=partner_order).fillna(0))
     # Whether a (sector, partner) row exists at all. A row exists only where
-    # there was trade (01 found no zero values), so this separates "under 1%"
+    # there was trade (01 validation 8 asserts no zero values), so this separates "under 1%"
     # from "no trade". value_2023_bn cannot: it is rounded to USD 1mn, and
     # Maldives gems (USD 0.12mn) reads 0.000.
     has_trade = (df.pivot(index="sector", columns="partner_desc", values="value_2023_bn")

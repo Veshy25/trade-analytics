@@ -34,8 +34,7 @@
 --   7. Two pulls, two dates. Track D was pulled 15/09/2026; Tracks B and C on
 --      25/08/2026. Comtrade revises published figures, so the cross-track
 --      checks in V3/V4 could in principle show revision drift. In practice
---      they do not, but be exact about what "in practice" means here, because
---      this assumption overstated it until 17/09/2026. Worst absolute
+--      they do not, but be exact about what "in practice" means here. Worst absolute
 --      divergence per sector over all 200 partner-years: petroleum 0.00%,
 --      textiles 0.18%, pharmaceuticals 0.97%, gems & jewellery 1.95%,
 --      engineering / machinery 11.54% (Japan, 2022). ELEVEN partner-years
@@ -51,8 +50,7 @@
 --      so the gap exists without any pull-date difference. It is inferred,
 --      not proven — no series was pulled on both dates to rule revision out,
 --      and the mechanism (value held at chapter level with no HS6 breakdown)
---      is the likely explanation, not a demonstrated one. This assumption
---      stated it as established fact until 23/09/2026.
+--      is the likely explanation, not a demonstrated one.
 --   8. Nominal USD throughout (02 assumption 6). Every growth figure is
 --      exposed to the 2022 commodity spike, petroleum most of all.
 --   9. Every share, growth and CAGR divisor is wrapped in NULLIF(..., 0).
@@ -220,7 +218,9 @@ SELECT * FROM v_track_d_sector_market_concentration;
 -- Query 5: CAGR 2014 -> 2023 per (sector, partner), with the 2023 value so
 --          a large growth rate off a tiny base is visible for what it is.
 --          Pairs with no trade in 2014 get NULL, not a made-up rate.
--- Exported as track_d_sector_partner_cagr.csv.
+-- Exported as track_d_sector_partner_cagr.csv: finding 14 cites it for its
+-- USD values, and it is the input for the dashboard's planned Sector x
+-- Market page.
 -- ============================================================
 DROP VIEW IF EXISTS v_track_d_sector_partner_cagr;
 CREATE VIEW v_track_d_sector_partner_cagr AS
@@ -308,8 +308,7 @@ GROUP BY aggr_level;
 --     Eleven partner-years exceed 1%: ten engineering 2022, one gems 2022.
 --     Direction is never materially positive (HS6 sum <= HS2 chapter): 332
 --     of the 1,000 partner-years are positive, but the largest is 0.002%
---     (USD 1, Maldives gems 2014) — rounding, not value. This said "always
---     negative" until 23/09/2026.
+--     (USD 1, Maldives gems 2014; S8) — rounding, not value.
 --
 --     The join below is inner, so a sector-year present in one track and not
 --     the other would vanish from the comparison instead of failing it. That
@@ -319,8 +318,12 @@ GROUP BY aggr_level;
 --     join returns all 1,000 partner-years. Until 23/09/2026 this comment
 --     said 01 validation 6 asserted both partners and years; it was a plain
 --     SELECT, and it covers the partner set only.
-DROP VIEW IF EXISTS v_track_d_reconciliation_vs_c;
-CREATE VIEW v_track_d_reconciliation_vs_c AS
+-- Two views: v_track_d_reconciliation_rows keeps every partner-year
+-- unrounded, so S8 at the end of this file can count the positive ones; the
+-- view the assertion reads summarises it by sector. Dropped with CASCADE so a
+-- re-run also clears the views built on it, which are recreated below.
+DROP VIEW IF EXISTS v_track_d_reconciliation_rows CASCADE;
+CREATE VIEW v_track_d_reconciliation_rows AS
 WITH d AS (
     SELECT sector, partner_code, ref_year, SUM(fob_value) AS d_value
     FROM clean_track_d_india_partner_sector
@@ -350,6 +353,10 @@ joined AS (
     FROM d
     JOIN c USING (sector, partner_code, ref_year)
 )
+SELECT * FROM joined;
+
+DROP VIEW IF EXISTS v_track_d_reconciliation_vs_c;
+CREATE VIEW v_track_d_reconciliation_vs_c AS
 SELECT
     sector,
     COUNT(*)                                   AS partner_years,
@@ -357,7 +364,7 @@ SELECT
     ROUND(MAX(pct_diff), 2)                    AS max_pct_diff,
     ROUND(MAX(ABS(pct_diff)), 2)               AS worst_abs_pct_diff,
     COUNT(*) FILTER (WHERE ABS(pct_diff) > 1)  AS partner_years_over_1pct
-FROM joined
+FROM v_track_d_reconciliation_rows
 GROUP BY sector
 ORDER BY worst_abs_pct_diff DESC;
 
@@ -373,8 +380,8 @@ BEGIN
     SELECT SUM(partner_years), MAX(worst_abs_pct_diff), SUM(partner_years_over_1pct)
       INTO n, worst, over1
     FROM v_track_d_reconciliation_vs_c;
-    IF n <> 1000 OR worst > 11.54 OR over1 <> 11 THEN
-        RAISE EXCEPTION '06 V3: % partner-years, worst % percent, % over 1 percent (expected 1000 / <= 11.54 / 11)', n, worst, over1;
+    IF n <> 1000 OR worst <> 11.54 OR over1 <> 11 THEN
+        RAISE EXCEPTION '06 V3: % partner-years, worst % percent, % over 1 percent (expected 1000 / 11.54 / 11)', n, worst, over1;
     END IF;
     RAISE NOTICE '06 V3 PASSED: 1000 partner-years, worst % percent, 11 over 1 percent.', worst;
 END $$;
@@ -425,8 +432,41 @@ BEGIN
            MAX(panel_coverage_pct) FILTER (WHERE ref_year = 2023)
       INTO n, lo, hi, lo23, hi23
     FROM v_track_d_panel_coverage;
-    IF n <> 50 OR lo < 52.3 OR hi > 71.3 OR lo23 < 57.0 OR hi23 > 70.2 THEN
+    -- The quoted range ends themselves (stored at 1 dp, as quoted), not
+    -- bounds: a narrower range would pass a bounds check while the published
+    -- figures went stale.
+    IF n <> 50 OR lo <> 52.3 OR hi <> 71.3 OR lo23 <> 57.0 OR hi23 <> 70.2 THEN
         RAISE EXCEPTION '06 V4: % sector-years, range % to %, 2023 % to % (expected 50, 52.3-71.3, 2023 57.0-70.2)', n, lo, hi, lo23, hi23;
     END IF;
     RAISE NOTICE '06 V4 PASSED: coverage % to % percent (2023: % to %).', lo, hi, lo23, hi23;
 END $$;
+
+
+-- ============================================================
+-- Supporting figure (S8)
+--
+-- The V3 comment above: of the 1,000 partner-years, how many have the HS6
+-- sum ABOVE the HS2 chapter (332), and how large the largest of those is
+-- (0.002%, USD 1 — Maldives gems 2014). Exported by sql/08 with S1–S7 as
+-- data/processed/supporting_figures.csv.
+-- ============================================================
+DROP VIEW IF EXISTS v_support_06;
+CREATE VIEW v_support_06 AS
+WITH pos AS (
+    SELECT * FROM v_track_d_reconciliation_rows WHERE pct_diff > 0
+),
+top1 AS (
+    SELECT * FROM pos ORDER BY pct_diff DESC, sector, partner_code, ref_year LIMIT 1
+)
+SELECT '06 S8a'::text AS figure_id, 'Track D partner-years with the HS6 sum above the Track C chapter'::text AS figure,
+       (SELECT COUNT(*) FROM pos)::numeric AS value, 'partner-years'::text AS unit, 'sql/06 V3 comment'::text AS cited_in
+UNION ALL
+SELECT '06 S8b', 'Largest of those, as % of the chapter value', ROUND(pct_diff, 3), 'percent', 'sql/06 V3 comment' FROM top1
+UNION ALL
+SELECT '06 S8c', 'Largest of those, in USD', ROUND(d_value - c_value), 'USD', 'sql/06 V3 comment' FROM top1;
+
+SELECT v.*, t.sector, t.partner_code, t.ref_year
+FROM v_support_06 v
+CROSS JOIN (SELECT sector, partner_code, ref_year FROM v_track_d_reconciliation_rows
+            WHERE pct_diff > 0 ORDER BY pct_diff DESC LIMIT 1) t
+ORDER BY v.figure_id;
