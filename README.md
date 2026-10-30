@@ -136,7 +136,7 @@ A Power BI report on the committed results, saved as a Power BI project (PBIP) s
 
 ## Tech stack
 
-PostgreSQL 18 · pgAdmin 4 · Python (UN Comtrade API pull, matplotlib charts) · Power BI (PBIP: TMDL model, PBIR report)
+PostgreSQL 18 · pgAdmin 4 · Python (UN Comtrade API pull, script not published; matplotlib charts) · Power BI (PBIP: TMDL model, PBIR report)
 
 ## About this project
 
