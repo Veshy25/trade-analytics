@@ -15,11 +15,10 @@ external WITS anchor, which is cited to its source and is not derived here.
   part of what reads as growth is price, not volume, and petroleum is where
   that distortion is largest.
 - **Bangladesh has 2015–2018 only** — four years, no 2023. WITS carries
-  nothing for Bangladesh after 2015 either, so the missing recent years are a
-  gap in the source rather than in the pull (`sql/02` assumption 2). WITS and
-  this project agree on the year of the value they share (2015); until
-  23/09/2026 this note said WITS labelled it 2016, which was a misreading of
-  the WITS page. Bangladesh's growth rate spans three years and is not
+  nothing for Bangladesh after 2015 either, so the missing recent years are most
+  likely a gap in the source rather than in the pull, though that is not proven
+  here (`sql/02` assumption 2). WITS and
+  this project agree on the year of the value they share (2015). Bangladesh's growth rate spans three years and is not
   comparable to a nine-year rate without saying so.
 - **Track C shares are share-of-panel, not share-of-world.** The 20 partner
   markets cover 61.9%–64.4% of India's exports, so a partner at "27.8%" holds
@@ -29,8 +28,9 @@ external WITS anchor, which is cited to its source and is not derived here.
   India's imports, `sql/07` V5).
 - **The panel is a selection, not India's top 20 — and it was chosen for
   exports.** No selection rule survives in the project's records; it holds
-  India's largest markets, all four South Asian neighbours whatever their size
-  (the Maldives is 0.2% of it) and Viet Nam. Reused for imports, it covers
+  India's largest markets, four South Asian neighbours whatever their size —
+  Bangladesh, Nepal, Sri Lanka and the Maldives (0.2% of it); Bhutan and
+  Pakistan are not in it — and Viet Nam. Reused for imports, it covers
   54.7% of India's 2023 imports overall but only **33.9% of mineral fuels and
   37.8% of precious stones and metals** (`sql/07` V5b), so energy and gold
   suppliers outside the twenty are missing. Every partner ranking below —
@@ -179,8 +179,7 @@ was tonnes, not price — as far as Comtrade's estimated tonnage can show it.
 **Engineering/machinery compounded at 11.79%, nearly tripling from USD 22.6bn
 to 61.6bn** — USD 39.0bn of the five sectors' USD 64.0bn net increase (61%).
 Petroleum added 27.0bn and pharmaceuticals 9.6bn; two of the five sectors
-*shrank* in nominal terms. (Titled "the growth is entirely in engineering"
-until 23/09/2026, which the table below never supported.)
+*shrank* in nominal terms.
 
 | Sector | 2014 USD bn | 2023 USD bn | CAGR |
 |---|---:|---:|---:|
@@ -224,9 +223,7 @@ one HS edition, a code is a product, so this is the right denominator for a
 editions, and editions split, merge and retire codes: 32 of engineering's 37
 "missing" codes and 30 of textiles' 37 last appear in 2016 or 2021, the year
 before an edition change. They are mostly renumbered products, not products
-India stopped exporting. The CSV column is now `hs6_codes_all_years` to say
-so; until 23/09/2026 it was `hs6_products_all_years` and this paragraph read
-it as "37 more products".
+India stopped exporting, which is why the CSV column is `hs6_codes_all_years`.
 
 *Source: `sql/03` Query 5 · `data/processed/track_b_sector_concentration_2023.csv`*
 
@@ -314,17 +311,18 @@ second-worst is −1.05%.
 This is the project's strongest internal control: two datasets pulled
 separately (from the same source, on the same day), at different
 granularities, agree within 2.5% in every sector-year — within 0.005% in 44 of
-the 50, and to the dollar in 8. The worst gap, −2.46%, is USD 1.33bn. (This
-said "independently pulled … within a rounding error" until 23/09/2026.)
+the 50, and to the dollar in 8. The worst gap, −2.46%, is USD 1.33bn.
 
-*Source: `sql/03` V5 · `data/processed/track_b_cross_track_reconciliation.csv`*
+*Source: `sql/03` V5, S5 · `data/processed/track_b_cross_track_reconciliation.csv` ·
+`data/processed/supporting_figures.csv` (03 S5)*
 
-## 11. The chapter totals reconcile exactly to the published all-commodities figure
+## 11. The chapter totals match the published all-commodities figure to WITS's precision
 
 India's 2023 exports, summed here from 97 HS2 chapters, come to
 **USD 431,411,977,211**. WITS (World Bank / ITC / UNCTAD / UN Comtrade / WTO)
 publishes India's 2023 merchandise exports as **USD 431,411,977.21 thousand** —
-identical to the dollar.
+the same figure to WITS's published precision of USD 10 (the sum here is USD 1
+higher, inside that rounding).
 
 This confirms the aggregation is exactly right: no chapter missing, nothing
 double-counted, no rollup row silently included.
@@ -346,10 +344,9 @@ this project treated as "estimated by Comtrade rather than as-reported". That
 reading was wrong.
 
 `legacyEstimationFlag` is a **quantity and net-weight** code, not a value code.
-UN Statistics Division, *Quantity and Weight information in UN Comtrade*
-(October 2009), §4.1: `0` = no estimation, `2` = quantity only, `4` = net
-weight only, `6` = both. Neither that document nor the 2019 methodology guide
-describes any flag for an estimated value.
+UN Comtrade's processing methodology (FAO, UNSD and ITC, [*Trade data processing and validation methodology*](https://comtradeapi.un.org/files/v1/app/wiki/UNSD_Method_trade_data_processing_v6-17_Jun_2019.pdf) (2019), Part: UN Comtrade, "Documentation of estimated values"):
+`0` = no estimation, `2` = quantity only, `4` = net weight only, `6` = both.
+It describes no flag for an estimated value.
 
 The data confirms it without the document. On Track B, which carries the flag
 and both modern booleans, every flag-2 row (162) is quantity-only estimated,
@@ -358,8 +355,7 @@ The reverse does not hold: 2,905 flag-0 rows are estimated too (2
 quantity-only, 1,187 net-weight-only, 1,716 both) — the flag was never
 back-filled for them, the same one-way pattern as Track A's 552 rows. `sql/02`
 V1a asserts the flag-to-boolean direction on Track A rather than describing
-it. (Until 23/09/2026 this paragraph said "exactly … no exceptions", true in
-one direction only.)
+it.
 
 And the part that settles it: **`netWgt` on the HS2 tracks holds no positive
 value at all** — blank on 48.3% of Track A rows and exactly `0` on the other
@@ -385,7 +381,7 @@ differently — which is the caveat the old wording was reaching for, with the
 wrong column. It is a statement about *how the figure was built*, not about
 whether it was estimated, and it does not invalidate the comparison: these are
 the standard published figures, and finding 11 shows India's 2023 chapter sum
-reconciling to WITS to the dollar.
+matching WITS to its published precision.
 
 For completeness, the net-weight exposure the flag *does* measure is in the CSV
 as `pct_value_on_netwgt_est_rows` (India 70.0% of decade value, China 89.2%,
@@ -393,8 +389,9 @@ Bangladesh 70.2%, Viet Nam 61.3%). It is reported because the column exists,
 not because it constrains anything here — at HS2 there is no weight to estimate.
 Where it genuinely matters is finding 17, at HS6, where weight *is* populated.
 
-*Source: `sql/02` V1a/V1b · `data/processed/track_a_reporting_basis.csv` ·
-[UNSD, Quantity and Weight information in UN Comtrade](https://comtradeapi.un.org), October 2009, §4.1*
+*Source: `sql/02` V1a/V1b, S1, S2 · `data/processed/track_a_reporting_basis.csv` ·
+`data/processed/supporting_figures.csv` (02 S1, S2) ·
+[FAO, UNSD and ITC, Trade data processing and validation methodology](https://comtradeapi.un.org/files/v1/app/wiki/UNSD_Method_trade_data_processing_v6-17_Jun_2019.pdf) (2019), "Documentation of estimated values"*
 
 ---
 
@@ -456,7 +453,8 @@ The Rotterdam caution in finding 9 stands: a share of this is refined product
 landed at Europe's largest port for onward distribution, recorded against the
 Netherlands. Comtrade records the declared partner.
 
-*Source: `sql/06` Query 2 · `data/processed/track_d_sector_partner_shift.csv`*
+*Source: `sql/06` Query 2 · `data/processed/track_d_sector_partner_shift.csv` (shares) ·
+`data/processed/track_d_sector_partner_cagr.csv` (USD values)*
 
 ## 15. Engineering and textiles concentrated into the USA; gems shifted toward it; petroleum concentrated into the Netherlands
 
@@ -470,8 +468,7 @@ the USA's share *rose* 32.5% → 44.8%, the fifth-largest shift in the data,
 while the UAE's fell faster (47.6% → 33.4%). Petroleum's HHI rose too
 (1,175 → 1,406), but into the Netherlands (7.3% → 28.5%), with the USA
 roughly flat (+0.7 points). Pharma (4,134 → 3,991) eased slightly from a
-one-market book. (Titled "every sector except gems and pharma concentrated
-further into the USA" until 23/09/2026 — wrong for gems and for petroleum.)
+one-market book.
 
 These are panel HHIs and are not scored against the usual bands — the panel is
 not the whole market (`sql/06` assumption 6). The direction is what the data
@@ -517,10 +514,13 @@ tonnage; price ended the period below where it started.
 
 > **Read this with the finding, not after it.** 95.3% of that 2023 tonnage —
 > and 95.3% in 2014, peaking at 99.7% in 2020 — sits on rows where **Comtrade
-> estimated the net weight rather than India reporting it**. Comtrade's stated
-> method is to derive missing weight from the value using weighted or standard
-> unit values (UNSD, October 2009). So the "volume" series is, for most of its
-> mass, value divided by an assumed price, and this finding cannot fully
+> estimated the net weight rather than India reporting it**. Comtrade's
+> methodology (FAO, UNSD and ITC, 2019) estimates missing weight in one of three
+> ways: converting a reported quantity with a known factor, from partially
+> reported weights, or from the value using standard unit values (the median
+> unit value across reporters). The data does not say which method each row
+> used; where it is the last, the "volume" series is value divided by an
+> assumed price, so this finding cannot fully
 > separate "India shipped more tonnes" from "Comtrade's unit-value assumption
 > moved less than India's reported value". The direction is probably right —
 > the value and volume indices diverge far more than any plausible error in
@@ -528,8 +528,8 @@ tonnage; price ended the period below where it started.
 > decomposition the headline implies, and `sql/03` Q8 now reports
 > `weight_estimated_kg_pct` so the exposure travels with the number.
 >
-> Note this is a *kilogram-weighted* share. The row-based share, which was the
-> only one Q8 reported until 17/09/2026, reads a comfortable 23.8–63.2% for
+> Note this is a *kilogram-weighted* share. The row-based share, also in Q8,
+> reads a comfortable 23.8–63.2% for
 > petroleum — because the estimated rows are the enormous ones. Never quote
 > the row figure as the tonnage figure.
 
@@ -571,8 +571,7 @@ The estimation column ranks trustworthiness. Textiles is the sector where the
 volume reading is most trustworthy (30.6% → 57.1% of tonnage estimated);
 pharmaceuticals is where it is least (97.1% → 100.0%), with petroleum close
 behind (95.3% in both years) — the reverse of what their coverage percentages
-alone would suggest. (Until 23/09/2026 this paragraph named petroleum as the
-least trustworthy, against its own table.)
+alone would suggest.
 
 Textiles is the one sector where the volume data changes the reading most:
 5.86 million tonnes in 2023 against 6.89 in 2014 (−14.9%), and no year after
@@ -585,13 +584,13 @@ Gems & jewellery is excluded on coverage (`sql/03` Q8): only 40% of its 2014
 value sits on rows with a net weight, and weight is a poor measure of gems in
 any case. The row is in the CSV, flagged.
 
-*Source: `sql/03` Queries 6–8 · `data/processed/track_b_sector_volume_vs_value.csv`, `track_b_engineering_unit_value_mix.csv`, `track_b_petroleum_volume_series.csv`, `track_b_volume_coverage.csv`*
+*Source: `sql/03` Queries 6–8, S6 · `data/processed/track_b_sector_volume_vs_value.csv`, `track_b_engineering_unit_value_mix.csv`, `track_b_petroleum_volume_series.csv`, `track_b_volume_coverage.csv`, `supporting_figures.csv` (03 S6, textile tonnage by year)*
 
 ## 18. Half of India's deficit is one chapter, and the surplus chapters are small
 
 **Mineral fuels (HS 27) ran a USD 131.3bn deficit in 2023 — 220.6bn imported
 against 89.3bn exported — 55% of the total deficit.** Electrical machinery
-(−43.8bn), precious stones and metals (−39.2bn) and machinery (−27.8bn) follow.
+(−43.7bn), precious stones and metals (−39.2bn) and machinery (−27.8bn) follow.
 India is a net importer in three of its own five focus sectors — petroleum,
 gems and engineering — despite being a large exporter in each.
 
@@ -603,7 +602,7 @@ the CSV below on 17/09/2026, having been published as 65.3 and 310.9.
 | Side | HS2 | Chapter | Exports | Imports | Balance (USD bn) |
 |---|---|---|---:|---:|---:|
 | Deficit | 27 | Mineral fuels | 89.3 | 220.6 | **−131.3** |
-| Deficit | 85 | Electrical machinery | 32.3 | 76.1 | −43.8 |
+| Deficit | 85 | Electrical machinery | 32.3 | 76.1 | −43.7 |
 | Deficit | 71 | Pearls, stones, precious metals | 33.4 | 72.7 | −39.2 |
 | Deficit | 84 | Machinery | 29.3 | 57.1 | −27.8 |
 | Surplus | 30 | Pharmaceuticals | 21.3 | 2.6 | **+18.7** |
@@ -615,7 +614,7 @@ the CSV below on 17/09/2026, having been published as 65.3 and 310.9.
 ## 19. The China deficit more than doubled to USD 106bn; within the panel, the USA and Netherlands are the surplus markets
 
 **India's bilateral deficit with China was USD 105.7bn in 2023 — 122.0bn
-imported, 16.3bn exported — up from 44.8bn in 2014.** It is 44% of India's
+imported, 16.2bn exported — up from 44.8bn in 2014.** It is 44% of India's
 total deficit. **Among the twenty partners in the panel**, it is larger than
 the next four bilateral deficits combined (Saudi Arabia −23.8, Indonesia
 −16.6, Japan −13.7, Germany −8.5).
@@ -635,12 +634,12 @@ Vietnam from +3.7bn to −4.0bn.
 
 | Partner | Exports 2023 | Imports 2023 | Balance 2014 | Balance 2023 | Change |
 |---|---:|---:|---:|---:|---:|
-| China | 16.3 | 122.0 | −44.8 | **−105.7** | −60.9 |
+| China | 16.2 | 122.0 | −44.8 | **−105.7** | −60.9 |
 | Saudi Arabia | 10.8 | 34.6 | −19.6 | −23.8 | −4.2 |
 | Indonesia | 7.4 | 24.0 | −10.7 | −16.6 | −5.9 |
 | UAE | 33.0 | 37.5 | +5.6 | −4.5 | −10.2 |
 | Netherlands | 23.1 | 2.4 | +4.0 | **+20.7** | +16.7 |
-| USA | 75.8 | 42.1 | +22.3 | **+33.7** | +11.4 |
+| USA | 75.8 | 42.1 | +22.2 | **+33.7** | +11.4 |
 
 The 20 partners cover 50–58% of India's imports (`sql/07` V5), lower than the
 export-side panel — partly because India's import sources are more dispersed
@@ -665,8 +664,8 @@ same chapters India is trying to export.
 ## Corrections kept visible
 
 Four corrections are recorded here rather than quietly applied. The second and
-third were found by a cold audit of the published repository on 16/09/2026 and
-closed on 17/09/2026; the fourth by a second cold audit on 23/09/2026.
+third were found by the second cold audit of the published repository, on
+16/09/2026, and closed on 17/09/2026; the fourth by the third, on 23/09/2026.
 
 **1. HS descriptions change between HS editions, and one Phase 1 query grouped
 on them.** `sql/02` Query 3 grouped by `cmd_code, cmd_desc` across all ten
@@ -683,7 +682,7 @@ right; the explanation attached to it was not. The five HS2 chapter rewordings
 Tracks B/D are **not all HS 2022**: 42 change at 2017 (the HS 2017 edition,
 `classificationCode` H4 → H5) and 34 at 2022 (HS 2022, H5 → H6), with three
 codes — 570490, 847510, 852352 — changing in both years, two of them reverting
-to their pre-2017 wording. The worked example the repo quotes, petroleum
+to their pre-2017 wording (`supporting_figures.csv`, 03 S7). The worked example the repo quotes, petroleum
 270750, is itself a 2017 change ("ASTM D 86 method" → "ISO 3405 method"). The
 column that records the edition, `classificationCode`, was meanwhile being
 dropped in `sql/01` as "constant across the pull" — it is not constant by year
@@ -704,7 +703,7 @@ instead of from UN Comtrade's own field documentation, which defines both
 precisely and was not consulted until an auditor did.
 
 **4. Several headline claims said more than the evidence.** None of the
-arithmetic was wrong — a second cold audit re-derived about 150 figures and
+arithmetic was wrong — the third cold audit re-derived about 150 figures and
 found every one correct — but the words around them went further than the
 numbers. The headline said India's growth was "concentrated in" petroleum,
 quoting its 20.7% *level* share; its share of the decade's *growth* is 23.7%,

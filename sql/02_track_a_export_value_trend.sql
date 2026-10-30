@@ -20,9 +20,8 @@
 --      Note what is_aggregate actually means: the record was COMPUTED BY
 --      ROLLING UP more detailed lines. It describes how the figure was
 --      assembled, not whether it was estimated. Nothing in this pull marks
---      a VALUE as estimated at all: legacy_estimation_flag, which this file
---      treated as that marker until 17/09/2026, is a quantity/net-weight
---      code — see V1a, where the misreading is set out and corrected.
+--      a VALUE as estimated at all: legacy_estimation_flag is a
+--      quantity/net-weight code — see V1a and finding 12.
 --      These two flags are mutually exclusive
 --      and together cover every row (verified against the raw CSV: 675
 --      reported + 2607 aggregate = 3282, no overlap), so summing both
@@ -90,8 +89,7 @@
 --      (the HS 2017 edition, classificationCode H4 -> H5) and 34 at 2022
 --      (HS 2022, H5 -> H6), three codes (570490, 847510, 852352) changing
 --      in both years — 847510 and 852352 revert to their pre-2017 wording.
---      This file said "HS 2022" for the HS6 count until 17/09/2026, which
---      was wrong: the worked example below, petroleum 270750, is itself a
+--      The worked example below, petroleum 270750, is itself a
 --      2017 change ("ASTM D 86 method" -> "ISO 3405 method (equivalent to
 --      the ASTM D 86 method)"). The edition each row was filed under is in
 --      classificationCode, carried forward on Track B and mapped in 01
@@ -111,7 +109,7 @@
 --      codes — e.g. mobile phones were 851712 until 2021 and 851713
 --      (smartphones) / 851714 (other) from 2022. Of the codes Track B shows
 --      with no 2023 row, most (32 of 37 in engineering, 30 of 37 in textiles,
---      8 of 10 in pharmaceuticals) last appear in 2016 or 2021, the final year
+--      8 of 10 in pharmaceuticals; 02 S4) last appear in 2016 or 2021, the final year
 --      before an edition change. So any per-code series or count that spans
 --      2016/2017 or 2021/2022 at HS6 is not like-for-like: a code that
 --      "disappears" was usually retired or split, not stopped being exported.
@@ -246,7 +244,8 @@ SELECT * FROM v_track_a_top10_chapters;
 --
 -- Bangladesh caveat (assumption 2): it has 2015-2018 only, so its base year
 -- is 2015 and its CAGR spans 3 years, not 9. first_year, last_year and
--- years_present are returned precisely so a 4-year growth rate is never
+-- years_present are returned precisely so a 3-year growth rate (four
+-- years of data, 2015-2018) is never
 -- silently read as a decade one — Bangladesh's 8.08% is not comparable to
 -- Vietnam's 9.96% without saying over what.
 --
@@ -293,8 +292,7 @@ SELECT
     ) AS cagr_pct
 FROM bounds b
 -- Two joins, not three: `l` is the last year (and supplies reporter_desc),
--- `f` the first. A third join on the same last-year key was carried here
--- until 17/09/2026 purely to read reporter_desc off it.
+-- `f` the first.
 JOIN yearly f ON f.reporter_iso = b.reporter_iso AND f.ref_year = b.first_year
 JOIN yearly l ON l.reporter_iso = b.reporter_iso AND l.ref_year = b.last_year
 ORDER BY cagr_pct DESC;
@@ -457,23 +455,22 @@ SELECT * FROM v_track_a_india_chapter_contribution;
 --      README's "reporting gaps get filled by estimation" paragraph.
 --
 --      Why that was wrong. legacyEstimationFlag is a quantity and net-weight
---      code, not a value code. UN Statistics Division, "Quantity and Weight
---      information in UN Comtrade" (October 2009), section 4.1:
+--      code, not a value code. FAO, UNSD and ITC, "Trade data processing and
+--      validation methodology" (2019), Part: UN Comtrade, "Documentation of
+--      estimated values" (https://comtradeapi.un.org/files/v1/app/wiki/UNSD_Method_trade_data_processing_v6-17_Jun_2019.pdf):
 --          0 = no estimation
 --          2 = quantity estimation only
 --          4 = net weight estimation only
 --          6 = both quantity and net weight are estimated
---      Neither that document nor the 2019 methodology guide describes a flag
---      for an estimated value.
+--      It describes no flag for an estimated value.
 --
 --      The data says the same without the document. On Track B, which carries
 --      the flag and both modern booleans, every flag-2 row (162) is
 --      quantity-only estimated, every flag-4 row (3,776) net-weight-only and
 --      every flag-6 row (6,656) both. The reverse does NOT hold there either:
 --      2,905 flag-0 Track B rows are estimated too (2 quantity-only, 1,187
---      net-weight-only, 1,716 both). This paragraph said "exactly ... no
---      exceptions" until 23/09/2026, which is true only in the flag-to-boolean
---      direction. On Track A the first query below asserts the same
+--      net-weight-only, 1,716 both; S1). The flag implies the booleans, not
+--      the reverse. On Track A the first query below asserts the same
 --      containment.
 --
 --      The asymmetry matters and is easy to get wrong: the implication runs
@@ -601,3 +598,89 @@ SELECT
     COUNT(*) FILTER (WHERE is_aggregate)                         AS aggregate_rows,
     COUNT(*)                                                     AS total_rows
 FROM clean_track_a_country_benchmark;
+
+
+-- ============================================================
+-- Supporting figures (S1–S4)
+--
+-- Counts quoted in the findings, the README or comments above that no result
+-- query returns. Each is defined here once and exported by sql/08, with S5–S7
+-- (sql/03) and S8 (sql/06), as data/processed/supporting_figures.csv.
+--
+-- S1. Finding 12: on Track B, how legacy_estimation_flag lines up with the
+--     two estimation booleans — every flag-2 row quantity-only (162), every
+--     flag-4 row net-weight-only (3,776), every flag-6 row both (6,656), and
+--     2,905 flag-0 rows estimated anyway (2 / 1,187 / 1,716).
+-- S2. Finding 12: Track A's net weight is blank on 48.3% of rows, exactly 0
+--     on 51.7%, and positive on none.
+-- S3. README, Data reliability: HS 99 ("commodities not specified") in each
+--     reporter's decade exports — China 212.4bn (0.8%), Viet Nam 29.6bn
+--     (1.2%), India 5.1bn (0.15%).
+-- S4. Assumption 7 above: Track B codes with no 2023 row, and how many of
+--     them last appear in 2016 or 2021, the year before an HS edition change.
+-- ============================================================
+DROP VIEW IF EXISTS v_support_02;
+CREATE VIEW v_support_02 AS
+WITH flags AS (
+    SELECT
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 2)                                                       AS f2,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 2 AND is_qty_estimated AND NOT is_net_wgt_estimated)    AS f2_qty_only,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 4)                                                       AS f4,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 4 AND NOT is_qty_estimated AND is_net_wgt_estimated)    AS f4_wgt_only,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 6)                                                       AS f6,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 6 AND is_qty_estimated AND is_net_wgt_estimated)        AS f6_both,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 0 AND (is_qty_estimated OR is_net_wgt_estimated))       AS f0_est,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 0 AND is_qty_estimated AND NOT is_net_wgt_estimated)    AS f0_qty_only,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 0 AND NOT is_qty_estimated AND is_net_wgt_estimated)    AS f0_wgt_only,
+        COUNT(*) FILTER (WHERE legacy_estimation_flag = 0 AND is_qty_estimated AND is_net_wgt_estimated)        AS f0_both
+    FROM clean_track_b_india_sector_detail
+),
+netwgt AS (
+    SELECT
+        ROUND(100.0 * COUNT(*) FILTER (WHERE net_wgt IS NULL) / COUNT(*), 1) AS blank_pct,
+        ROUND(100.0 * COUNT(*) FILTER (WHERE net_wgt = 0) / COUNT(*), 1)     AS zero_pct,
+        COUNT(*) FILTER (WHERE net_wgt > 0)                                  AS positive_rows
+    FROM clean_track_a_country_benchmark
+),
+hs99 AS (
+    SELECT
+        reporter_desc,
+        ROUND(SUM(fob_value) FILTER (WHERE cmd_code = '99') / 1e9, 1)                    AS bn,
+        ROUND(100.0 * SUM(fob_value) FILTER (WHERE cmd_code = '99') / SUM(fob_value), 2) AS pct
+    FROM clean_track_a_country_benchmark
+    WHERE aggr_level = 2 AND reporter_desc IN ('China', 'Viet Nam', 'India')
+    GROUP BY reporter_desc
+),
+gone AS (
+    SELECT sector, MAX(ref_year) AS last_year
+    FROM clean_track_b_india_sector_detail
+    GROUP BY sector, cmd_code
+    HAVING MAX(ref_year) < 2023
+),
+gone_by_sector AS (
+    SELECT sector,
+           COUNT(*)                                        AS no_2023_row,
+           COUNT(*) FILTER (WHERE last_year IN (2016, 2021)) AS last_before_edition
+    FROM gone
+    WHERE sector IN ('engineering_machinery', 'textiles', 'pharmaceuticals')
+    GROUP BY sector
+)
+SELECT '02 S1a'::text AS figure_id, 'Track B rows with flag 2'::text AS figure, f2::numeric AS value, 'rows'::text AS unit, 'finding 12'::text AS cited_in FROM flags
+UNION ALL SELECT '02 S1b', 'of which quantity-only estimated', f2_qty_only, 'rows', 'finding 12' FROM flags
+UNION ALL SELECT '02 S1c', 'Track B rows with flag 4', f4, 'rows', 'finding 12' FROM flags
+UNION ALL SELECT '02 S1d', 'of which net-weight-only estimated', f4_wgt_only, 'rows', 'finding 12' FROM flags
+UNION ALL SELECT '02 S1e', 'Track B rows with flag 6', f6, 'rows', 'finding 12' FROM flags
+UNION ALL SELECT '02 S1f', 'of which both quantity and net weight estimated', f6_both, 'rows', 'finding 12' FROM flags
+UNION ALL SELECT '02 S1g', 'Track B rows with flag 0 but an estimation boolean set', f0_est, 'rows', 'finding 12' FROM flags
+UNION ALL SELECT '02 S1h', 'of which quantity-only', f0_qty_only, 'rows', 'finding 12' FROM flags
+UNION ALL SELECT '02 S1i', 'of which net-weight-only', f0_wgt_only, 'rows', 'finding 12' FROM flags
+UNION ALL SELECT '02 S1j', 'of which both', f0_both, 'rows', 'finding 12' FROM flags
+UNION ALL SELECT '02 S2a', 'Track A rows with net weight blank', blank_pct, 'percent of rows', 'finding 12' FROM netwgt
+UNION ALL SELECT '02 S2b', 'Track A rows with net weight exactly 0', zero_pct, 'percent of rows', 'finding 12' FROM netwgt
+UNION ALL SELECT '02 S2c', 'Track A rows with positive net weight', positive_rows, 'rows', 'finding 12' FROM netwgt
+UNION ALL SELECT '02 S3 ' || reporter_desc || ' bn', 'HS 99 exports 2014-2023, ' || reporter_desc, bn, 'USD bn', 'README, Data reliability' FROM hs99
+UNION ALL SELECT '02 S3 ' || reporter_desc || ' pct', 'HS 99 share of decade exports, ' || reporter_desc, pct, 'percent', 'README, Data reliability' FROM hs99
+UNION ALL SELECT '02 S4 ' || sector || ' a', 'Track B codes with no 2023 row, ' || sector, no_2023_row, 'codes', 'sql/02 assumption 7' FROM gone_by_sector
+UNION ALL SELECT '02 S4 ' || sector || ' b', 'of which last seen in 2016 or 2021, ' || sector, last_before_edition, 'codes', 'sql/02 assumption 7' FROM gone_by_sector;
+
+SELECT * FROM v_support_02 ORDER BY figure_id;

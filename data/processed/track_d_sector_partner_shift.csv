@@ -13,8 +13,8 @@ engineering_machinery,United Kingdom,8.1,7.3,-0.8
 engineering_machinery,Japan,2.8,1.8,-0.9
 engineering_machinery,Viet Nam,2.2,1.2,-1.0
 engineering_machinery,Saudi Arabia,4.5,3.2,-1.3
-engineering_machinery,Sri Lanka,2.0,0.5,-1.4
 engineering_machinery,Germany,7.7,6.4,-1.4
+engineering_machinery,Sri Lanka,2.0,0.5,-1.4
 engineering_machinery,Bangladesh,3.5,1.8,-1.7
 engineering_machinery,Indonesia,3.2,1.5,-1.7
 engineering_machinery,Malaysia,3.4,1.5,-1.9
@@ -24,16 +24,16 @@ gems_jewellery,Singapore,2.0,3.1,1.1
 gems_jewellery,France,0.4,1.4,1.0
 gems_jewellery,United Kingdom,2.0,2.7,0.8
 gems_jewellery,Italy,0.5,1.0,0.5
-gems_jewellery,Saudi Arabia,0.1,0.4,0.3
 gems_jewellery,Malaysia,0.3,0.6,0.3
+gems_jewellery,Saudi Arabia,0.1,0.4,0.3
 gems_jewellery,Germany,0.4,0.6,0.2
+gems_jewellery,Indonesia,0.0,0.1,0.1
+gems_jewellery,Nepal,0.1,0.1,0.1
 gems_jewellery,Netherlands,0.1,0.2,0.1
 gems_jewellery,Sri Lanka,0.1,0.2,0.1
-gems_jewellery,Nepal,0.1,0.1,0.1
-gems_jewellery,Indonesia,0.0,0.1,0.1
-gems_jewellery,Viet Nam,0.0,0.0,0.0
 gems_jewellery,Bangladesh,0.0,0.0,0.0
 gems_jewellery,Maldives,0.0,0.0,0.0
+gems_jewellery,Viet Nam,0.0,0.0,0.0
 gems_jewellery,Japan,1.3,1.2,-0.1
 gems_jewellery,South Africa,0.4,0.2,-0.2
 gems_jewellery,China,0.6,0.2,-0.4
@@ -49,8 +49,8 @@ petroleum_products,Indonesia,2.6,3.6,1.0
 petroleum_products,USA,11.7,12.4,0.7
 petroleum_products,Maldives,0.0,0.3,0.2
 petroleum_products,France,1.9,1.9,0.0
-petroleum_products,Malaysia,2.8,2.7,-0.1
 petroleum_products,Germany,0.1,0.0,-0.1
+petroleum_products,Malaysia,2.8,2.7,-0.1
 petroleum_products,Viet Nam,0.2,0.0,-0.1
 petroleum_products,Italy,1.8,1.1,-0.7
 petroleum_products,Sri Lanka,1.7,0.7,-1.0
@@ -72,8 +72,8 @@ pharmaceuticals,China,0.6,0.6,0.0
 pharmaceuticals,Germany,2.9,2.9,0.0
 pharmaceuticals,Bangladesh,0.5,0.4,-0.1
 pharmaceuticals,Malaysia,0.9,0.8,-0.1
-pharmaceuticals,Sri Lanka,2.5,2.2,-0.3
 pharmaceuticals,Singapore,0.9,0.6,-0.3
+pharmaceuticals,Sri Lanka,2.5,2.2,-0.3
 pharmaceuticals,Nepal,2.3,1.8,-0.5
 pharmaceuticals,USA,63.1,62.2,-0.9
 pharmaceuticals,Viet Nam,2.8,1.2,-1.6
@@ -88,8 +88,8 @@ textiles,Sri Lanka,2.2,2.8,0.6
 textiles,South Africa,0.9,1.1,0.2
 textiles,Maldives,0.0,0.1,0.0
 textiles,Italy,3.4,3.2,-0.2
-textiles,Malaysia,1.1,0.9,-0.2
 textiles,Japan,1.6,1.5,-0.2
+textiles,Malaysia,1.1,0.9,-0.2
 textiles,Singapore,0.5,0.3,-0.2
 textiles,Indonesia,0.9,0.6,-0.3
 textiles,Belgium,2.1,1.7,-0.4

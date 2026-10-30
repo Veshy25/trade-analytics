@@ -38,9 +38,10 @@
 --      for choosing the twenty survives in the project's records, so it
 --      should not be read as "India's top 20 markets". What the data shows:
 --      it holds India's largest destinations (USA, UAE, Netherlands, China,
---      UK, Singapore — together 63.4% of the panel in 2023), all four South
---      Asian neighbours whatever their size (Bangladesh 11.3bn, Nepal 7.2bn,
---      Sri Lanka 3.6bn, Maldives 0.6bn), and Viet Nam, a Track A comparator.
+--      UK, Singapore — together 63.4% of the panel in 2023), four South Asian
+--      neighbours whatever their size (Bangladesh 11.3bn, Nepal 7.2bn, Sri
+--      Lanka 3.6bn, Maldives 0.6bn; Bhutan and Pakistan are not in the
+--      panel), and Viet Nam, a Track A comparator.
 --      The Maldives, at USD 0.59bn (0.2% of the panel), is almost certainly
 --      smaller than several markets left out. The panel covers 61.9-64.4% of
 --      India's exports (V5), so shares and rankings are within-panel
@@ -50,6 +51,7 @@
 
 -- ============================================================
 -- Query 1: export value to each partner, by year
+-- (Exploratory: printed for inspection, not exported or cited in the findings.)
 -- ============================================================
 SELECT
     partner_desc,
@@ -63,6 +65,7 @@ ORDER BY partner_desc, ref_year;
 
 -- ============================================================
 -- Query 2: exports to each partner with year-on-year growth %
+-- (Exploratory: printed for inspection, not exported or cited in the findings.)
 --           LAG() partitioned by partner; first year of each series is NULL
 -- ============================================================
 WITH partner_yearly AS (
@@ -98,9 +101,7 @@ ORDER BY partner_desc, ref_year;
 -- ============================================================
 -- Query 3: top partners ranked, with share of the tracked panel
 --           latest year (2023) plus the full-period (2014-2023) total.
---           Exported as track_c_partner_totals.csv. The full-period rank and
---           share printed here until 23/09/2026 were read by nothing and were
---           not in the CSV; dropped when this became a view.
+--           Exported as track_c_partner_totals.csv.
 -- ============================================================
 DROP VIEW IF EXISTS v_track_c_partner_totals;
 CREATE VIEW v_track_c_partner_totals AS
@@ -153,7 +154,8 @@ SELECT * FROM v_track_c_partner_totals;
 --   hhi_true_lower = hhi_panel * c^2
 --       the unobserved residual is spread thinly across many small markets
 --       and contributes ~nothing. India's residual is ~37% split across
---       ~180 reporters, so this is the realistic end of the range.
+--       the many destinations outside the panel, so this is the realistic
+--       end of the range.
 --
 --   hhi_true_upper = hhi_panel * c^2 + (1 - c)^2 * 10000
 --       the entire residual is a single hidden partner. Implausible, but it
@@ -196,7 +198,7 @@ shares AS (
         ref_year,
         partner_desc,
         -- value_usd carried through here so panel_hhi below needs no second
-        -- join back to partner_yearly (there was one until 23/09/2026).
+        -- join back to partner_yearly.
         value_usd,
         value_usd / NULLIF(SUM(value_usd) OVER (PARTITION BY ref_year), 0) AS share,
         -- ROW_NUMBER() so "rnk <= 5" returns exactly five partners per year;
@@ -299,6 +301,7 @@ SELECT * FROM v_track_c_partner_rank_moves;
 -- ============================================================
 -- Query 5b: what India sells to its top 5 partners —
 --            top 5 HS2 chapters per partner, 2023
+-- (Exploratory: printed for inspection, not exported or cited in the findings.)
 -- ============================================================
 WITH top_partners AS (
     SELECT partner_code, partner_desc
@@ -423,8 +426,10 @@ BEGIN
     SELECT COUNT(*), MIN(panel_coverage_pct), MAX(panel_coverage_pct)
       INTO n, lo, hi
     FROM v_track_c_partner_concentration;
-    IF n <> 10 OR lo < 61.9 OR hi > 64.4 THEN
-        RAISE EXCEPTION '04 V5: % years, coverage % to % percent, expected 10 years within 61.9 to 64.4 percent', n, lo, hi;
+    -- The quoted range ends (stored at 1 dp, as quoted), not bounds, so a
+    -- narrower range fails too.
+    IF n <> 10 OR lo <> 61.9 OR hi <> 64.4 THEN
+        RAISE EXCEPTION '04 V5: % years, coverage % to % percent, expected 10 years from 61.9 to 64.4 percent', n, lo, hi;
     END IF;
     RAISE NOTICE '04 V5 PASSED: panel coverage % to % percent across all 10 years.', lo, hi;
 END $$;

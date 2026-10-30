@@ -53,14 +53,12 @@ Track C (25/08) for the same partner-years. Petroleum matches exactly across
 all 200 partner-years; textiles (worst 0.18%), pharmaceuticals (0.97%) and gems
 & jewellery (1.95%) stay within 2%; engineering/machinery in 2022 runs to
 −11.5%. Eleven of the 1,000 partner-years checked exceed 1% — ten engineering
-2022 and one gems 2022. (This paragraph claimed a match "to the cent everywhere
-except engineering" until 17/09/2026, which the query's own output contradicted.)
+2022 and one gems 2022.
 The engineering gap is consistent with a property of Comtrade's HS 84/85 records
 for that year rather than revision drift: Track B diverges from Track A in the
 same sector-year (finding 10), and those two come from the *same* 25/08 pull.
 That is an inference, not a proof — no series was pulled on both dates, so
-revision between them cannot be ruled out directly. (This paragraph stated it
-as established fact until 23/09/2026.) The three Phase 1 files were **not**
+revision between them cannot be ruled out directly. The three Phase 1 files were **not**
 re-pulled and are byte-identical to their 25/08/2026 checksums.
 
 ### `pull_manifest.json`
@@ -78,7 +76,8 @@ It is written automatically at the end of every pull, and **merged, not
 overwritten**: a later pull adds or replaces only the entries for the tracks it
 fetched. Entries written since 15/09/2026 carry a `track` label, their own
 `pulled_on` date and `pull` timestamps; the three original entries have neither
-and inherit the top-level `pull` block. A `pulls` array logs each run.
+and inherit the top-level `pull` block. A `pulls` array logs each run made since then; the 25/08/2026 pull predates it
+and is described by the top-level `pull` block.
 
 *One caveat, stated because it matters: the manifest committed today was
 reconstructed **retroactively** on 08/09/2026. The 25/08/2026 pull predates the
@@ -110,15 +109,15 @@ per-partner fallback was needed. It is delivered as **two files split by year
 range** because the single file came to 78.5 MB (74.9 MiB) — past GitHub's
 50 MiB warning threshold, though still under its 100 MiB hard limit. The two
 halves total the same 78.5 MB; `sql/00` loads both into one table.
-Sizes in this file are decimal MB throughout; until 23/09/2026 some were MiB,
-so the same bytes were quoted as both 74.9 and 78.5 MB.
+Sizes in this file are decimal MB throughout.
 
 **Partners (20, identical for Tracks C, D and E2):** USA, ARE, CHN, BGD, MDV,
 GBR, DEU, NPL, SGP, VNM, NLD, SAU, FRA, LKA, IDN, MYS, ITA, BEL, ZAF, JPN.
 **This is a selected panel, not India's top 20 markets.** No selection rule
 survives in the project's records. It contains India's largest export
-destinations, all four South Asian neighbours regardless of size (the Maldives
-takes 0.2% of the panel) and Viet Nam, a Track A comparator; several markets
+destinations, four South Asian neighbours regardless of size — Bangladesh,
+Nepal, Sri Lanka and the Maldives (0.2% of the panel); Bhutan and Pakistan are
+not in it — and Viet Nam, a Track A comparator; several markets
 larger than the smallest members are left out. It was chosen for exports and
 reused unchanged for imports (E2), where it under-represents energy and gold
 suppliers — `sql/04` assumption 7 and `sql/07` assumption 9.
@@ -184,13 +183,13 @@ slightly by track — see the notes column.
 | `aggrLevel` | `aggr_level` | smallint | 2 = HS2 chapter, 6 = HS6 product |
 | `isLeaf` | — | boolean | Dropped 17/09/2026: read by no query in `02`–`08` |
 | `fobvalue` | `fob_value` | numeric | **Export tracks (A–D).** Free-on-board value, USD — the analysis value |
-| `cifvalue` | `cif_value` | numeric | **Import tracks (E1, E2).** Cost-insurance-freight value, USD — the analysis value for imports. `fobvalue` is blank on 73.5% of E1 rows and 69.6% of E2 rows and holds exactly `0` on the rest — never a positive value — and is dropped there. (Said "blank on 100%" until 17/09/2026.) |
+| `cifvalue` | `cif_value` | numeric | **Import tracks (E1, E2).** Cost-insurance-freight value, USD — the analysis value for imports. `fobvalue` is blank on 73.5% of E1 rows and 69.6% of E2 rows and holds exactly `0` on the rest — never a positive value — and is dropped there. |
 | `primaryValue` | `primary_value` | numeric | Equals `fob_value` on every export row and `cif_value` on every import row; `sql/01` validations 3 and 5 assert 0 mismatches each |
-| `legacyEstimationFlag` | `legacy_estimation_flag` | smallint | **A quantity/net-weight estimation code, NOT a value-estimation marker.** UNSD, *Quantity and Weight information in UN Comtrade* (October 2009), §4.1: `0` = no estimation, `2` = quantity only, `4` = net weight only, `6` = both. Tracks A, C, E1 and E2 carry only `0` and `4`; Tracks B and D carry all four (B: 6,382 / 162 / 3,776 / 6,656 rows, with flag `6` on 56% of Track B value). This file described `4` as "Comtrade estimate" until 17/09/2026 — see `sql/02` V1a and finding 12 for the correction |
+| `legacyEstimationFlag` | `legacy_estimation_flag` | smallint | **A quantity/net-weight estimation code, NOT a value-estimation marker.** FAO, UNSD and ITC, [*Trade data processing and validation methodology*](https://comtradeapi.un.org/files/v1/app/wiki/UNSD_Method_trade_data_processing_v6-17_Jun_2019.pdf) (2019), Part: UN Comtrade, "Documentation of estimated values": `0` = no estimation, `2` = quantity only, `4` = net weight only, `6` = both. Tracks A, C, E1 and E2 carry only `0` and `4`; Tracks B and D carry all four (B: 6,382 / 162 / 3,776 / 6,656 rows, with flag `6` on 56% of Track B value). Finding 12 sets out how this flag was once misread, and `sql/02` V1a asserts its meaning |
 | `isReported` | `is_reported` | boolean | This exact row was directly reported |
 | `isAggregate` | `is_aggregate` | boolean | Row was **computed by rolling up** more detailed lines rather than filed directly at this level. It marks how a value was *assembled*, not whether it was estimated — and neither does `legacy_estimation_flag`, which is about weight. Each reporter switches from `isReported` to `isAggregate` once and never back (China 2015, Viet Nam and Bangladesh 2016, India 2017); `sql/02` V1a/V1b report it |
 | `sector` | `sector` | text | **Tracks B and D only — DERIVED, not from the API.** Assigned during the pull by mapping the HS2 prefix of `cmdCode` to one of the five sector labels above (see the sector table earlier in this file) |
-| `netWgt` | `net_wgt` | numeric | **Tracks B and D only** (HS6). Net weight in kg — the single volume measure used in `sql/03` Q6–Q8. Populated (positive) on ~90% of HS6 rows. On the HS2 tracks it is blank on 48–50% of rows and exactly `0` on the rest — no positive value anywhere — because Comtrade does not aggregate mixed units to chapter level; "blank on 100%" was the wrong description and is corrected here. Carried since 15/09/2026 |
+| `netWgt` | `net_wgt` | numeric | **Tracks B and D only** (HS6). Net weight in kg — the single volume measure used in `sql/03` Q6–Q8. Populated (positive) on ~90% of HS6 rows. On the HS2 tracks it is blank on 48.3–50.5% of rows (A 48.3, E1 49.6, C 50.2, E2 50.5) and exactly `0` on the rest — no positive value anywhere — because Comtrade does not aggregate mixed units to chapter level; "blank on 100%" was the wrong description and is corrected here. Carried since 15/09/2026 |
 | `isNetWgtEstimated` | `is_net_wgt_estimated` | boolean | Tracks B and D, and Track A since 17/09/2026 (where `sql/02` V1a uses it to assert what `legacy_estimation_flag` means). Comtrade's estimate flag for the weight, reported per sector-year in `sql/03` Q8 both as a row share and — the one that matters for a volume claim — as `weight_estimated_kg_pct` |
 | `classificationCode` | `classification_code` | text | **Not constant — the HS edition the row was filed under.** `H4` to 2016, `H5` from 2017, `H6` from 2022, and it varies by reporter as well as by year (Viet Nam filed 2017 under `H4`). Carried on Track B from 17/09/2026 and mapped in `sql/01` validation 7; dropped on tracks that never group on `cmdDesc` |
 | `partnerISO` | — | text | Dropped 17/09/2026: read by no query in `02`–`08`; `partner_desc` carries it |
@@ -201,19 +200,18 @@ slightly by track — see the notes column.
 On the export tracks, `cifvalue` — non-blank on 873 Track A rows, but all 873
 hold exactly `0`, so "populated" overstated it; irrelevant to an FOB-valued
 export in any case, and `sql/01` validation 3 asserts `primary_value = fob_value`
-on every export track (A, B, C and D — Track A only until 23/09/2026, when this
-sentence already said "throughout").
+on every export track (A, B, C and D).
 On the import tracks, `fobvalue` (blank or `0`, never positive). On the HS2
 tracks, all quantity and weight fields — blank or `0` by construction, never
-positive; on the HS6 tracks, `altQty`, `grossWgt` and their unit/estimated
-companions. `isLeaf` and `partnerISO` were dropped on 17/09/2026 as unread by
+positive — except Track A's `isNetWgtEstimated`, kept for `sql/02` V1a; on the
+HS6 tracks, `qtyUnitCode`, `isQtyEstimated`, `altQty`, `grossWgt` and their
+unit/estimated companions. `isLeaf` and `partnerISO` were dropped on 17/09/2026 as unread by
 any query. On every track: `motCode`/`motDesc`, `customsCode`/`customsDesc`,
 `mosCode`, `typeCode`, `freqCode`, `period`, `flowCode`/`flowDesc` (constant
 within each track), `partner2*`, `refPeriodId`, `refMonth` and
-`isOriginalClassification`. `classificationCode` is dropped everywhere except
-Track B — it is *not* constant, and this file listed it as such until
-17/09/2026. There are no `*Note` fields in this API response; an earlier
-version of this list said there were.
+`isOriginalClassification` and `classificationSearchCode`. `classificationCode` is dropped everywhere except
+Track B — it is *not* constant. There are no `*Note` fields in this API
+response.
 
 ### A note on `cmdDesc`
 
@@ -222,8 +220,8 @@ them. The five HS2 chapter rewordings (15, 16, 24, 84, 88) are HS 2022, from
 `refYear` 2022 onward. The 73 HS6 products reworded in Tracks B/D are not:
 **42 change at 2017** (HS 2017, `classificationCode` H4 → H5) and **34 at 2022**
 (HS 2022, H5 → H6), with three codes — 570490, 847510, 852352 — changing in
-both years, two of which revert to their pre-2017 wording. This file attributed
-all 73 to HS 2022 until 17/09/2026. The description is a label that changes,
+both years, two of which revert to their pre-2017 wording (`supporting_figures.csv`,
+03 S7). The description is a label that changes,
 and `classificationCode` is the column that says which edition a row belongs
 to. Any multi-year `GROUP BY` that includes `cmdDesc` splits one code into two
 rows — `sql/02` assumption 7 records the case where that happened and was

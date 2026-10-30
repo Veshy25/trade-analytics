@@ -6,11 +6,7 @@
 --
 -- NOTE on views (23/09/2026): every result set exported to data/processed/ is
 -- defined once here as a view (v_track_e_*), and sql/08 only copies it out —
--- see 02's header for why. If you change a view, rerun 08. Q2 is the query
--- whose 08 copy had drifted: 08 took cmd_desc from the export side only,
--- without the COALESCE this file added on 17/09/2026. Harmless on this data
--- (V6 proves the chapter sets match), but the committed CSV came from the
--- unfixed copy until 23/09/2026.
+-- see 02's header for why. If you change a view, rerun 08.
 --
 -- Assumptions made here (flagging before running, not after):
 --   1. VALUATION BASIS DIFFERS. Exports are FOB (Track A/C, fob_value);
@@ -27,8 +23,7 @@
 --      database (Marini, Dippelsman and Stanger, "New Estimates for Direction
 --      of Trade Statistics", IMF WP/18/16, 2018). Treat ~6-10% as the assumed
 --      range, higher for long-haul and low-value-density trade — not a
---      finding. This file quoted 10% as "long-standing" and 10-20% as the
---      range until 23/09/2026, which was out of date. No adjustment is
+--      finding. No adjustment is
 --      applied; the caveat travels with the number.
 --   2. Row inclusion and aggregation follow 02 assumptions 1 and 3: both
 --      is_reported and is_aggregate rows are summed (V3 re-confirms the

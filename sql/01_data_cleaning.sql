@@ -22,8 +22,7 @@
 --     mosCode, motCode/motDesc,
 --     partner2Code/partner2Iso/partner2Desc (not split out), refPeriodId,
 --     refMonth, period (redundant with refYear), isOriginalClassification.
---   - classificationCode is NOT constant and was wrongly listed above as
---     such until 17/09/2026. It records the HS edition the reporter filed
+--   - classificationCode is NOT constant. It records the HS edition the reporter filed
 --     under and moves with the calendar: H4 through 2016, H5 from 2017, H6
 --     from 2022 — and it varies by REPORTER as well as by year, since Viet
 --     Nam filed 2017 under H4 while the other three had moved to H5. That
@@ -73,6 +72,9 @@ SELECT
     NULLIF(fobvalue, '')::numeric              AS fob_value,
     NULLIF(primaryvalue, '')::numeric          AS primary_value,
     NULLIF(legacyestimationflag, '')::smallint AS legacy_estimation_flag,
+    -- net_wgt is kept only so 02 S2 can show it holds no weight at HS2:
+    -- blank stays NULL and '0' stays 0, which is the distinction S2 counts.
+    NULLIF(netwgt, '')::numeric                AS net_wgt,
     isnetwgtestimated::boolean                 AS is_net_wgt_estimated,
     isreported::boolean                        AS is_reported,
     isaggregate::boolean                       AS is_aggregate
@@ -83,8 +85,7 @@ FROM raw_track_a_country_benchmark;
 -- a reported and an aggregate line, both would be level 2 and both would be
 -- summed. Declaring these UNIQUE makes a bad re-pull fail loudly at load
 -- instead of silently inflating every total. Verified at build time: 0
--- duplicate groups in all six tracks (this note said "three" until
--- 17/09/2026, from before Tracks D, E1 and E2 existed).
+-- duplicate groups in all six tracks.
 CREATE UNIQUE INDEX idx_clean_a_year_reporter_cmd
     ON clean_track_a_country_benchmark (ref_year, reporter_code, cmd_code);
 
@@ -115,6 +116,7 @@ SELECT
     -- is kept only for per-product reference, never summed.
     NULLIF(netwgt, '')::numeric                AS net_wgt,
     isnetwgtestimated::boolean                 AS is_net_wgt_estimated,
+    isqtyestimated::boolean                    AS is_qty_estimated,   -- for 02 S1
     NULLIF(qty, '')::numeric                   AS qty,
     NULLIF(qtyunitabbr, '')                    AS qty_unit
 FROM raw_track_b_india_sector_detail;
@@ -430,3 +432,20 @@ GROUP BY reporterdesc, refyear::int
 HAVING COUNT(DISTINCT classificationcode) > 1
     OR refyear::int = 2017
 ORDER BY reporter_desc, ref_year;
+
+-- 8. No zero or blank values on Track D (added 29/10/2026). The sector x
+--    partner heatmap (scripts/make_chart.py, chart 3) reads "a row exists" as
+--    "there was trade", which holds only while no Track D row has a zero or
+--    blank value. Asserted rather than assumed, so a re-pull that breaks it
+--    stops here instead of mislabelling a cell.
+DO $$
+DECLARE n bigint;
+BEGIN
+    SELECT COUNT(*) INTO n
+    FROM clean_track_d_india_partner_sector
+    WHERE fob_value IS NULL OR fob_value = 0;
+    IF n > 0 THEN
+        RAISE EXCEPTION '01 validation 8: % Track D rows have a zero or blank value', n;
+    END IF;
+    RAISE NOTICE '01 validation 8 PASSED: no zero or blank values on Track D.';
+END $$;
