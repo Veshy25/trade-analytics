@@ -173,7 +173,7 @@ def chart_petroleum_volume() -> None:
              f"Source: UN Comtrade, pulled {pulled_on('track_b_')}. HS 27 at HS6, India to World, FOB, nominal USD. "
              f"Unit value over rows carrying net weight ({pct_range(cov['value_coverage_pct'])}% of value); "
              f"{pct_range(cov['weight_estimated_kg_pct'])}% of\n"
-             "that weight is Comtrade-estimated from value, not reporter-filed (03 Q8).",
+             "that weight is Comtrade-estimated, not reporter-filed (03 Q8).",
              fontsize=7.5, color="#666")
     fig.tight_layout(rect=(0, 0.035, 1, 1))
     fig.savefig(out, dpi=160)

@@ -75,6 +75,99 @@ table 'Dim Sector'
 		displayFolder: Sectors
 		lineageTag: m-unit-value-change-display
 
+	measure 'Share 2014 pct' =
+			VAR K = [Shift Sector Key]
+			RETURN
+				CALCULATE ( SELECTEDVALUE ( 'D Sector Partner Shift'[share_2014_pct] ), REMOVEFILTERS ( 'Dim Sector' ), 'Dim Sector'[Sector] = K )
+		formatString: 0.0
+		displayFolder: Sector Market
+		lineageTag: m-share-2014-pct
+
+	measure 'Share 2023 pct' =
+			VAR K = [Shift Sector Key]
+			RETURN
+				CALCULATE ( SELECTEDVALUE ( 'D Sector Partner Shift'[share_2023_pct] ), REMOVEFILTERS ( 'Dim Sector' ), 'Dim Sector'[Sector] = K )
+		formatString: 0.0
+		displayFolder: Sector Market
+		lineageTag: m-share-2023-pct
+
+	measure 'Share Shift ppt' =
+			VAR K = [Shift Sector Key]
+			RETURN
+				CALCULATE ( SELECTEDVALUE ( 'D Sector Partner Shift'[shift_ppt] ), REMOVEFILTERS ( 'Dim Sector' ), 'Dim Sector'[Sector] = K )
+		formatString: +0.0;-0.0;0.0
+		displayFolder: Sector Market
+		lineageTag: m-share-shift-ppt
+
+	measure 'Shift Bar Colour' =
+			VAR S = [Share Shift ppt]
+			RETURN
+				IF ( ISBLANK ( S ), BLANK (), IF ( S >= 0, "#118DFF", "#E66C37" ) )
+		displayFolder: Sector Market
+		lineageTag: m-shift-bar-colour
+
+	measure 'Shift Chart Title' =
+			VAR K = [Shift Sector Key]
+			VAR C = CALCULATE ( SELECTEDVALUE ( 'Dim Sector'[Sector Display] ), REMOVEFILTERS ( 'Dim Sector' ), 'Dim Sector'[Sector] = K )
+			RETURN
+				C & ": change in each market's share, 2014 → 2023 (pp)"
+		displayFolder: Sector Market
+		lineageTag: m-shift-chart-title
+
+	measure 'Market 1 Name' = CALCULATE ( SELECTEDVALUE ( 'D Sector Partner Matrix 2023'[partner_desc] ), 'D Sector Partner Matrix 2023'[rank_in_sector] = 1 )
+		displayFolder: Sector Market
+		lineageTag: m-market-1-name
+
+	measure 'Market 1 Share pct' = CALCULATE ( SUM ( 'D Sector Partner Matrix 2023'[pct_of_sector_panel] ), 'D Sector Partner Matrix 2023'[rank_in_sector] = 1 )
+		formatString: 0.0
+		displayFolder: Sector Market
+		lineageTag: m-market-1-share-pct
+
+	measure 'Market 2 Name' = CALCULATE ( SELECTEDVALUE ( 'D Sector Partner Matrix 2023'[partner_desc] ), 'D Sector Partner Matrix 2023'[rank_in_sector] = 2 )
+		displayFolder: Sector Market
+		lineageTag: m-market-2-name
+
+	measure 'Market 2 Share pct' = CALCULATE ( SUM ( 'D Sector Partner Matrix 2023'[pct_of_sector_panel] ), 'D Sector Partner Matrix 2023'[rank_in_sector] = 2 )
+		formatString: 0.0
+		displayFolder: Sector Market
+		lineageTag: m-market-2-share-pct
+
+	measure 'Market 3 Name' = CALCULATE ( SELECTEDVALUE ( 'D Sector Partner Matrix 2023'[partner_desc] ), 'D Sector Partner Matrix 2023'[rank_in_sector] = 3 )
+		displayFolder: Sector Market
+		lineageTag: m-market-3-name
+
+	measure 'Market 3 Share pct' = CALCULATE ( SUM ( 'D Sector Partner Matrix 2023'[pct_of_sector_panel] ), 'D Sector Partner Matrix 2023'[rank_in_sector] = 3 )
+		formatString: 0.0
+		displayFolder: Sector Market
+		lineageTag: m-market-3-share-pct
+
+	measure 'Top 3 Share 2014 pct' = CALCULATE ( SELECTEDVALUE ( 'D Sector Market Concentration'[top3_partner_share_pct] ), REMOVEFILTERS ( 'Dim Year' ), 'D Sector Market Concentration'[ref_year] = 2014 )
+		formatString: 0.0
+		displayFolder: Sector Market
+		lineageTag: m-top3-share-2014-pct
+
+	measure 'Top 3 Share 2023 pct' = CALCULATE ( SELECTEDVALUE ( 'D Sector Market Concentration'[top3_partner_share_pct] ), REMOVEFILTERS ( 'Dim Year' ), 'D Sector Market Concentration'[ref_year] = 2023 )
+		formatString: 0.0
+		displayFolder: Sector Market
+		lineageTag: m-top3-share-2023-pct
+
+	measure 'Shift Sector Key' = COALESCE ( SELECTEDVALUE ( 'Dim Sector'[Sector] ), "petroleum_products" )
+		displayFolder: Sector Market
+		lineageTag: m-shift-sector-key
+
+	measure 'Sector Concentration Note' =
+			VAR s = SELECTEDVALUE ( 'Dim Sector'[Sector] )
+			RETURN
+				SWITCH (
+					TRUE (),
+					ISBLANK ( s ), BLANK (),
+					s IN { "petroleum_products", "pharmaceuticals", "gems_jewellery" },
+						"Single HS2 chapter",
+					"Several HS2 chapters"
+				)
+		displayFolder: Sectors
+		lineageTag: m-sector-concentration-note
+
 	column Sector
 		lineageTag: 2bfd31d2-1ae6-44e9-9db9-6d2f75368c94
 		summarizeBy: none

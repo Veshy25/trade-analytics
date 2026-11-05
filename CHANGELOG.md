@@ -6,6 +6,28 @@ corrections that changed a published claim are also in the findings, under
 [Corrections kept visible](insights/key_findings.md#corrections-kept-visible).
 Commit history has the rest.
 
+## 05/11/2026 — dashboard, raw-data notice and repository history
+
+- **Repository history.** The repository was recreated on this date so that the
+  seven raw UN Comtrade CSVs are gone from its history as well as from `main`:
+  at 284,752 records they exceed UN Comtrade's 100,000-record free limit for
+  redistribution. Commit dates are kept. Earlier commit IDs and pull-request
+  numbers no longer resolve; the review table in the README uses the new IDs.
+- **Raw-data notice.** The notices in the README and `data/raw/README.md` now
+  state that limit, replacing "permission has been requested".
+- **Dashboard.** Pages 4 (Sector × Market) and 5 (Trade Balance) are added. The
+  Sectors table no longer prints a merger-guideline verdict, and the Benchmark
+  treemap is labelled as gross gains with the falls and net figure stated, which
+  closes the fourth cold audit.
+- **Wording.**
+  - Finding 19's title called the USA and the Netherlands "the surplus markets";
+    11 of the 20 are in surplus, and those two are the largest.
+  - The findings preamble said five things and lists six.
+  - The petroleum chart's footnote said weight is estimated "from value"; that
+    is one of the three methods finding 17 names.
+  - `data/raw/README.md` still described the CSVs as present, and
+    `data/processed/README.md` and `sql/06` called page 4 planned.
+
 ## 29/10/2026 — points from the fourth cold audit
 
 - **Raw data.** The seven raw UN Comtrade CSVs were removed from the

@@ -219,8 +219,7 @@ SELECT * FROM v_track_d_sector_market_concentration;
 --          a large growth rate off a tiny base is visible for what it is.
 --          Pairs with no trade in 2014 get NULL, not a made-up rate.
 -- Exported as track_d_sector_partner_cagr.csv: finding 14 cites it for its
--- USD values, and it is the input for the dashboard's planned Sector x
--- Market page.
+-- USD values.
 -- ============================================================
 DROP VIEW IF EXISTS v_track_d_sector_partner_cagr;
 CREATE VIEW v_track_d_sector_partner_cagr AS

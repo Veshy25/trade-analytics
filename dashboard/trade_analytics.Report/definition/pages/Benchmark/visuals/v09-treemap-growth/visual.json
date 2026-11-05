@@ -135,7 +135,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Where India''s export growth came from, 2014–2023 (USD bn)'"
+                  "Value": "'Top 10 contributors to India''s export growth, 2014–2023 (gross gains, USD bn)'"
                 }
               }
             }
@@ -148,7 +148,14 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'26 chapters fell by USD 25.2bn; net growth was USD 113.9bn'"
                 }
               }
             }

@@ -201,7 +201,7 @@ CREATE TABLE raw_track_e_india_partner_imports
 -- ============================================================
 -- Load step
 --
--- The commands below load every committed CSV into the tables created
+-- The commands below load every CSV under data/raw/ into the tables created
 -- above. Run this file from the repository root, because the paths are
 -- relative to the working directory psql was started in, not to this file.
 --

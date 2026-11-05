@@ -113,12 +113,12 @@
                       "Entity": "Dim Sector"
                     }
                   },
-                  "Property": "Sector HHI Band"
+                  "Property": "Sector Concentration Note"
                 }
               },
-              "queryRef": "Dim Sector.Sector HHI Band",
-              "nativeQueryRef": "Sector HHI Band",
-              "displayName": "Concentration"
+              "queryRef": "Dim Sector.Sector Concentration Note",
+              "nativeQueryRef": "Sector Concentration Note",
+              "displayName": "Product spread"
             }
           ]
         }

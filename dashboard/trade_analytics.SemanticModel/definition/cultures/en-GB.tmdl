@@ -138,19 +138,7 @@ cultureInfo en-GB
 			          "ConceptualProperty": "Sector HHI Band"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "Concentration": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "dim_country.country_display": {
 			      "Definition": {
@@ -222,19 +210,7 @@ cultureInfo en-GB
 			          "ConceptualProperty": "Panel HHI Upper"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "Upper bound": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "dim_partner.panel_hhi": {
 			      "Definition": {
@@ -264,19 +240,7 @@ cultureInfo en-GB
 			          "ConceptualProperty": "Panel HHI Lower"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "Lower bound": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "dim_partner.partner_display": {
 			      "Definition": {
@@ -403,6 +367,684 @@ cultureInfo en-GB
 			      "Terms": [
 			        {
 			          "Exports (USD bn)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.sector_partner_share_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Sector Partner Share pct"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "dim_sector.sector_partner_value_2023_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Sector Partner Value 2023 bn"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "dim_sector.product_value_2023_mn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Product Value 2023 mn"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "dim_sector.product_share_of_partner_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Product Share of Partner pct"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "dim_sector.share_shift_ppt": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Share Shift ppt"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Change in share (pp)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.share_2014_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Share 2014 pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Share 2014 (%)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.share_2023_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Share 2023 pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Share 2023 (%)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "d_top_products_by_market.partner_rank": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "D Top Products By Market",
+			          "ConceptualProperty": "partner_rank"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "d_top_products_by_market.partner_desc": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "D Top Products By Market",
+			          "ConceptualProperty": "partner_desc"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "d_top_products_by_market.product_rank": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "D Top Products By Market",
+			          "ConceptualProperty": "product_rank"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "d_top_products_by_market.cmd_code": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "D Top Products By Market",
+			          "ConceptualProperty": "cmd_code"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "d_top_products_by_market.cmd_desc": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "D Top Products By Market",
+			          "ConceptualProperty": "cmd_desc"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "dim_sector.top_3_share_2014_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Top 3 Share 2014 pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "2014": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.top_3_share_2023_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Top 3 Share 2023 pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "2023": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.market_1_name": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Market 1 Name"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Largest market": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.market_1_share_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Market 1 Share pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Share %": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.market_2_name": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Market 2 Name"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Second": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.market_2_share_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Market 2 Share pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Share %": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.market_3_name": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Market 3 Name"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Third": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.market_3_share_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Market 3 Share pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Share %": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_sector.sector_concentration_note": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Sector Concentration Note"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Product spread": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.country_exports_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Country Exports bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Exports": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.country_imports_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Country Imports bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Imports": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.country_balance_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Country Balance bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Balance": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.chapter_balance_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Chapter Balance bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Balance": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.chapter_exports_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Chapter Exports bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Exports": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.chapter_imports_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Chapter Imports bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Imports": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.partner_balance_change_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Partner Balance Change bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Change in balance (USD bn)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.partner_balance_2014_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Partner Balance 2014 bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Balance 2014 (USD bn)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.partner_balance_2023_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Partner Balance 2023 bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Balance 2023 (USD bn)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "e_india_chapter_balance_2023.cmd_desc": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "E India Chapter Balance 2023",
+			          "ConceptualProperty": "cmd_desc"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "e_india_chapter_balance_2023.cmd_code": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "E India Chapter Balance 2023",
+			          "ConceptualProperty": "cmd_code"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "HS2": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.chapter_short_name": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "Chapter Short Name"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Chapter": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.india_exports_2023_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "India Exports 2023 bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Exports, USD bn": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.india_imports_2023_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "India Imports 2023 bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Imports, USD bn": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.india_balance_2023_bn": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "India Balance 2023 bn"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Balance, USD bn": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.india_balance_pct_of_trade_2023": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "India Balance pct of Trade 2023"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% of total trade": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_country.india_export_cover_2023_pct": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Country",
+			          "ConceptualProperty": "India Export Cover 2023 pct"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Export cover, %": {
 			            "State": "Suggested",
 			            "Source": {
 			              "Type": "External",

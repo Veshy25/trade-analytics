@@ -2,7 +2,7 @@
 
 A SQL-driven analysis of India's merchandise trade over the past decade — exports benchmarked against three comparator economies (China, Bangladesh, Vietnam), then where each sector's exports go, imports and trade balance, and volume against value — sourced directly from the UN Comtrade API. Built as a portfolio project in PostgreSQL, with Python for the charts and a Power BI dashboard.
 
-> **Raw data not included (29/10/2026).** The seven raw UN Comtrade extracts this analysis was built on have been removed from the repository. UN Comtrade's terms require permission to republish its data unmodified, and that permission has been requested from the UN Statistics Division; the files will be restored if it is given. Everything else is here: the SQL, the 28 result tables in `data/processed/`, the findings, the charts and the Power BI dashboard, none of which need the raw files to read or open. To rebuild from scratch, pull the data yourself from the UN Comtrade API with a free key, using the exact parameters in [`data/raw/README.md`](data/raw/README.md).
+> **Raw data not included.** The seven raw CSVs are not redistributed: at 284,752 records they exceed UN Comtrade's 100,000-record free limit. Data would have to be pulled manually from the site: [UN Comtrade](https://comtradeplus.un.org). Everything else is here: the SQL, the 28 result tables in `data/processed/`, the findings, the charts and the Power BI dashboard, none of which need the raw files to read or open. The exact pull parameters are in [`data/raw/README.md`](data/raw/README.md).
 
 **→ [Read the findings](insights/key_findings.md)** — twenty findings with the numbers, caveats attached.
 
@@ -47,9 +47,9 @@ Most validation here is self-consistency; one check is not. India's 2023 exports
 
 ```
 trade-analytics/
-├── dashboard/                  # Power BI project (PBIP) — pages 1–3 of 5 so far
+├── dashboard/                  # Power BI project (PBIP) — all five pages
 │   ├── trade_analytics.pbip            # Open this in Power BI Desktop
-│   ├── screenshots/                    # One PNG per built page, shown under Dashboard below
+│   ├── screenshots/                    # One PNG per page, shown under Dashboard below
 │   ├── trade_analytics.Report/         # Report (PBIR): one JSON file per page and visual
 │   └── trade_analytics.SemanticModel/  # Data model (TMDL): tables, relationships, measures
 ├── data/
@@ -126,13 +126,17 @@ Tracks are reconciled against each other — Track B sums to within 2.46% of Tra
 
 ## Dashboard
 
-A Power BI report on the committed results, saved as a Power BI project (PBIP) so the data model (TMDL) and every visual (JSON) can be read here without Power BI. **Three pages are built.** Benchmark: each country's CAGR, the indexed trend, the top ten chapters of the country chosen in the slicer (India by default) and where India's decade growth came from. Sectors: the five focus sectors' value trend, growth against product concentration (HHI), and value, volume and concentration side by side. Markets: India's 2023 exports across the 20-partner panel, the panel's concentration (HHI) since 2014 with the range India's whole-market figure could fall in, and how each partner's rank moved between 2014 and 2023. Two more pages are planned. Open `dashboard/trade_analytics.pbip` in Power BI Desktop (it reads `data/processed/` from `main`, so nothing needs running first), or download the `.pbix` from the [latest release](https://github.com/Veshy25/trade-analytics/releases/latest).
+A Power BI report on the committed results, saved as a Power BI project (PBIP) so the data model (TMDL) and every visual (JSON) can be read here without Power BI. **All five pages are built.** Benchmark: each country's CAGR, the indexed trend, the top ten chapters of the country chosen in the slicer (India by default) and the ten chapters that added most to India's exports, with the falls and the net figure stated beside them. Sectors: the five focus sectors' value trend, growth against product concentration (HHI), and value, volume and concentration side by side. Markets: India's 2023 exports across the 20-partner panel, the panel's concentration (HHI) since 2014 with the range India's whole-market figure could fall in, and how each partner's rank moved between 2014 and 2023. Sector × Market: each sector's three largest markets, the share those three take in 2014 against 2023, and how each market's share shifted for the sector chosen in the slicer. Trade Balance: exports, imports and balance over time for the country chosen in the slicer (India by default), India's 2023 figures, its largest chapter deficits and surpluses, and how its balance with each partner changed. Open `dashboard/trade_analytics.pbip` in Power BI Desktop (it reads `data/processed/` from `main`, so nothing needs running first), or download the `.pbix` from the [latest release](https://github.com/Veshy25/trade-analytics/releases/latest).
 
 ![Dashboard page 1: Benchmark](dashboard/screenshots/dashboard_page_1_benchmark.png)
 
 ![Dashboard page 2: Sectors](dashboard/screenshots/dashboard_page_2_sectors.png)
 
 ![Dashboard page 3: Markets](dashboard/screenshots/dashboard_page_3_markets.png)
+
+![Dashboard page 4: Sector × Market](dashboard/screenshots/dashboard_page_4_sector_market.png)
+
+![Dashboard page 5: Trade Balance](dashboard/screenshots/dashboard_page_5_trade_balance.png)
 
 ## Tech stack
 
@@ -153,9 +157,10 @@ After each major stage I put the published repository through a structured revie
 
 | Pass | Date | Reviewed | Points raised | Closed in |
 |---|---|---|---|---|
-| 1 | 02/09/2026 | [`17af5d3`](https://github.com/Veshy25/trade-analytics/commit/17af5d3) | 13 points and 8 suggested additions; the findings write-up did not exist yet | [`c6d69a0`](https://github.com/Veshy25/trade-analytics/commit/c6d69a0) |
-| 2 | 16/09/2026 | [`07d53ad`](https://github.com/Veshy25/trade-analytics/commit/07d53ad) | 20 points, three of which changed a published claim — finding 12 was withdrawn | [#3](https://github.com/Veshy25/trade-analytics/pull/3) |
-| 3 | 23/09/2026 | [`dc6b830`](https://github.com/Veshy25/trade-analytics/commit/dc6b830) | 37 points; about 150 figures re-derived with no arithmetic errors, but wording that went further than the evidence | [#4](https://github.com/Veshy25/trade-analytics/pull/4) |
+| 1 | 02/09/2026 | [`4e4c00b`](https://github.com/Veshy25/trade-analytics/commit/4e4c00b) | 13 points and 8 suggested additions; the findings write-up did not exist yet | [`eb3d92f`](https://github.com/Veshy25/trade-analytics/commit/eb3d92f) |
+| 2 | 16/09/2026 | [`8e10162`](https://github.com/Veshy25/trade-analytics/commit/8e10162) | 20 points, three of which changed a published claim — finding 12 was withdrawn | [`65a6652`](https://github.com/Veshy25/trade-analytics/commit/65a6652) |
+| 3 | 23/09/2026 | [`65a6652`](https://github.com/Veshy25/trade-analytics/commit/65a6652) | 37 points; about 150 figures re-derived with no arithmetic errors, but wording that went further than the evidence | [`2e7ea65`](https://github.com/Veshy25/trade-analytics/commit/2e7ea65) |
+| 4 | 27/10/2026 | [`747f34c`](https://github.com/Veshy25/trade-analytics/commit/747f34c) | 18 points; about 540 figures re-derived with 6 mismatches, all rounding or wording | [`5d87eef`](https://github.com/Veshy25/trade-analytics/commit/5d87eef) and [#1](https://github.com/Veshy25/trade-analytics/pull/1) |
 
 I worked through every point raised, re-derived each data claim before changing it, and closed it in the repository itself.
 

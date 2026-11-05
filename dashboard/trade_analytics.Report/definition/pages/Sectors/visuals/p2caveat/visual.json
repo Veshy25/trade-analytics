@@ -37,7 +37,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "· Covers five sectors, not all exports. Values in nominal USD.",
+                    "value": "· Five sectors, not all exports; nominal USD.",
                     "textStyle": {
                       "fontSize": "9pt"
                     }
@@ -57,7 +57,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "· HHI measures product concentration; bands follow the 2010 US merger guidelines.",
+                    "value": "· HHI measures product concentration. A single-chapter sector scores high by construction; no merger-guideline verdict is applied.",
                     "textStyle": {
                       "fontSize": "9pt"
                     }
