@@ -1,0 +1,203 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "p4top3",
+  "position": {
+    "x": 440,
+    "y": 68,
+    "z": 2000,
+    "height": 304,
+    "width": 816,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Sector Display"
+                }
+              },
+              "queryRef": "Dim Sector.Sector Display",
+              "nativeQueryRef": "Sector Display",
+              "displayName": "Sector"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Market 1 Name"
+                }
+              },
+              "queryRef": "Dim Sector.Market 1 Name",
+              "nativeQueryRef": "Market 1 Name",
+              "displayName": "Largest market"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Market 1 Share pct"
+                }
+              },
+              "queryRef": "Dim Sector.Market 1 Share pct",
+              "nativeQueryRef": "Market 1 Share pct",
+              "displayName": "Share %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Market 2 Name"
+                }
+              },
+              "queryRef": "Dim Sector.Market 2 Name",
+              "nativeQueryRef": "Market 2 Name",
+              "displayName": "Second"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Market 2 Share pct"
+                }
+              },
+              "queryRef": "Dim Sector.Market 2 Share pct",
+              "nativeQueryRef": "Market 2 Share pct",
+              "displayName": "Share % "
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Market 3 Name"
+                }
+              },
+              "queryRef": "Dim Sector.Market 3 Name",
+              "nativeQueryRef": "Market 3 Name",
+              "displayName": "Third"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
+                  "Property": "Market 3 Share pct"
+                }
+              },
+              "queryRef": "Dim Sector.Market 3 Share pct",
+              "nativeQueryRef": "Market 3 Share pct",
+              "displayName": "Share %  "
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Dim Sector"
+                  }
+                },
+                "Property": "Market 1 Share pct"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Each sector's three largest markets, 2023'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Share of the sector's exports to the 20-market panel (%)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

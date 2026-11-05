@@ -1,0 +1,203 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "p5kpi",
+  "position": {
+    "x": 1008,
+    "y": 68,
+    "z": 4000,
+    "height": 288,
+    "width": 248,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "India Exports 2023 bn"
+                }
+              },
+              "queryRef": "Dim Country.India Exports 2023 bn",
+              "nativeQueryRef": "India Exports 2023 bn",
+              "displayName": "Exports, USD bn"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "India Imports 2023 bn"
+                }
+              },
+              "queryRef": "Dim Country.India Imports 2023 bn",
+              "nativeQueryRef": "India Imports 2023 bn",
+              "displayName": "Imports, USD bn"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "India Balance 2023 bn"
+                }
+              },
+              "queryRef": "Dim Country.India Balance 2023 bn",
+              "nativeQueryRef": "India Balance 2023 bn",
+              "displayName": "Balance, USD bn"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "India Balance pct of Trade 2023"
+                }
+              },
+              "queryRef": "Dim Country.India Balance pct of Trade 2023",
+              "nativeQueryRef": "India Balance pct of Trade 2023",
+              "displayName": "% of total trade"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "India Export Cover 2023 pct"
+                }
+              },
+              "queryRef": "Dim Country.India Export Cover 2023 pct",
+              "nativeQueryRef": "India Export Cover 2023 pct",
+              "displayName": "Export cover, %"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'India, 2023'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "layout": [
+        {
+          "properties": {
+            "orientation": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "columnCount": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            },
+            "rowCount": {
+              "expr": {
+                "Literal": {
+                  "Value": "3D"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "maxTiles": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "value": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "18D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "label": [
+        {
+          "properties": {
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'belowValue'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -8,7 +8,7 @@ and the underlying result sets are committed as CSVs in `data/processed/` so
 nothing here has to be taken on trust. The single exception is finding 11's
 external WITS anchor, which is cited to its source and is not derived here.
 
-**Read this first — five things that shape every number on the page:**
+**Read this first — six things that shape every number on the page:**
 
 - **All figures are nominal USD**, exporter-reported FOB. There is no deflator
   applied. The 2022 global commodity spike is therefore *inside* these numbers:
@@ -611,7 +611,7 @@ the CSV below on 17/09/2026, having been published as 65.3 and 310.9.
 
 *Source: `sql/07` Query 2 · `data/processed/track_e_india_chapter_balance_2023.csv`*
 
-## 19. The China deficit more than doubled to USD 106bn; within the panel, the USA and Netherlands are the surplus markets
+## 19. The China deficit more than doubled to USD 106bn; within the panel, the USA and Netherlands are the largest surpluses
 
 **India's bilateral deficit with China was USD 105.7bn in 2023 — 122.0bn
 imported, 16.2bn exported — up from 44.8bn in 2014.** It is 44% of India's
@@ -628,7 +628,7 @@ India's partners in general. (Until 23/09/2026 this finding made that
 comparison without the qualifier.)
 
 On the other side, **the USA (+33.7bn) and the Netherlands (+20.7bn)** are the
-two large surplus markets in the panel. The Netherlands surplus is petroleum (finding 14).
+two largest of the 11 surpluses in the panel. The Netherlands surplus is petroleum (finding 14).
 The UAE flipped from a +5.6bn surplus in 2014 to a −4.5bn deficit in 2023, and
 Vietnam from +3.7bn to −4.0bn.
 

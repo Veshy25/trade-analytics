@@ -3,7 +3,9 @@
   "pageOrder": [
     "Benchmark",
     "Sectors",
-    "Markets"
+    "Markets",
+    "SectorMarket",
+    "TradeBalance"
   ],
-  "activePageName": "Markets"
+  "activePageName": "TradeBalance"
 }

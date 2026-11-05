@@ -1,0 +1,167 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "p5balance",
+  "position": {
+    "x": 440,
+    "y": 68,
+    "z": 3000,
+    "height": 288,
+    "width": 552,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "lineClusteredColumnComboChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Year"
+                    }
+                  },
+                  "Property": "Year Label"
+                }
+              },
+              "queryRef": "Dim Year.Year Label",
+              "nativeQueryRef": "Year Label",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "Country Exports bn"
+                }
+              },
+              "queryRef": "Dim Country.Country Exports bn",
+              "nativeQueryRef": "Country Exports bn",
+              "displayName": "Exports"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "Country Imports bn"
+                }
+              },
+              "queryRef": "Dim Country.Country Imports bn",
+              "nativeQueryRef": "Country Imports bn",
+              "displayName": "Imports"
+            }
+          ]
+        },
+        "Y2": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "Country Balance bn"
+                }
+              },
+              "queryRef": "Dim Country.Country Balance bn",
+              "nativeQueryRef": "Country Balance bn",
+              "displayName": "Balance"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "valueAxis": [
+        {
+          "properties": {
+            "secShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Country"
+                    }
+                  },
+                  "Property": "Balance Chart Title"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Imports CIF (incl. ~6–10% freight, insurance; assumed), exports FOB'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,11 +1,10 @@
 # Raw data — provenance and dictionary
 
-> **The seven raw CSVs are not included (29/10/2026).** UN Comtrade's terms
-> require permission to republish its data unmodified. That permission has been
-> requested from the UN Statistics Division, and the files will be restored here
-> if it is given. This file and `pull_manifest.json` still describe them in
-> full: what was pulled, when, with which parameters, and the row count and
-> SHA-256 of every file.
+> **The seven raw CSVs are not redistributed:** at 284,752 records they exceed
+> UN Comtrade's 100,000-record free limit. Data would have to be pulled manually
+> from the site: [UN Comtrade](https://comtradeplus.un.org). This file and
+> `pull_manifest.json` still describe them in full: what was pulled, when, with
+> which parameters, and the row count and SHA-256 of every file.
 
 The analysis ran on the unmodified output of two UN Comtrade API pulls — three
 files on **25/08/2026** (Tracks A, B, C: exports) and four on **15/09/2026**
@@ -66,7 +65,7 @@ re-pulled and are byte-identical to their 25/08/2026 checksums.
 `pull_manifest.json` in this folder is the machine-readable record of the pull:
 timestamps, the exact API parameters per track, row counts, file sizes, and a
 **SHA-256 for each CSV** — so the raw data is verifiable, not merely dated.
-Anyone can confirm the files here are the ones the pull produced:
+Anyone who repeats the pull can compare their files with the ones analysed here:
 
 ```bash
 shasum -a 256 data/raw/*.csv        # compare against pull_manifest.json
@@ -241,20 +240,17 @@ edition or states them as code counts.
 
 ## Reproducing the analysis
 
-Nothing needs re-pulling. Run `sql/00` through `sql/08` from the repository root
-against a PostgreSQL database — the CSVs here are the only input required, and
-`sql/01` asserts the expected row counts (and the FOB/CIF valuation invariants)
-in `DO` blocks that `RAISE EXCEPTION`, so a mismatch fails loudly rather than
-producing quiet nonsense.
+Pull the seven files first (above) and place them in this folder. Then run
+`sql/00` through `sql/08` from the repository root against a PostgreSQL
+database. `sql/01` asserts the expected row counts (and the FOB/CIF valuation
+invariants) in `DO` blocks that `RAISE EXCEPTION`, so a mismatch fails loudly
+rather than producing quiet nonsense.
 
-To confirm the files are the ones the analysis was built on:
+To compare your files with the ones the analysis was built on:
 
 ```bash
 shasum -a 256 data/raw/*.csv        # compare against pull_manifest.json
 ```
 
-If you want equivalent data for your own work, both pulls are fully specified
-above — reporters, period, `cmdCode`, `flowCode` and the partner list are all
-recorded, and a free UN Comtrade API key plus the `comtradeapicall` client will
-reproduce the request. Expect different figures for the recent years: that
-difference is the reason this repository ships the data rather than the puller.
+Expect different figures for the recent years: Comtrade revises its data, which
+is why the committed results in `data/processed/` remain the reference.

@@ -46,6 +46,131 @@ table 'Dim Country'
 		displayFolder: Benchmark
 		lineageTag: m-top10-chart-title
 
+	measure 'Balance Country Key' = COALESCE ( [Selected Country Key], "India" )
+		displayFolder: Trade Balance
+		lineageTag: m-balance-country-key
+
+	measure 'Country Exports bn' =
+			VAR K = [Balance Country Key]
+			RETURN
+				CALCULATE ( SUM ( 'E Country Trade Balance'[exports_bn] ), REMOVEFILTERS ( 'Dim Country' ), 'Dim Country'[Country] = K )
+		formatString: #,##0.0
+		displayFolder: Trade Balance
+		lineageTag: m-country-exports-bn
+
+	measure 'Country Imports bn' =
+			VAR K = [Balance Country Key]
+			RETURN
+				CALCULATE ( SUM ( 'E Country Trade Balance'[imports_bn] ), REMOVEFILTERS ( 'Dim Country' ), 'Dim Country'[Country] = K )
+		formatString: #,##0.0
+		displayFolder: Trade Balance
+		lineageTag: m-country-imports-bn
+
+	measure 'Country Balance bn' =
+			VAR K = [Balance Country Key]
+			RETURN
+				CALCULATE ( SUM ( 'E Country Trade Balance'[balance_bn] ), REMOVEFILTERS ( 'Dim Country' ), 'Dim Country'[Country] = K )
+		formatString: +#,##0.0;-#,##0.0;0.0
+		displayFolder: Trade Balance
+		lineageTag: m-country-balance-bn
+
+	measure 'Balance Chart Title' =
+			VAR K = [Balance Country Key]
+			VAR C = CALCULATE ( SELECTEDVALUE ( 'Dim Country'[Country Display] ), REMOVEFILTERS ( 'Dim Country' ), 'Dim Country'[Country] = K )
+			RETURN
+				C & ": exports, imports and balance, 2014–2023 (USD bn)"
+		displayFolder: Trade Balance
+		lineageTag: m-balance-chart-title
+
+	measure 'India Exports 2023 bn' = CALCULATE ( SUM ( 'E Country Trade Balance'[exports_bn] ), REMOVEFILTERS ( 'Dim Country' ), REMOVEFILTERS ( 'Dim Year' ), 'E Country Trade Balance'[reporter_desc] = "India", 'E Country Trade Balance'[ref_year] = 2023 )
+		formatString: #,##0.0
+		displayFolder: Trade Balance
+		lineageTag: m-india-exports-2023-bn
+
+	measure 'India Imports 2023 bn' = CALCULATE ( SUM ( 'E Country Trade Balance'[imports_bn] ), REMOVEFILTERS ( 'Dim Country' ), REMOVEFILTERS ( 'Dim Year' ), 'E Country Trade Balance'[reporter_desc] = "India", 'E Country Trade Balance'[ref_year] = 2023 )
+		formatString: #,##0.0
+		displayFolder: Trade Balance
+		lineageTag: m-india-imports-2023-bn
+
+	measure 'India Balance 2023 bn' = CALCULATE ( SUM ( 'E Country Trade Balance'[balance_bn] ), REMOVEFILTERS ( 'Dim Country' ), REMOVEFILTERS ( 'Dim Year' ), 'E Country Trade Balance'[reporter_desc] = "India", 'E Country Trade Balance'[ref_year] = 2023 )
+		formatString: +#,##0.0;-#,##0.0;0.0
+		displayFolder: Trade Balance
+		lineageTag: m-india-balance-2023-bn
+
+	measure 'India Export Cover 2023 pct' = CALCULATE ( SUM ( 'E Country Trade Balance'[export_cover_pct] ), REMOVEFILTERS ( 'Dim Country' ), REMOVEFILTERS ( 'Dim Year' ), 'E Country Trade Balance'[reporter_desc] = "India", 'E Country Trade Balance'[ref_year] = 2023 )
+		formatString: 0.0
+		displayFolder: Trade Balance
+		lineageTag: m-india-export-cover-2023-pct
+
+	measure 'Chapter Balance bn' = SUM ( 'E India Chapter Balance 2023'[balance_bn] )
+		formatString: +#,##0.0;-#,##0.0;0.0
+		displayFolder: Trade Balance
+		lineageTag: m-chapter-balance-bn
+
+	measure 'Chapter Exports bn' = SUM ( 'E India Chapter Balance 2023'[exports_bn] )
+		formatString: #,##0.0
+		displayFolder: Trade Balance
+		lineageTag: m-chapter-exports-bn
+
+	measure 'Chapter Imports bn' = SUM ( 'E India Chapter Balance 2023'[imports_bn] )
+		formatString: #,##0.0
+		displayFolder: Trade Balance
+		lineageTag: m-chapter-imports-bn
+
+	measure 'Partner Balance Change bn' = SUM ( 'E India Partner Balance'[balance_change_bn] )
+		formatString: +#,##0.0;-#,##0.0;0.0
+		displayFolder: Trade Balance
+		lineageTag: m-partner-balance-change-bn
+
+	measure 'Partner Balance 2014 bn' = SUM ( 'E India Partner Balance'[balance_2014_bn] )
+		formatString: +#,##0.0;-#,##0.0;0.0
+		displayFolder: Trade Balance
+		lineageTag: m-partner-balance-2014-bn
+
+	measure 'Partner Balance 2023 bn' = SUM ( 'E India Partner Balance'[balance_2023_bn] )
+		formatString: +#,##0.0;-#,##0.0;0.0
+		displayFolder: Trade Balance
+		lineageTag: m-partner-balance-2023-bn
+
+	measure 'Chapter Bar Colour' =
+			VAR B = [Chapter Balance bn]
+			RETURN
+				IF ( ISBLANK ( B ), BLANK (), IF ( B >= 0, "#118DFF", "#E66C37" ) )
+		displayFolder: Trade Balance
+		lineageTag: m-chapter-bar-colour
+
+	measure 'Partner Change Colour' =
+			VAR B = [Partner Balance Change bn]
+			RETURN
+				IF ( ISBLANK ( B ), BLANK (), IF ( B >= 0, "#118DFF", "#E66C37" ) )
+		displayFolder: Trade Balance
+		lineageTag: m-partner-change-colour
+
+	measure 'Chapter Short Name' =
+			VAR c = SELECTEDVALUE ( 'E India Chapter Balance 2023'[cmd_code] )
+			RETURN
+				SWITCH (
+					c,
+					"27", "Mineral fuels & oils",
+					"85", "Electrical machinery",
+					"71", "Pearls, gems & precious metals",
+					"84", "Machinery & boilers",
+					"39", "Plastics",
+					"30", "Pharmaceuticals",
+					"87", "Vehicles (not rail)",
+					"10", "Cereals",
+					"62", "Apparel, not knitted",
+					"03", "Fish & seafood",
+					SELECTEDVALUE ( 'E India Chapter Balance 2023'[cmd_desc] )
+				)
+		displayFolder: Trade Balance
+		lineageTag: m-chapter-short-name
+
+	measure 'India Balance pct of Trade 2023' = CALCULATE ( SUM ( 'E Country Trade Balance'[balance_pct_of_trade] ), REMOVEFILTERS ( 'Dim Country' ), REMOVEFILTERS ( 'Dim Year' ), 'E Country Trade Balance'[reporter_desc] = "India", 'E Country Trade Balance'[ref_year] = 2023 )
+		formatString: +0.0;-0.0;0.0
+		displayFolder: Trade Balance
+		lineageTag: m-india-balance-pct-of-trade-2023
+
 	column Country
 		lineageTag: 085ab8ec-577f-45c6-b973-ea7572d34f95
 		summarizeBy: none

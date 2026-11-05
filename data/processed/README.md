@@ -63,7 +63,7 @@ regenerate them by re-running the SQL rather than editing them.
 | `track_d_sector_partner_shift.csv` | sector × partner | `shift_ppt` = `share_2023_pct` − `share_2014_pct`. |
 | `track_d_top_products_by_market.csv` | sector × top-3 partner × top-5 product | `value_2023_mn` is USD millions. `pct_of_partner_sector` = the product's share of that partner's exports in that sector. |
 | `track_d_sector_market_concentration.csv` | sector × year | `hhi_panel` is **market** concentration within the panel. `partners_with_trade` counts partners with a non-zero share. |
-| `track_d_sector_partner_cagr.csv` | sector × partner | `cagr_pct` 2014–2023 on USD millions. The input for the planned Sector × Market dashboard page. |
+| `track_d_sector_partner_cagr.csv` | sector × partner | `cagr_pct` 2014–2023 on USD millions. Finding 14 cites it for its USD values. |
 
 ## Track E — imports and trade balance (`sql/07`)
 
