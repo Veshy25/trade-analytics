@@ -23,11 +23,6 @@
     },
     {
       "source": "v02slicer",
-      "target": "v08bartop10",
-      "type": "NoFilter"
-    },
-    {
-      "source": "v02slicer",
       "target": "v06kpibangladesh",
       "type": "NoFilter"
     },

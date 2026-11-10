@@ -28,8 +28,8 @@
               },
               "queryRef": "Dim Country.Country Display",
               "nativeQueryRef": "Country Display",
-              "displayName": "Country",
-              "active": true
+              "active": true,
+              "displayName": "Country"
             }
           ]
         }
@@ -43,13 +43,6 @@
               "expr": {
                 "Literal": {
                   "Value": "'Dropdown'"
-                }
-              }
-            },
-            "isInvertedSelectionMode": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
                 }
               }
             }
