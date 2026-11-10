@@ -6,6 +6,18 @@ corrections that changed a published claim are also in the findings, under
 [Corrections kept visible](insights/key_findings.md#corrections-kept-visible).
 Commit history has the rest.
 
+## 10/11/2026 — dashboard slicer, opening page and trade-balance rounding
+
+- **Dashboard.** The Benchmark page's top-ten chart now follows the country
+  slicer, as the README describes; it had stayed on India for every country.
+  The report now opens on the Benchmark page rather than Trade Balance.
+- **Rounding.** `track_e_india_chapter_balance_2023.csv` now gives `balance_bn`
+  to 3 dp (previously 2), so the dashboard's one-decimal figures round from the
+  value rather than from a rounded figure. Electrical machinery (HS 85) shows
+  −43.7, as in finding 18 (previously −43.8), and fish (HS 03) +6.1 (previously
+  +6.2). No other figure changes. The page 5 screenshot still shows the earlier
+  two figures.
+
 ## 05/11/2026 — dashboard, raw-data notice and repository history
 
 - **Repository history.** The repository was recreated on this date so that the

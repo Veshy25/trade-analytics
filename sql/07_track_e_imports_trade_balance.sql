@@ -144,7 +144,10 @@ SELECT
     cmd_desc,
     ROUND(exports_usd / 1e9, 2) AS exports_bn,
     ROUND(imports_usd / 1e9, 2) AS imports_bn,
-    ROUND(balance_usd / 1e9, 2) AS balance_bn
+    -- Balance at 3 dp so a 1 dp display rounds from the value, not from an
+    -- already-rounded figure: HS 85 is -43.745, which shows as -43.7 (at 2 dp
+    -- it was -43.75 and showed as -43.8).
+    ROUND(balance_usd / 1e9, 3) AS balance_bn
 FROM ranked
 WHERE deficit_rank <= 10 OR surplus_rank <= 10
 ORDER BY side, rank_on_side;
