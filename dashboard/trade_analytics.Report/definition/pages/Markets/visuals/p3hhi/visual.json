@@ -112,79 +112,6 @@
           }
         }
       ],
-      "y1AxisReferenceLine": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "displayName": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Highly concentrated (2,500)'"
-                }
-              }
-            },
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "2500D"
-                }
-              }
-            },
-            "lineColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#C0392B'"
-                    }
-                  }
-                }
-              }
-            },
-            "style": {
-              "expr": {
-                "Literal": {
-                  "Value": "'dashed'"
-                }
-              }
-            },
-            "dataLabelShow": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "dataLabelText": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Name'"
-                }
-              }
-            },
-            "dataLabelColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#C0392B'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "id": "1"
-          }
-        }
-      ],
       "dataPoint": [
         {
           "properties": {
@@ -333,7 +260,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'India''s export markets are never highly concentrated (HHI, 2014–2023)'"
+                  "Value": "'Concentration of India''s export markets (HHI, 2014–2023)'"
                 }
               }
             }
