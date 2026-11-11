@@ -6,6 +6,55 @@ corrections that changed a published claim are also in the findings, under
 [Corrections kept visible](insights/key_findings.md#corrections-kept-visible).
 Commit history has the rest.
 
+## 11/11/2026 — points from the fifth cold audit
+
+- **Finding 1.** Retitled "slowest of the three economies with a full decade of
+  data", previously "slowest of the four". Bangladesh's rate covers 2015–2018
+  only, and over that window India (6.85%) grew faster than China (3.03%); the
+  four-country figures for it are now in the finding (`sql/02` S9).
+- **Finding 7.** The title no longer says "never highly concentrated", which
+  holds on the 2010 bands only; this matches the Markets page change below.
+- **Result sets.** Three figures the findings quote were in no CSV and now are:
+  `track_d_reconciliation_vs_track_c.csv`, `track_d_panel_coverage.csv` and
+  `track_e_panel_coverage.csv`. `supporting_figures.csv` gains S9–S12 and three
+  rows under S8. Result sets: 28 → 31.
+- **Assertions.** `07` V5 checks the published 50.4–58.2% itself, where it
+  checked a 50.0–58.5 band, and reads the view the query prints. `02` V3 and
+  `07` V4 assert the two totals matched to WITS, and `01` validation 9 asserts
+  one name per reporter and partner code, since the views group on names.
+  PASSED notices: 15 → 18.
+- **Clean tables.** Columns that no query read are dropped from `sql/01`:
+  quantity and weight on Track D, `qty` and its unit on Track B, and
+  `legacy_estimation_flag` on Tracks C, D, E1 and E2. No result changes.
+- **Dashboard text.** `data/processed/README.md` lists the figures that are typed
+  into dashboard titles and caveats, with the CSV each comes from.
+- **SQL comments.** The dated correction notes that still sat in the SQL files
+  are removed; each is recorded in the sections below, and the comments now
+  describe what each query does today. `sql/04` V5 reads its coverage from
+  Query 4's view instead of restating the query.
+- **Wording.**
+  - Petroleum does not reconcile "exactly" across the two pulls: 85 of its 200
+    partner-years are identical and the rest differ by up to USD 2.
+  - "All 97 chapters exist in every year" holds for India and China; Viet Nam
+    and Bangladesh lack one to four in some years.
+  - `sql/06` S8 gave USD 1 as the largest positive gap; that is the gap on the
+    largest percentage, and the largest in dollars is USD 17. The 23/09/2026
+    entry below is corrected to match.
+  - Comtrade's weight estimate comes from the value under two of its three
+    methods, not one (finding 17, `sql/03` assumption 7, README).
+  - Finding 17 quoted 2022's indices on a 2014 base as evidence of a price
+    spike; it now quotes the 2021 → 2022 change.
+  - Findings 13, 16 and 20: two sentences are marked as interpretation, one is
+    replaced by a figure, and the transshipment caution is extended to the UAE.
+  - `scripts/make_chart.py`: two figures in the docstring were taken from
+    rounded indices (37.9% and 16.9%, previously 38.0% and 16.8%).
+  - Data dictionary: `netWgt` is also carried on Track A and `isQtyEstimated`
+    on Track B; `sql/01` said "48-50%" where the dictionary says 48.3–50.5%.
+  - README and `data/raw/README.md` said the data "would have to be pulled
+    manually from the site"; both now point to the documented pull.
+  - Stale comments in `sql/01`, `02` and `03`; a `_usd` convention in
+    `data/processed/README.md` that no column used.
+
 ## 11/11/2026 — Markets page no longer applies a concentration verdict
 
 - **Dashboard.** The Markets page no longer applies a merger-guideline verdict
@@ -101,7 +150,7 @@ Commit history has the rest.
 - `sql/06` assumption 7 and `data/raw/README.md`: the explanation of the
   engineering 2022 gap was stated as fact; it is an inference. V3: the HS6 sum
   was described as "always negative" against the HS2 chapter; 332 of 1,000
-  partner-years are positive, the largest by USD 1.
+  partner-years are positive, the largest by USD 17.
 - `sql/07`: Q2's committed CSV came from an older copy of the query in `08`
   that lacked a COALESCE (harmless on this data); the CIF/FOB margin was quoted
   as 10% "long-standing" with a 10–20% range, which was out of date.
@@ -115,6 +164,14 @@ Commit history has the rest.
 - `data/raw/README.md`: some sizes were in MiB, so the same file was quoted as
   74.9 and 78.5 MB; `sql/01` validation 3 covered Track A only while the text
   said "throughout"; an inference about revision drift was stated as fact.
+- `sql/01` validation 6 (the partner panel) was a plain `SELECT` covering
+  Tracks C and D while `sql/06` described it as asserted; it is now asserted
+  and covers E2.
+- `sql/02`: `track_a_top10_chapters.csv` gained `rank_basis`, because
+  `rank_2023` is a full-period rank for Bangladesh; `rows_flag4` and
+  `rows_netwgt_est` were printed but not exported.
+- `sql/03` V5 printed its divergence at 1 dp (−2.5) while finding 10 cited
+  −2.46.
 
 ## 17/09/2026 — points from the second cold audit
 
@@ -132,3 +189,13 @@ Commit history has the rest.
 - `sql/06` assumption 7 and `data/raw/README.md`: Track D was said to match
   Track C "to the cent everywhere except engineering"; the query's own output
   showed small gaps in textiles, pharmaceuticals and gems.
+- Finding 18: the ten largest surpluses and deficits were summed as USD 65.3bn
+  and 310.9bn; they are 80.8bn and 305.9bn.
+- `sql/01`: validation 1 (row counts) was a plain `SELECT` while the data
+  dictionary said a mismatch would fail loudly; the panel check's
+  `EXCEPT … UNION ALL` ran left to right without parentheses and tested one
+  direction only.
+- `sql/02`: the Bangladesh gap was called genuine on the evidence of the pull
+  itself, which is circular; the three chapter falls in finding 3 were derived
+  ad hoc and cited to a CSV that did not hold them (now Query 5).
+- `sql/07` V6: the two export-to-import joins were unasserted.

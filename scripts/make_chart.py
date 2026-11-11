@@ -21,8 +21,8 @@ Bangladesh is drawn dashed because it has 2015-2018 only (Track A assumption
 
 Chart 2 — petroleum products: value, tonnes and USD/kg, each indexed to
 2014 = 100. Three lines on one axis is the point: it shows the value
-collapses of 2015 and 2020 were mostly price (value fell 49.6% and 38.0%,
-tonnes 14.6% and 16.8%) and the 2014-2023 growth was volume (unit value
+collapses of 2015 and 2020 were mostly price (value fell 49.6% and 37.9%,
+tonnes 14.6% and 16.9%) and the 2014-2023 growth was volume (unit value
 ended below where it started). 03 Q7.
 
 Chart 3 — sector x partner heatmap, 2023: each sector's 20-partner panel

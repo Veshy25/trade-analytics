@@ -1,8 +1,8 @@
 # Raw data — provenance and dictionary
 
 > **The seven raw CSVs are not redistributed:** at 284,752 records they exceed
-> UN Comtrade's 100,000-record free limit. Data would have to be pulled manually
-> from the site: [UN Comtrade](https://comtradeplus.un.org). This file and
+> UN Comtrade's 100,000-record free limit. To get them, repeat the pull from
+> [UN Comtrade](https://comtradeplus.un.org) as described below. This file and
 > `pull_manifest.json` still describe them in full: what was pulled, when, with
 > which parameters, and the row count and SHA-256 of every file.
 
@@ -48,7 +48,7 @@ of that file*. The pull date is metadata, not trivia.
 after A–C, any query that combines them — every trade balance in `sql/07`,
 every cross-track check in `sql/06` — mixes figures as held on two different
 days. `sql/06` V3 measures this directly by reconciling Track D (15/09) against
-Track C (25/08) for the same partner-years. Petroleum matches exactly across
+Track C (25/08) for the same partner-years. Petroleum agrees to within USD 2 in
 all 200 partner-years; textiles (worst 0.18%), pharmaceuticals (0.97%) and gems
 & jewellery (1.95%) stay within 2%; engineering/machinery in 2022 runs to
 −11.5%. Eleven of the 1,000 partner-years checked exceed 1% — ten engineering
@@ -78,7 +78,7 @@ fetched. Entries written since 15/09/2026 carry a `track` label, their own
 and inherit the top-level `pull` block. A `pulls` array logs each run made since then; the 25/08/2026 pull predates it
 and is described by the top-level `pull` block.
 
-*One caveat, stated because it matters: the manifest committed today was
+*One caveat, stated because it matters: the committed manifest was
 reconstructed **retroactively** on 08/09/2026. The 25/08/2026 pull predates the
 manifest feature, so its date comes from the CSVs' filesystem mtimes — reliable
 to the day, but not to the second, and the `_reconstructed` block in the JSON
@@ -86,7 +86,7 @@ says so. Future pulls record exact start and finish timestamps directly.*
 
 *A `pulled_at` column inside each CSV was considered and rejected: `sql/00`
 loads positionally, so a 48th column would desync every `raw_*` staging table
-from the data already committed. A sidecar file carries the same metadata and
+from the files already pulled. A sidecar file carries the same metadata and
 touches no schema.*
 
 ## Exact API parameters
@@ -184,15 +184,15 @@ slightly by track — see the notes column.
 | `fobvalue` | `fob_value` | numeric | **Export tracks (A–D).** Free-on-board value, USD — the analysis value |
 | `cifvalue` | `cif_value` | numeric | **Import tracks (E1, E2).** Cost-insurance-freight value, USD — the analysis value for imports. `fobvalue` is blank on 73.5% of E1 rows and 69.6% of E2 rows and holds exactly `0` on the rest — never a positive value — and is dropped there. |
 | `primaryValue` | `primary_value` | numeric | Equals `fob_value` on every export row and `cif_value` on every import row; `sql/01` validations 3 and 5 assert 0 mismatches each |
-| `legacyEstimationFlag` | `legacy_estimation_flag` | smallint | **A quantity/net-weight estimation code, NOT a value-estimation marker.** FAO, UNSD and ITC, [*Trade data processing and validation methodology*](https://comtradeapi.un.org/files/v1/app/wiki/UNSD_Method_trade_data_processing_v6-17_Jun_2019.pdf) (2019), Part: UN Comtrade, "Documentation of estimated values": `0` = no estimation, `2` = quantity only, `4` = net weight only, `6` = both. Tracks A, C, E1 and E2 carry only `0` and `4`; Tracks B and D carry all four (B: 6,382 / 162 / 3,776 / 6,656 rows, with flag `6` on 56% of Track B value). Finding 12 sets out how this flag was once misread, and `sql/02` V1a asserts its meaning |
+| `legacyEstimationFlag` | `legacy_estimation_flag` | smallint | **Tracks A and B only** — read by `sql/02` V1a and S1, and dropped on C, D, E1 and E2, where no query reads it. **A quantity/net-weight estimation code, NOT a value-estimation marker.** FAO, UNSD and ITC, [*Trade data processing and validation methodology*](https://comtradeapi.un.org/files/v1/app/wiki/UNSD_Method_trade_data_processing_v6-17_Jun_2019.pdf) (2019), Part: UN Comtrade, "Documentation of estimated values": `0` = no estimation, `2` = quantity only, `4` = net weight only, `6` = both. Tracks A, C, E1 and E2 carry only `0` and `4`; Tracks B and D carry all four (B: 6,382 / 162 / 3,776 / 6,656 rows, with flag `6` on 56% of Track B value). Finding 12 sets out how this flag was once misread, and `sql/02` V1a asserts its meaning |
 | `isReported` | `is_reported` | boolean | This exact row was directly reported |
 | `isAggregate` | `is_aggregate` | boolean | Row was **computed by rolling up** more detailed lines rather than filed directly at this level. It marks how a value was *assembled*, not whether it was estimated — and neither does `legacy_estimation_flag`, which is about weight. Each reporter switches from `isReported` to `isAggregate` once and never back (China 2015, Viet Nam and Bangladesh 2016, India 2017); `sql/02` V1a/V1b report it |
 | `sector` | `sector` | text | **Tracks B and D only — DERIVED, not from the API.** Assigned during the pull by mapping the HS2 prefix of `cmdCode` to one of the five sector labels above (see the sector table earlier in this file) |
-| `netWgt` | `net_wgt` | numeric | **Tracks B and D only** (HS6). Net weight in kg — the single volume measure used in `sql/03` Q6–Q8. Populated (positive) on ~90% of HS6 rows. On the HS2 tracks it is blank on 48.3–50.5% of rows (A 48.3, E1 49.6, C 50.2, E2 50.5) and exactly `0` on the rest — no positive value anywhere — because Comtrade does not aggregate mixed units to chapter level; "blank on 100%" was the wrong description and is corrected here. Carried since 15/09/2026 |
-| `isNetWgtEstimated` | `is_net_wgt_estimated` | boolean | Tracks B and D, and Track A since 17/09/2026 (where `sql/02` V1a uses it to assert what `legacy_estimation_flag` means). Comtrade's estimate flag for the weight, reported per sector-year in `sql/03` Q8 both as a row share and — the one that matters for a volume claim — as `weight_estimated_kg_pct` |
+| `netWgt` | `net_wgt` | numeric | **Track B** (HS6), **and Track A** (kept only so `sql/02` S2 can show it holds no weight). Net weight in kg — the single volume measure used in `sql/03` Q6–Q8. Populated (positive) on ~90% of HS6 rows, B and D alike; Track D's is not carried, because volume is analysed on Track B only. On the HS2 tracks it is blank on 48.3–50.5% of rows (A 48.3, E1 49.6, C 50.2, E2 50.5) and exactly `0` on the rest — no positive value anywhere — because Comtrade does not aggregate mixed units to chapter level; "blank on 100%" was the wrong description and is corrected here. Carried since 15/09/2026 |
+| `isNetWgtEstimated` | `is_net_wgt_estimated` | boolean | Track B, and Track A since 17/09/2026 (where `sql/02` V1a uses it to assert what `legacy_estimation_flag` means). Comtrade's estimate flag for the weight, reported per sector-year in `sql/03` Q8 both as a row share and — the one that matters for a volume claim — as `weight_estimated_kg_pct` |
 | `classificationCode` | `classification_code` | text | **Not constant — the HS edition the row was filed under.** `H4` to 2016, `H5` from 2017, `H6` from 2022, and it varies by reporter as well as by year (Viet Nam filed 2017 under `H4`). Carried on Track B from 17/09/2026 and mapped in `sql/01` validation 7; dropped on tracks that never group on `cmdDesc` |
 | `partnerISO` | — | text | Dropped 17/09/2026: read by no query in `02`–`08`; `partner_desc` carries it |
-| `qty` / `qtyUnitAbbr` | `qty` / `qty_unit` | numeric / text | Tracks B and D. Quantity in the commodity's own unit (u, m², carat, kWh, kg…). Kept for per-product reference only — **never summed**, because units differ within a sector |
+| `qty` / `qtyUnitAbbr` | — | numeric / text | Dropped: quantity is in the commodity's own unit (u, m², carat, kWh, kg…), so it cannot be summed within a sector, and no query reads it |
 
 ### Dropped in cleaning
 
@@ -202,9 +202,11 @@ export in any case, and `sql/01` validation 3 asserts `primary_value = fob_value
 on every export track (A, B, C and D).
 On the import tracks, `fobvalue` (blank or `0`, never positive). On the HS2
 tracks, all quantity and weight fields — blank or `0` by construction, never
-positive — except Track A's `isNetWgtEstimated`, kept for `sql/02` V1a; on the
-HS6 tracks, `qtyUnitCode`, `isQtyEstimated`, `altQty`, `grossWgt` and their
-unit/estimated companions. `isLeaf` and `partnerISO` were dropped on 17/09/2026 as unread by
+positive — except Track A's `netWgt` and `isNetWgtEstimated`, kept for `sql/02` S2 and V1a;
+on the HS6 tracks, `qty`, `qtyUnitAbbr`, `qtyUnitCode`, `altQty`, `grossWgt` and
+their unit/estimated companions; on Track D, `netWgt`, `isNetWgtEstimated` and
+`isQtyEstimated` as well (Track B keeps them for `sql/03` Q6–Q8 and `sql/02` S1).
+`legacyEstimationFlag` is dropped on Tracks C, D, E1 and E2. `isLeaf` and `partnerISO` were dropped on 17/09/2026 as unread by
 any query. On every track: `motCode`/`motDesc`, `customsCode`/`customsDesc`,
 `mosCode`, `typeCode`, `freqCode`, `period`, `flowCode`/`flowDesc` (constant
 within each track), `partner2*`, `refPeriodId`, `refMonth` and
@@ -227,8 +229,9 @@ rows — `sql/02` assumption 7 records the case where that happened and was
 corrected.
 
 **The code is the key only within one edition.** This file used to say "the
-code is the key" without qualification. At HS2 that holds — all 97 chapters
-exist every year. At HS6 it does not: each edition also *splits, merges and
+code is the key" without qualification. At HS2 that holds — no chapter is
+renumbered, and India and China carry all 97 every year (Viet Nam and Bangladesh
+lack one to four in some years). At HS6 it does not: each edition also *splits, merges and
 retires* codes (mobile phones were `851712` until 2021, then `851713`
 smartphones and `851714` other). Most HS6 codes that "disappear" from Track B
 do so in 2016 or 2021, the year before an edition change — retired or split,

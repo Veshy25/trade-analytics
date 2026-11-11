@@ -4,7 +4,7 @@
 -- Phase 1 could not answer ("which markets buy India's pharmaceuticals?").
 -- Phase 2, pulled 15/09/2026.
 --
--- NOTE on views (23/09/2026): every result set exported to data/processed/ is
+-- NOTE on views: every result set exported to data/processed/ is
 -- defined once here as a view (v_track_d_*), and sql/08 only copies it out —
 -- see 02's header for why. If you change a view, rerun 08.
 --
@@ -39,10 +39,7 @@
 --      textiles 0.18%, pharmaceuticals 0.97%, gems & jewellery 1.95%,
 --      engineering / machinery 11.54% (Japan, 2022). ELEVEN partner-years
 --      exceed 1% — ten of them engineering in 2022, and one gems & jewellery
---      in 2022. Only petroleum matches to the cent; the earlier claim that
---      "every other sector-year matches to the cent" and that "every
---      partner-year over 1% is engineering in 2022" were both false, and V3
---      printed the counter-example directly beneath them. The engineering gap
+--      in 2022. Only petroleum matches to within USD 2 (S8). The engineering gap
 --      is the same sector-year where Track B already diverges -2.46% from
 --      Track A (03 V5, finding 10). That points to a property of India's 2022
 --      HS 84/85 records rather than revision between the two pull dates:
@@ -260,8 +257,7 @@ SELECT * FROM v_track_d_sector_partner_cagr;
 
 -- V1. Partner coverage and series completeness. Expect 20 partners, no
 --     World (partner_code 0), and 10 years for every partner. The partner
---     set is asserted in 01 validation 6; the ten years are asserted here
---     (23/09/2026).
+--     set is asserted in 01 validation 6; the ten years are asserted here.
 DO $$
 DECLARE lo bigint; hi bigint;
 BEGIN
@@ -307,16 +303,15 @@ GROUP BY aggr_level;
 --     Eleven partner-years exceed 1%: ten engineering 2022, one gems 2022.
 --     Direction is never materially positive (HS6 sum <= HS2 chapter): 332
 --     of the 1,000 partner-years are positive, but the largest is 0.002%
---     (USD 1, Maldives gems 2014; S8) — rounding, not value.
+--     of its chapter (Maldives gems 2014) and USD 17 in dollars (S8) —
+--     rounding, not value.
 --
 --     The join below is inner, so a sector-year present in one track and not
 --     the other would vanish from the comparison instead of failing it. That
 --     is a no-op on this data — both panels hold the same 20 partners (01
 --     validation 6) and 10 years for every partner (06 V1 for D; Track C is
 --     complete per 04 V3) — and the assertion after this query checks the
---     join returns all 1,000 partner-years. Until 23/09/2026 this comment
---     said 01 validation 6 asserted both partners and years; it was a plain
---     SELECT, and it covers the partner set only.
+--     join returns all 1,000 partner-years.
 -- Two views: v_track_d_reconciliation_rows keeps every partner-year
 -- unrounded, so S8 at the end of this file can count the positive ones; the
 -- view the assertion reads summarises it by sector. Dropped with CASCADE so a
@@ -369,10 +364,10 @@ ORDER BY worst_abs_pct_diff DESC;
 
 SELECT * FROM v_track_d_reconciliation_vs_c;
 
--- V3 assertion (added 23/09/2026). Holds the data to what the findings and
+-- V3 assertion. Holds the data to what the findings and
 -- README publish: 1,000 partner-years compared, worst divergence 11.54%,
--- eleven over 1%. Not an export — the view exists so the assertion reads the
--- same numbers the query prints.
+-- eleven over 1%. It reads the view the query prints, which is exported as
+-- track_d_reconciliation_vs_track_c.csv.
 DO $$
 DECLARE n bigint; worst numeric; over1 bigint;
 BEGIN
@@ -394,6 +389,7 @@ END $$;
 --     58.8 / pharma 57.0. Pharma's low coverage matters: the 20-partner
 --     panel misses ~43% of India's pharma exports, so "USA = 62% of the
 --     panel" (Q1) is NOT "USA = 62% of India's pharma exports".
+--     Exported as track_d_panel_coverage.csv.
 DROP VIEW IF EXISTS v_track_d_panel_coverage;
 CREATE VIEW v_track_d_panel_coverage AS
 WITH d AS (
@@ -420,7 +416,7 @@ ORDER BY d.sector, d.ref_year;
 
 SELECT * FROM v_track_d_panel_coverage;
 
--- V4 assertion (added 23/09/2026): the published coverage ranges — 57.0 to
+-- V4 assertion: the published coverage ranges — 57.0 to
 -- 70.2% of each sector's exports in 2023, 52.3 to 71.3% over all fifty
 -- sector-years.
 DO $$
@@ -445,9 +441,11 @@ END $$;
 -- Supporting figure (S8)
 --
 -- The V3 comment above: of the 1,000 partner-years, how many have the HS6
--- sum ABOVE the HS2 chapter (332), and how large the largest of those is
--- (0.002%, USD 1 — Maldives gems 2014). Exported by sql/08 with S1–S7 as
--- data/processed/supporting_figures.csv.
+-- sum ABOVE the HS2 chapter (332); the largest of those as a share of its
+-- chapter (0.002%, a USD 1 gap — Maldives gems 2014) and in dollars (USD 17);
+-- and, for petroleum, how many of its 200 partner-years are identical (85)
+-- and the largest gap either way (USD 2). Exported by sql/08 with the other
+-- supporting figures as data/processed/supporting_figures.csv.
 -- ============================================================
 DROP VIEW IF EXISTS v_support_06;
 CREATE VIEW v_support_06 AS
@@ -462,7 +460,17 @@ SELECT '06 S8a'::text AS figure_id, 'Track D partner-years with the HS6 sum abov
 UNION ALL
 SELECT '06 S8b', 'Largest of those, as % of the chapter value', ROUND(pct_diff, 3), 'percent', 'sql/06 V3 comment' FROM top1
 UNION ALL
-SELECT '06 S8c', 'Largest of those, in USD', ROUND(d_value - c_value), 'USD', 'sql/06 V3 comment' FROM top1;
+SELECT '06 S8c', 'USD gap on that partner-year', ROUND(d_value - c_value), 'USD', 'sql/06 V3 comment' FROM top1
+UNION ALL
+SELECT '06 S8d', 'Largest positive gap, in USD', (SELECT ROUND(MAX(d_value - c_value)) FROM pos), 'USD', 'sql/06 V3 comment'
+UNION ALL
+SELECT '06 S8e', 'Petroleum partner-years where Track D equals Track C to the dollar',
+       (SELECT COUNT(*) FROM v_track_d_reconciliation_rows
+         WHERE sector = 'petroleum_products' AND d_value = c_value)::numeric, 'partner-years', 'findings preamble'
+UNION ALL
+SELECT '06 S8f', 'Largest petroleum gap either way, in USD',
+       (SELECT ROUND(MAX(ABS(d_value - c_value))) FROM v_track_d_reconciliation_rows
+         WHERE sector = 'petroleum_products'), 'USD', 'findings preamble';
 
 SELECT v.*, t.sector, t.partner_code, t.ref_year
 FROM v_support_06 v

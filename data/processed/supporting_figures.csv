@@ -1,4 +1,5 @@
 figure_id,figure,value,unit,cited_in
+02 S10,"India exports 2023, whole dollars",431411977211,USD,finding 11
 02 S1a,Track B rows with flag 2,162,rows,finding 12
 02 S1b,of which quantity-only estimated,162,rows,finding 12
 02 S1c,Track B rows with flag 4,3776,rows,finding 12
@@ -24,6 +25,11 @@ figure_id,figure,value,unit,cited_in
 02 S4 pharmaceuticals b,"of which last seen in 2016 or 2021, pharmaceuticals",8,codes,sql/02 assumption 7
 02 S4 textiles a,"Track B codes with no 2023 row, textiles",37,codes,sql/02 assumption 7
 02 S4 textiles b,"of which last seen in 2016 or 2021, textiles",30,codes,sql/02 assumption 7
+02 S9 Bangladesh,"CAGR 2015-2018, the window all four reporters share, Bangladesh",8.08,percent,finding 1
+02 S9 China,"CAGR 2015-2018, the window all four reporters share, China",3.03,percent,finding 1
+02 S9 India,"CAGR 2015-2018, the window all four reporters share, India",6.85,percent,finding 1
+02 S9 Viet Nam,"CAGR 2015-2018, the window all four reporters share, Viet Nam",14.58,percent,finding 1
+03 S11,"Mobile phones (851713, 851714) unit value, 2023",1017,USD per kg,finding 17
 03 S5a,Sector-years where Track B equals Track A to the dollar,8,sector-years,finding 10
 03 S5b,Sector-years where Track B is within 0.005% of Track A,44,sector-years,finding 10
 03 S6 2014,"Textiles net weight, 2014",6.89,million tonnes,finding 17
@@ -42,4 +48,8 @@ figure_id,figure,value,unit,cited_in
 03 S7d,HS6 codes reworded in both 2017 and 2022,3,codes,findings correction 2
 06 S8a,Track D partner-years with the HS6 sum above the Track C chapter,332,partner-years,sql/06 V3 comment
 06 S8b,"Largest of those, as % of the chapter value",0.002,percent,sql/06 V3 comment
-06 S8c,"Largest of those, in USD",1,USD,sql/06 V3 comment
+06 S8c,USD gap on that partner-year,1,USD,sql/06 V3 comment
+06 S8d,"Largest positive gap, in USD",17,USD,sql/06 V3 comment
+06 S8e,Petroleum partner-years where Track D equals Track C to the dollar,85,partner-years,findings preamble
+06 S8f,"Largest petroleum gap either way, in USD",2,USD,findings preamble
+07 S12,"India imports 2023, whole dollars",672140129636,USD,finding 16

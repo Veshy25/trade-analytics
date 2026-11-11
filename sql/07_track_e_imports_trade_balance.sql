@@ -4,7 +4,7 @@
 --   E2 — India <- the 20 Track C partners, HS2               (mirror of Track C)
 -- joined to the Phase 1 export tables to produce balances. Phase 2.
 --
--- NOTE on views (23/09/2026): every result set exported to data/processed/ is
+-- NOTE on views: every result set exported to data/processed/ is
 -- defined once here as a view (v_track_e_*), and sql/08 only copies it out —
 -- see 02's header for why. If you change a view, rerun 08.
 --
@@ -45,10 +45,9 @@
 --   7. Every share, growth and ratio divisor is wrapped in NULLIF(..., 0).
 --   8. Query 4 groups on cmd_code only and shows the latest year's
 --      description — HS 2022 reworded chapters 15, 16, 24, 84 and 88 from
---      2022 onward (02 assumption 7). This is the query where that bug was
---      first noticed: grouping on cmd_desc made HS 84 and 15 appear to have
+--      2022 onward (02 assumption 7). Grouping on cmd_desc would make HS 84 and 15 appear to have
 --      no 2014 imports at all.
---   9. THE PARTNER PANEL WAS BUILT FOR EXPORTS (added 23/09/2026). E2 reuses
+--   9. THE PARTNER PANEL WAS BUILT FOR EXPORTS. E2 reuses
 --      Track C's twenty partners, which were chosen on the export side (04
 --      assumption 7). India's import sources are a different set, and the
 --      panel under-represents exactly the suppliers that drive its deficit:
@@ -58,8 +57,7 @@
 --      every Q3 ranking is a ranking WITHIN THE PANEL: "China's deficit is
 --      larger than the next four combined" holds among these twenty, and
 --      says nothing about bilateral deficits with countries the panel leaves
---      out. The coverage figure (V5) was always disclosed; the direction of
---      the bias was not.
+--      out.
 
 -- ============================================================
 -- Query 1: country trade balance, year by year
@@ -250,7 +248,7 @@ SELECT * FROM v_track_e_india_import_mix;
 -- V1. Partner scope. E1 must be World only; E2 must be the 20 Track C
 --     partners with no World row. Expect: e1_non_world = 0, e2_partners = 20,
 --     e2_world_rows = 0, e2_partners_not_in_c = 0. The E2 half is asserted
---     in 01 validation 6; the E1 half is asserted here (23/09/2026).
+--     in 01 validation 6; the E1 half is asserted here.
 DO $$
 DECLARE n bigint;
 BEGIN
@@ -303,9 +301,25 @@ SELECT SUM(cif_value) AS india_2023_imports_usd
 FROM clean_track_e_country_imports
 WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023;
 
+-- V4 assertion: hold the data to the WITS-matched figure.
+DO $$
+DECLARE v numeric;
+BEGIN
+    SELECT ROUND(SUM(cif_value)) INTO v
+    FROM clean_track_e_country_imports
+    WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023;
+    IF v <> 672140129636 THEN
+        RAISE EXCEPTION '07 V4: India 2023 imports sum to USD % (expected 672140129636)', v;
+    END IF;
+    RAISE NOTICE '07 V4 PASSED: India''s 2023 imports sum to USD 672,140,129,636.';
+END $$;
+
 -- V5. E2 panel coverage: the 20 partners' share of India's total imports
 --     (E1), per year — the import-side twin of 04 V5. This is the "share of
 --     what" behind every E2 figure.
+--     Exported as track_e_panel_coverage.csv.
+DROP VIEW IF EXISTS v_track_e_panel_coverage;
+CREATE VIEW v_track_e_panel_coverage AS
 WITH p AS (
     SELECT ref_year, SUM(cif_value) AS panel_usd
     FROM clean_track_e_india_partner_imports
@@ -326,26 +340,24 @@ SELECT
 FROM p JOIN w USING (ref_year)
 ORDER BY p.ref_year;
 
--- V5 assertion (added 23/09/2026): the published range is 50-58%; at build
--- time it runs 50.4-58.2%.
+SELECT * FROM v_track_e_panel_coverage;
+
+-- V5 assertion: the published range is 50-58% (50.4-58.2%). It reads the view
+-- the query prints and checks the range ends themselves, not bounds, so a
+-- narrower range fails too.
 DO $$
 DECLARE lo numeric; hi numeric; n bigint;
 BEGIN
-    SELECT COUNT(*),
-           MIN(ROUND(100.0 * p.v / NULLIF(w.v, 0), 1)),
-           MAX(ROUND(100.0 * p.v / NULLIF(w.v, 0), 1))
+    SELECT COUNT(*), MIN(panel_coverage_pct), MAX(panel_coverage_pct)
       INTO n, lo, hi
-    FROM (SELECT ref_year, SUM(cif_value) AS v FROM clean_track_e_india_partner_imports
-          WHERE aggr_level = 2 GROUP BY ref_year) p
-    JOIN (SELECT ref_year, SUM(cif_value) AS v FROM clean_track_e_country_imports
-          WHERE aggr_level = 2 AND reporter_iso = 'IND' GROUP BY ref_year) w USING (ref_year);
-    IF n <> 10 OR lo < 50.0 OR hi > 58.5 THEN
-        RAISE EXCEPTION '07 V5: % years, E2 coverage % to % percent (expected 10 years, 50 to 58)', n, lo, hi;
+    FROM v_track_e_panel_coverage;
+    IF n <> 10 OR lo <> 50.4 OR hi <> 58.2 THEN
+        RAISE EXCEPTION '07 V5: % years, E2 coverage % to % percent (expected 10 years, 50.4 to 58.2)', n, lo, hi;
     END IF;
     RAISE NOTICE '07 V5 PASSED: E2 covers % to % percent of India''s imports.', lo, hi;
 END $$;
 
--- V5b. Panel import coverage by chapter, 2023 (added 23/09/2026, behind
+-- V5b. Panel import coverage by chapter, 2023 (behind
 --      assumption 9). One row per HS2 chapter, largest import chapters first:
 --      India's imports from the world (E1), from the twenty (E2), and the
 --      share the panel sees. Mineral fuels (27) and precious stones and
@@ -384,11 +396,10 @@ ORDER BY rank_by_imports;
 SELECT * FROM v_track_e_panel_import_coverage_2023;
 
 
--- V6. Join-coverage assertions (added 17/09/2026). Q2 and Q3 both join an
+-- V6. Join-coverage assertions. Q2 and Q3 both join an
 --     export track to an import track. Both are no-ops on this data, and both
 --     would drop or blank rows silently if that ever stopped being true, so
---     the condition is asserted rather than assumed. A cold audit on
---     16/09/2026 flagged them as latent; this is the answer to that.
+--     the condition is asserted rather than assumed.
 DO $$
 DECLARE
     only_one_side bigint;
@@ -429,3 +440,20 @@ BEGIN
 
     RAISE NOTICE '07 V6 PASSED: Q2 chapter coverage symmetric, Q3 returns all 40 partner-year pairs.';
 END $$;
+
+
+-- ============================================================
+-- Supporting figure (S12)
+--
+-- Finding 16: India's 2023 imports in whole dollars, the figure matched to
+-- WITS (USD 672,140 million). V4 above asserts it. Exported by sql/08 with the
+-- other supporting figures as data/processed/supporting_figures.csv.
+-- ============================================================
+DROP VIEW IF EXISTS v_support_07;
+CREATE VIEW v_support_07 AS
+SELECT '07 S12'::text AS figure_id, 'India imports 2023, whole dollars'::text AS figure,
+       ROUND(SUM(cif_value)) AS value, 'USD'::text AS unit, 'finding 16'::text AS cited_in
+FROM clean_track_e_country_imports
+WHERE aggr_level = 2 AND reporter_iso = 'IND' AND ref_year = 2023;
+
+SELECT * FROM v_support_07;

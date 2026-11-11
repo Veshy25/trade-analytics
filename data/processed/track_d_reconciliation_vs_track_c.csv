@@ -1,0 +1,6 @@
+sector,partner_years,min_pct_diff,max_pct_diff,worst_abs_pct_diff,partner_years_over_1pct
+engineering_machinery,200,-11.54,0.00,11.54,10
+gems_jewellery,200,-1.95,0.00,1.95,1
+petroleum_products,200,0.00,0.00,0.00,0
+pharmaceuticals,200,-0.97,0.00,0.97,0
+textiles,200,-0.18,0.00,0.18,0
