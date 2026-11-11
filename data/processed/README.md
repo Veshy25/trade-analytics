@@ -1,13 +1,14 @@
 # Results — what each CSV holds
 
-The 28 CSVs here are the analysis results, written by `sql/08_export_results.sql`
+The 31 CSVs here are the analysis results, written by `sql/08_export_results.sql`
 from views defined in `sql/02`–`sql/07`. They are derived, not source:
 regenerate them by re-running the SQL rather than editing them.
 
 ## Conventions
 
 - **Money** is nominal USD, with no deflator. The suffix gives the unit: `_bn`
-  is USD billions and `_mn` is USD millions. `_usd` columns are in dollars.
+  is USD billions and `_mn` is USD millions (`total_export_value_usd_bn` and
+  `sector_value_usd_bn` are billions too).
 - **Exports** are FOB and **imports** are CIF. A balance is FOB exports minus
   CIF imports (`sql/07` assumption 1).
 - **`_pct`** is a percentage, already multiplied by 100 (`27.8` means 27.8%).
@@ -21,7 +22,9 @@ regenerate them by re-running the SQL rather than editing them.
   concentrated.
 - **Rounding** happens once, in the view: 1 to 3 decimal places depending on
   the column. Re-derive a figure from the CSV's own precision, not from a
-  rounded figure in the prose.
+  rounded figure in the prose. Columns in one file can differ:
+  `track_e_india_chapter_balance_2023.csv` holds exports and imports at 2 dp and
+  the balance at 3 dp, so the printed columns do not subtract exactly.
 
 ## Track A — four-country benchmark (`sql/02`)
 
@@ -62,8 +65,10 @@ regenerate them by re-running the SQL rather than editing them.
 | `track_d_sector_partner_matrix_2023.csv` | sector × partner | `pct_of_sector_panel` = the partner's share of that sector's panel exports. |
 | `track_d_sector_partner_shift.csv` | sector × partner | `shift_ppt` = `share_2023_pct` − `share_2014_pct`. |
 | `track_d_top_products_by_market.csv` | sector × top-3 partner × top-5 product | `value_2023_mn` is USD millions. `pct_of_partner_sector` = the product's share of that partner's exports in that sector. |
-| `track_d_sector_market_concentration.csv` | sector × year | `hhi_panel` is **market** concentration within the panel. `partners_with_trade` counts partners with a non-zero share. |
+| `track_d_sector_market_concentration.csv` | sector × year | `hhi_panel` is **market** concentration within the panel. `partners_with_trade` counts partners with a non-zero share; it is 20 in every row on this data. |
 | `track_d_sector_partner_cagr.csv` | sector × partner | `cagr_pct` 2014–2023 on USD millions. Finding 14 cites it for its USD values. |
+| `track_d_panel_coverage.csv` | sector × year | `panel_coverage_pct` = the 20 partners' share of the sector's exports to the world (Track B): the "share of what" behind every Track D percentage. |
+| `track_d_reconciliation_vs_track_c.csv` | sector | Track D (HS6, pulled 15/09/2026) against Track C (HS2, pulled 25/08/2026), 200 partner-years per sector. `pct_diff` = (D − C) ÷ C × 100; `worst_abs_pct_diff` is the largest gap either way, and `partner_years_over_1pct` counts gaps above 1%. |
 
 ## Track E — imports and trade balance (`sql/07`)
 
@@ -74,9 +79,29 @@ regenerate them by re-running the SQL rather than editing them.
 | `track_e_india_partner_balance.csv` | partner | Balances for 2014 and 2023; `balance_change_bn` = 2023 − 2014. |
 | `track_e_india_import_mix.csv` | India's top-10 import chapters | `shift_ppt` = 2023 share − 2014 share. |
 | `track_e_panel_import_coverage_2023.csv` | India × HS2 chapter (97) | `panel_coverage_pct` = imports from the 20 partners ÷ India's world imports, by chapter. Low on fuels and gold (finding 19). |
+| `track_e_panel_coverage.csv` | year | `panel_coverage_pct` = India's imports from the 20 partners ÷ its imports from the world, all chapters. |
 
-## Supporting figures (`sql/02`, `03`, `06`)
+## Supporting figures (`sql/02`, `03`, `06`, `07`)
 
 | File | Grain | Notes |
 |---|---|---|
 | `supporting_figures.csv` | one row per figure | Counts quoted in the findings, the README or SQL comments that no other result set returns. `figure_id` names the query (`02 S1a` is `sql/02` S1), `unit` gives the unit of `value`, and `cited_in` says where it is quoted. |
+
+## Figures quoted in dashboard text
+
+The dashboard's visuals refresh from these CSVs, but some titles and caveats quote
+a figure as text. If a CSV changes, re-check these against it.
+
+| Page | Text | From |
+|---|---|---|
+| Benchmark | "26 chapters fell by USD 25.2bn; net growth was USD 113.9bn" | `track_a_india_chapter_contribution_2014_2023.csv` |
+| Benchmark | "Its 8.08% CAGR" (Bangladesh) | `track_a_cagr.csv` |
+| Sectors | "Comtrade derived 95.3–99.7% of petroleum tonnage" | `track_b_volume_coverage.csv` |
+| Markets | "Top five (highlighted) take 59.0% of panel"; "covering 63.1%"; "the other 36.9%" | `track_c_partner_concentration.csv` |
+| Sector × Market | "covers 57.0–70.2% of the sector's 2023 world exports" | `track_d_panel_coverage.csv` |
+| Sector × Market | "agrees with India's partner totals within 1% in 2014 and 2023" | `sql/06` V3 (every gap above 1% is in 2022) |
+| Sector × Market | "Up in engineering and textiles; down in pharma and gems" | `track_d_sector_market_concentration.csv` |
+| Trade Balance | "China's deficit widened most (−60.9)" | `track_e_india_partner_balance.csv` |
+| Trade Balance | "Mineral fuels alone (−131.3) is over half the −240.7 total deficit" | `track_e_india_chapter_balance_2023.csv`, `track_e_country_trade_balance.csv` |
+| Trade Balance | "India's 2023 imports match WITS (USD 672,140mn)" | `supporting_figures.csv` (07 S12) |
+| Trade Balance | "50–58% of India's imports" | `track_e_panel_coverage.csv` |

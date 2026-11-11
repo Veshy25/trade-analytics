@@ -2,7 +2,7 @@
 
 A SQL-driven analysis of India's merchandise trade over the past decade — exports benchmarked against three comparator economies (China, Bangladesh, Vietnam), then where each sector's exports go, imports and trade balance, and volume against value — sourced directly from the UN Comtrade API. Built as a portfolio project in PostgreSQL, with Python for the charts and a Power BI dashboard.
 
-> **Raw data not included.** The seven raw CSVs are not redistributed: at 284,752 records they exceed UN Comtrade's 100,000-record free limit. Data would have to be pulled manually from the site: [UN Comtrade](https://comtradeplus.un.org). Everything else is here: the SQL, the 28 result tables in `data/processed/`, the findings, the charts and the Power BI dashboard, none of which need the raw files to read or open. The exact pull parameters are in [`data/raw/README.md`](data/raw/README.md).
+> **Raw data not included.** The seven raw CSVs are not redistributed: at 284,752 records they exceed UN Comtrade's 100,000-record free limit. To get them, repeat the pull from [UN Comtrade](https://comtradeplus.un.org) with the parameters documented here. Everything else is here: the SQL, the 31 result tables in `data/processed/`, the findings, the charts and the Power BI dashboard, none of which need the raw files to read or open; re-running the SQL and its eighteen assertions does. The exact pull parameters are in [`data/raw/README.md`](data/raw/README.md).
 
 **→ [Read the findings](insights/key_findings.md)** — twenty findings with the numbers, caveats attached.
 
@@ -34,7 +34,7 @@ The data came from two pulls — exports on 25/08/2026, imports and the partner 
 
 - **Exporter/importer asymmetry.** Exports are valued FOB and imports CIF, so the two sides of a shipment rarely match. The IMF's CIF/FOB factor is 6% since 2017, 10% before (IMF Working Paper 18/16) — an assumed range, not measured here. Every export figure is the exporter's own report, never a partner's mirrored import.
 - **No value in this pull is flagged as estimated — and this project got that wrong once.** `legacyEstimationFlag` marks estimated *quantity* and *net weight* only (FAO, UNSD and ITC, [*Trade data processing and validation methodology*](https://comtradeapi.un.org/files/v1/app/wiki/UNSD_Method_trade_data_processing_v6-17_Jun_2019.pdf) (2019), Part: UN Comtrade, "Documentation of estimated values"); the headline claim built on reading it as a value marker is withdrawn in [finding 12](insights/key_findings.md). What does bear on a 2014-vs-2023 comparison is each reporter's switch from filed to rolled-up chapter figures (`isReported` → `isAggregate`), reported in `sql/02` V1a/V1b.
-- **Where estimation bites is weight.** 95–100% of the tonnage behind most sector volume series is Comtrade-estimated — by conversion factors, from partially reported weights, or from the value using standard unit values; [finding 17](insights/key_findings.md) carries this next to its conclusion.
+- **Where estimation bites is weight.** 95–100% of the tonnage behind most sector volume series is Comtrade-estimated — by conversion factors, or from the value divided by a unit value (India's own where enough of the flow is reported, otherwise a standard one); [finding 17](insights/key_findings.md) carries this next to its conclusion.
 - **Confidentiality suppression.** Some countries withhold commodity or partner detail; it still counts in totals but not in the breakdowns.
 - **HS 99, "commodities not specified", is inside every total** — USD 212.4bn of China's decade exports (0.8%), 29.6bn of Vietnam's (1.2%) and 5.1bn of India's (0.15%) (`supporting_figures.csv`, 02 S3). It stays in because the published totals include it.
 
@@ -58,7 +58,7 @@ trade-analytics/
 │   │   └── pull_manifest.json      # Pull dates, parameters, row counts, SHA-256 per file
 │   └── processed/              # Query outputs, committed so results are readable
 │       ├── README.md               # What each CSV holds: source view, grain, units
-│       └── *.csv                   # 28 result sets — regenerate with sql/08
+│       └── *.csv                   # 31 result sets — regenerate with sql/08
 ├── scripts/
 │   └── make_chart.py           # Renders the three charts (reads data/processed/)
 ├── sql/
@@ -102,7 +102,7 @@ pip install -r requirements.txt
 python3 scripts/make_chart.py                                                    # optional: redraws the three charts
 ```
 
-Expected row counts after `01`: **3,282 / 16,976 / 18,956** (Tracks A/B/C) and **225,298 / 3,294 / 16,946** (Tracks D/E1/E2). `sql/01` asserts these, so a short or duplicated raw file stops the run there. A clean run prints **fifteen `PASSED` notices** across `01`–`07`, each a check that stops the run if the data stops matching what the findings say. A fresh pull reflects Comtrade's data on the day it runs; if figures have been revised since the analysed pull, these assertions are what will say so.
+Expected row counts after `01`: **3,282 / 16,976 / 18,956** (Tracks A/B/C) and **225,298 / 3,294 / 16,946** (Tracks D/E1/E2). `sql/01` asserts these, so a short or duplicated raw file stops the run there. A clean run prints **eighteen `PASSED` notices** across `01`–`07`, each a check that stops the run if the data stops matching what the findings say. A fresh pull reflects Comtrade's data on the day it runs; if figures have been revised since the analysed pull, these assertions are what will say so.
 
 **Run order matters.** `00` then `01` must run first. `02`–`07` create the result views and otherwise only read — and several read other tracks' tables, so run them all. `08` copies the views to `data/processed/` and runs last; it is numbered so it sorts after every analysis file, and `05` is unused.
 
@@ -161,6 +161,7 @@ After each major stage I put the published repository through a structured revie
 | 2 | 16/09/2026 | [`8e10162`](https://github.com/Veshy25/trade-analytics/commit/8e10162) | 20 points, three of which changed a published claim — finding 12 was withdrawn | [`65a6652`](https://github.com/Veshy25/trade-analytics/commit/65a6652) |
 | 3 | 23/09/2026 | [`65a6652`](https://github.com/Veshy25/trade-analytics/commit/65a6652) | 37 points; about 150 figures re-derived with no arithmetic errors, but wording that went further than the evidence | [`2e7ea65`](https://github.com/Veshy25/trade-analytics/commit/2e7ea65) |
 | 4 | 27/10/2026 | [`747f34c`](https://github.com/Veshy25/trade-analytics/commit/747f34c) | 18 points; about 540 figures re-derived with 6 mismatches, all rounding or wording | [`5d87eef`](https://github.com/Veshy25/trade-analytics/commit/5d87eef) and [#1](https://github.com/Veshy25/trade-analytics/pull/1) |
+| 5 | 11/11/2026 | [`5a7018e`](https://github.com/Veshy25/trade-analytics/commit/5a7018e) | 19 points; about 620 figures re-derived with 6 mismatches, all rounding or wording | [#4](https://github.com/Veshy25/trade-analytics/pull/4); four dashboard points follow in the next dashboard release |
 
 I worked through every point raised, re-derived each data claim before changing it, and closed it in the repository itself.
 

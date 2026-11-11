@@ -6,7 +6,7 @@
 --
 -- Source table: clean_track_c_india_partner_view (built in 01_data_cleaning.sql).
 --
--- NOTE on views (23/09/2026): every result set exported to data/processed/ is
+-- NOTE on views: every result set exported to data/processed/ is
 -- defined once here as a view (v_track_c_*), and sql/08 only copies it out —
 -- see 02's header for why. If you change a view, rerun 08.
 --
@@ -34,7 +34,7 @@
 --   5. Values are USD, exporter-reported FOB.
 --   6. Every growth / share ratio wraps its divisor in NULLIF(..., 0) so a
 --      zero or missing base returns NULL rather than raising an error.
---   7. The panel is a SELECTION, not a ranking (stated 23/09/2026). No rule
+--   7. The panel is a SELECTION, not a ranking. No rule
 --      for choosing the twenty survives in the project's records, so it
 --      should not be read as "India's top 20 markets". What the data shows:
 --      it holds India's largest destinations (USA, UAE, Netherlands, China,
@@ -162,10 +162,9 @@ SELECT * FROM v_track_c_partner_totals;
 --       is a genuine ceiling: no arrangement of the unobserved markets can
 --       push HHI above it.
 --
--- The true value sits between. What the range supports — REWORDED
--- 23/09/2026. This comment used to conclude that India's export markets are
--- "unconcentrated under ANY assumption" because the upper bound (1,750-1,889)
--- never reaches 2,500. That does not follow: on the 2010 US merger bands this
+-- The true value sits between. What the range supports: the upper bound
+-- (1,750-1,889) never reaches 2,500, but that does not make India's export
+-- markets "unconcentrated under any assumption". On the 2010 US merger bands this
 -- project quotes (03 Query 5), 1,500-2,500 is MODERATELY concentrated, so the
 -- ceiling lands in the moderate band in every year; and under the 2023 US
 -- Merger Guidelines, which replaced those bands with a single > 1,800 "highly
@@ -177,8 +176,7 @@ SELECT * FROM v_track_c_partner_totals;
 -- 17.6% (75.8bn of 431.4bn in 2023). No arrangement short of that reaches
 -- 2,500. The lower bound (386-481) assumes the residual is spread thinly
 -- across many markets. So: never highly concentrated on the 2010 bands under
--- any assumption, and low on any realistic one — but "unconcentrated under
--- any assumption" was an overstatement.
+-- any assumption, and low on any realistic one.
 --
 -- Exported as track_c_partner_concentration.csv.
 -- ============================================================
@@ -350,7 +348,7 @@ ORDER BY partner_desc, chapter_rank;
 -- ============================================================
 
 -- V1. Partner coverage. Expect 20 named partners and NO World (partner_code
---     = 0) row. Asserted in 01 validation 6 since 23/09/2026, together with
+--     = 0) row. Asserted in 01 validation 6, together with
 --     the identity of the C, D and E2 panels; this prints the detail.
 SELECT
     partner_code,
@@ -396,29 +394,13 @@ WHERE aggr_level = 2;
 --     against Track A's India-to-World HS2 rows. A high, stable ratio means
 --     the panel's shares approximate true destination shares; a low ratio
 --     means read every "pct_of_tracked" column strictly as within-panel.
-WITH tracked AS (
-    SELECT ref_year, SUM(fob_value) AS tracked_partners_usd
-    FROM clean_track_c_india_partner_view
-    WHERE aggr_level = 2
-    GROUP BY ref_year
-),
-india_world AS (
-    SELECT ref_year, SUM(fob_value) AS india_world_usd
-    FROM clean_track_a_country_benchmark
-    WHERE reporter_iso = 'IND'
-    GROUP BY ref_year
-)
-SELECT
-    t.ref_year,
-    t.tracked_partners_usd,
-    w.india_world_usd,
-    ROUND(100.0 * t.tracked_partners_usd / NULLIF(w.india_world_usd, 0), 1) AS tracked_pct_of_india_total
-FROM tracked t
--- Same inner join as Q4, same no-op, same reason it is worth naming.
-JOIN india_world w USING (ref_year)
-ORDER BY t.ref_year;
+--     Query 4's view already holds it as panel_coverage_pct; read it there
+--     rather than restate the query.
+SELECT ref_year, panel_coverage_pct
+FROM v_track_c_partner_concentration
+ORDER BY ref_year;
 
--- V5 assertion (added 23/09/2026): the README and findings state the panel
+-- V5 assertion: the README and findings state the panel
 -- covers 61.9%-64.4% of India's exports in every year. Hold the data to it.
 DO $$
 DECLARE n bigint; lo numeric; hi numeric;

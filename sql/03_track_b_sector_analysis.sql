@@ -11,7 +11,7 @@
 -- five sector names (27 / 30 / 71 / 84-85 / 50-63 — see the sector table in
 -- data/raw/README.md). Every other column comes straight from Comtrade.
 --
--- NOTE on views (23/09/2026): every result set exported to data/processed/ is
+-- NOTE on views: every result set exported to data/processed/ is
 -- defined once here as a view (v_track_b_*), and sql/08 only copies it out —
 -- see 02's header for why. If you change a view, rerun 08.
 --
@@ -38,7 +38,7 @@
 --      USD billion for readability.
 --   6. Every growth / share ratio wraps its divisor in NULLIF(..., 0) so a
 --      zero or missing base returns NULL rather than raising an error.
---   7. VOLUME (Queries 6-8, added 15/09/2026 for Phase 2). net_wgt in kg is
+--   7. VOLUME (Queries 6-8). net_wgt in kg is
 --      the single volume measure. qty is in mixed units (u, m2, carat, kWh)
 --      and is never summed. Volume exists only at HS6 — Comtrade does not
 --      aggregate mixed units to chapter level, so this is sector-level by
@@ -55,18 +55,19 @@
 --      "volume"); the flag is about coverage, but the caveat would stand even
 --      at 100%.
 --
---      HOW MUCH OF THE WEIGHT IS COMTRADE'S, NOT INDIA'S (added 17/09/2026).
---      Coverage is not the only gate, and the more important one was missing.
+--      HOW MUCH OF THE WEIGHT IS COMTRADE'S, NOT INDIA'S.
+--      Coverage is not the only gate, nor the more important one.
 --      Where a reporter files no net weight, Comtrade estimates it, by one of
 --      three methods (FAO, UNSD and ITC, "Trade data processing and validation
 --      methodology", 2019): a known conversion factor applied to a reported
---      quantity, partially reported weights, or the VALUE divided by a
---      standard unit value. Estimated weight is therefore not an independent
---      measurement of volume, and where the last method applies it is value
---      divided by an assumed price; the data does not say which was used. Q8 reported only the share of ROWS flagged, which for petroleum
---      reads a comfortable 24-63%. Weighted by kilograms — the thing actually
+--      quantity, or the VALUE divided by a unit value — the reporter's own
+--      for that product where enough of the flow is properly reported,
+--      otherwise a standard (median) one. Estimated weight is therefore not
+--      an independent measurement of volume, and under the last two methods
+--      it is value divided by a price; the data does not say which was used.
+--      The share of ROWS flagged reads a comfortable 24-63% for petroleum. Weighted by kilograms — the thing actually
 --      being summed — the share is 95.3% in 2014 and 95.3% in 2023, peaking
---      at 99.7%, because the few estimated rows are the enormous ones. Q8 now
+--      at 99.7%, because the few estimated rows are the enormous ones. Q8
 --      carries weight_estimated_kg_pct alongside the row share for exactly
 --      this reason, and Q7's petroleum series must be read with it: the
 --      volume-not-price reading in key_findings.md finding 17 holds only as
@@ -74,10 +75,10 @@
 --      diverge most where it matters most, so never quote the row figure as
 --      the tonnage figure.
 --
---      TWO MORE LIMITS ON READING Q6 (added 23/09/2026).
+--      TWO MORE LIMITS ON READING Q6.
 --      (a) Tonnes are summed over weight-bearing rows only, so when coverage
 --          moves between the endpoint years the tonnage change moves with it.
---          Q6 now also carries a coverage-adjusted tonnage (tonnes scaled up
+--          Q6 also carries a coverage-adjusted tonnage (tonnes scaled up
 --          by 1 / value coverage), which assumes the unweighed rows ship at
 --          the same USD/kg as the weighed ones. For textiles, coverage fell
 --          97.8% -> 93.0% and the change in tonnes goes from -14.9% raw to
@@ -229,9 +230,9 @@ WITH product_totals AS (
         -- were reworded across TWO editions — 42 at 2017 (HS 2017) and 34 at
         -- 2022 (HS 2022), three codes in both (02 assumption 7, S7).
         -- Grouping on cmd_desc
-        -- split them and truncated value_2014_2023_usd to the rows sharing
-        -- the latest wording — fixed 15/09/2026; one top-10 row was affected
-        -- (petroleum 270750: 3.58bn -> 3.62bn, itself a 2017 rewording).
+        -- would split them and truncate value_2014_2023_usd to the rows
+        -- sharing the latest wording; one top-10 row is affected (petroleum
+        -- 270750: 3.58bn against 3.62bn, itself a 2017 rewording).
         -- Grouping on the code fixes rewordings but not code CHANGES: where
         -- an edition split or retired a code, value_2014_2023_usd covers only
         -- the years that code existed (02 assumption 7). The 2023 ranking is
@@ -355,7 +356,7 @@ SELECT * FROM v_track_b_sector_concentration_2023;
 -- Query 6: volume vs value, 2014 -> 2023, per sector (assumption 7)
 --          How much of each sector's decade growth is tonnes, and how much
 --          is price. Unit value is USD per kg over weight-bearing rows only.
---          The last three columns (added 23/09/2026) scale tonnes by value
+--          The last three columns scale tonnes by value
 --          coverage — assumption 7(a); read them beside the raw tonnes, not
 --          instead of them. Exported as track_b_sector_volume_vs_value.csv.
 -- ============================================================
@@ -421,10 +422,9 @@ SELECT * FROM v_track_b_sector_volume_vs_value;
 
 -- ============================================================
 -- Query 6b: engineering's unit value with and without mobile phones
---           (added 23/09/2026, assumption 7(b)).
+--           (assumption 7(b)).
 --
---           Engineering's USD/kg rose 44.8% over the decade, which finding 17
---           read as "moving up the value chain". One product line carries
+--           Engineering's USD/kg rose 44.8% over the decade. One product line carries
 --           most of it. Mobile phones — 851712 until 2021, split into 851713
 --           (smartphones) and 851714 (other) in HS 2022 — went from USD
 --           0.56bn to 14.29bn at roughly USD 1,000/kg, against ~12 USD/kg for
@@ -432,8 +432,8 @@ SELECT * FROM v_track_b_sector_volume_vs_value;
 --           codes, so the edition change does not bias the comparison), the
 --           sector's unit value rises 11.43 -> 12.72 USD/kg, +11.3%.
 --           So the rise is mostly a shift in mix toward phones, not higher
---           prices across the basket. (The cold audit of 23/09/2026 quoted
---           +8.4%, which removes phones from 2023 but leaves them in 2014.)
+--           prices across the basket. (Removing phones from 2023 only, and
+--           leaving them in 2014, gives +8.4% and is not like-for-like.)
 --           Exported as track_b_engineering_unit_value_mix.csv.
 -- ============================================================
 DROP VIEW IF EXISTS v_track_b_engineering_unit_value_mix;
@@ -565,7 +565,7 @@ SELECT * FROM v_track_b_volume_coverage;
 -- V1. Partner coverage. Expect exactly one row: World (partner_code = 0).
 --     If named partners appear, the pull scope changed and the
 --     partner_code = 0 filter above would be silently dropping real data.
---     Asserted since 23/09/2026.
+--     Asserted.
 DO $$
 DECLARE n bigint;
 BEGIN
@@ -581,9 +581,9 @@ FROM clean_track_b_india_sector_detail
 GROUP BY partner_code, partner_desc
 ORDER BY row_count DESC;
 
--- V2. Aggregation levels present. aggr_level = 6 should hold the
---     overwhelming majority of rows and value; any level 2/4 rows are
---     rollups the queries exclude on purpose.
+-- V2. Aggregation levels present. Expect aggr_level = 6 only (16,976 rows,
+--     assumption 1); a level 2 or 4 row would be a rollup the queries
+--     exclude on purpose.
 SELECT aggr_level, COUNT(*) AS row_count, SUM(fob_value) AS total_value_usd
 FROM clean_track_b_india_sector_detail
 GROUP BY aggr_level
@@ -618,8 +618,7 @@ ORDER BY years_present, sector;
 --     expected (HS6 detail vs HS2 rollup); large ones are a flag to
 --     investigate before publishing. Exported as
 --     track_b_cross_track_reconciliation.csv, at 2 dp — the -2.46% that
---     finding 10 quotes. (The printed query rounded to 1 dp until
---     23/09/2026, so it showed -2.5 while the finding cited it for -2.46.)
+--     finding 10 quotes.
 --
 --     At build time: worst -2.462% (engineering/machinery 2022), 44 of 50
 --     sector-years within 0.005%, 8 identical to the dollar (03 S5).
@@ -691,11 +690,12 @@ END $$;
 
 
 -- ============================================================
--- Supporting figures (S5–S7)
+-- Supporting figures (S5–S7, S11)
 --
 -- Counts quoted in the findings or in comments above that no result query
--- returns. Each is defined here once and exported by sql/08, with S1–S4
--- (sql/02) and S8 (sql/06), as data/processed/supporting_figures.csv.
+-- returns. Each is defined here once and exported by sql/08, with S1–S4,
+-- S9 and S10 (sql/02), S8 (sql/06) and S12 (sql/07), as
+-- data/processed/supporting_figures.csv.
 --
 -- S5. Finding 10: how many of the 50 sector-years reconcile exactly, and
 --     how many within 0.005% (unrounded USD, from v_track_b_cross_track_usd).
@@ -705,6 +705,9 @@ END $$;
 --     description changes between consecutive years (73), the year the new
 --     wording first appears (2017: 42, 2022: 34), and codes reworded in both
 --     years (3). Track B and D agree on every code-year's description.
+-- S11. Finding 17: the unit value of mobile phones in 2023 (851713 and
+--     851714, weight-bearing rows), about USD 1,000/kg against about 12 for
+--     the rest of engineering (Q6b).
 -- ============================================================
 DROP VIEW IF EXISTS v_support_03;
 CREATE VIEW v_support_03 AS
@@ -738,6 +741,12 @@ reworded AS (
            BOOL_OR(ref_year = 2022) AS in_2022
     FROM changes
     GROUP BY cmd_code
+),
+phones AS (
+    SELECT ROUND(SUM(fob_value) / NULLIF(SUM(net_wgt), 0), 0) AS usd_per_kg
+    FROM clean_track_b_india_sector_detail
+    WHERE aggr_level = 6 AND partner_code = 0 AND ref_year = 2023
+      AND net_wgt > 0 AND cmd_code IN ('851713', '851714')
 )
 SELECT '03 S5a'::text AS figure_id, 'Sector-years where Track B equals Track A to the dollar'::text AS figure,
        exact::numeric AS value, 'sector-years'::text AS unit, 'finding 10'::text AS cited_in FROM recon
@@ -752,6 +761,8 @@ SELECT '03 S7b', 'HS6 codes reworded in 2017 (HS 2017 edition)', COUNT(*) FILTER
 UNION ALL
 SELECT '03 S7c', 'HS6 codes reworded in 2022 (HS 2022 edition)', COUNT(*) FILTER (WHERE in_2022), 'codes', 'findings correction 2' FROM reworded
 UNION ALL
-SELECT '03 S7d', 'HS6 codes reworded in both 2017 and 2022', COUNT(*) FILTER (WHERE in_2017 AND in_2022), 'codes', 'findings correction 2' FROM reworded;
+SELECT '03 S7d', 'HS6 codes reworded in both 2017 and 2022', COUNT(*) FILTER (WHERE in_2017 AND in_2022), 'codes', 'findings correction 2' FROM reworded
+UNION ALL
+SELECT '03 S11', 'Mobile phones (851713, 851714) unit value, 2023', usd_per_kg, 'USD per kg', 'finding 17' FROM phones;
 
 SELECT * FROM v_support_03 ORDER BY figure_id;
