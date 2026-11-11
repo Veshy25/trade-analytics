@@ -6,6 +6,20 @@ corrections that changed a published claim are also in the findings, under
 [Corrections kept visible](insights/key_findings.md#corrections-kept-visible).
 Commit history has the rest.
 
+## 11/11/2026 — Markets page no longer applies a concentration verdict
+
+- **Dashboard.** The Markets page no longer applies a merger-guideline verdict
+  to India's export-market concentration, in line with the Sectors page. The
+  chart title is now "Concentration of India's export markets (HHI,
+  2014–2023)", previously "India's export markets are never highly
+  concentrated"; the 2,500 reference line is removed; and the caveat names
+  both US thresholds, 2,500 (2010 guidelines) and 1,800 (2023 guidelines), as
+  antitrust heuristics. The upper bound of the possible range passes 1,800 in
+  2014–2016, 2022 and 2023, as finding 7 states. The partner chart's tooltip
+  now reads "Partner" rather than "Partner Display".
+- **Screenshots.** The Markets and Trade Balance screenshots are regenerated.
+  Trade Balance now shows −43.7 for electrical machinery and +6.1 for fish.
+
 ## 10/11/2026 — dashboard slicer, opening page and trade-balance rounding
 
 - **Dashboard.** The Benchmark page's top-ten chart now follows the country
@@ -15,8 +29,7 @@ Commit history has the rest.
   to 3 dp (previously 2), so the dashboard's one-decimal figures round from the
   value rather than from a rounded figure. Electrical machinery (HS 85) shows
   −43.7, as in finding 18 (previously −43.8), and fish (HS 03) +6.1 (previously
-  +6.2). No other figure changes. The page 5 screenshot still shows the earlier
-  two figures.
+  +6.2). No other figure changes.
 
 ## 05/11/2026 — dashboard, raw-data notice and repository history
 

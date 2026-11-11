@@ -28,7 +28,8 @@
               },
               "queryRef": "Dim Partner.Partner Display",
               "nativeQueryRef": "Partner Display",
-              "active": true
+              "active": true,
+              "displayName": "Partner"
             }
           ]
         },

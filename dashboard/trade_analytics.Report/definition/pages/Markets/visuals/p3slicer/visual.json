@@ -28,8 +28,8 @@
               },
               "queryRef": "Dim Partner.Partner Display",
               "nativeQueryRef": "Partner Display",
-              "displayName": "Partner",
-              "active": true
+              "active": true,
+              "displayName": "Partner"
             }
           ]
         }
@@ -43,6 +43,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'Dropdown'"
+                }
+              }
+            },
+            "isInvertedSelectionMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
@@ -67,6 +74,11 @@
               }
             }
           }
+        }
+      ],
+      "general": [
+        {
+          "properties": {}
         }
       ]
     },
