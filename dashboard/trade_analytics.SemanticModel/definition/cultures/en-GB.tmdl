@@ -1054,6 +1054,27 @@ cultureInfo en-GB
 			          }
 			        }
 			      ]
+			    },
+			    "dim_sector.weight_estimated_2023_display": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Dim Sector",
+			          "ConceptualProperty": "Weight Estimated 2023 Display"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Tonnage estimated (2023)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
 			    }
 			  }
 			}

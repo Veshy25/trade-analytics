@@ -161,7 +161,7 @@ After each major stage I put the published repository through a structured revie
 | 2 | 16/09/2026 | [`8e10162`](https://github.com/Veshy25/trade-analytics/commit/8e10162) | 20 points, three of which changed a published claim — finding 12 was withdrawn | [`65a6652`](https://github.com/Veshy25/trade-analytics/commit/65a6652) |
 | 3 | 23/09/2026 | [`65a6652`](https://github.com/Veshy25/trade-analytics/commit/65a6652) | 37 points; about 150 figures re-derived with no arithmetic errors, but wording that went further than the evidence | [`2e7ea65`](https://github.com/Veshy25/trade-analytics/commit/2e7ea65) |
 | 4 | 27/10/2026 | [`747f34c`](https://github.com/Veshy25/trade-analytics/commit/747f34c) | 18 points; about 540 figures re-derived with 6 mismatches, all rounding or wording | [`5d87eef`](https://github.com/Veshy25/trade-analytics/commit/5d87eef) and [#1](https://github.com/Veshy25/trade-analytics/pull/1) |
-| 5 | 11/11/2026 | [`5a7018e`](https://github.com/Veshy25/trade-analytics/commit/5a7018e) | 19 points; about 620 figures re-derived with 6 mismatches, all rounding or wording | [#4](https://github.com/Veshy25/trade-analytics/pull/4); four dashboard points follow in the next dashboard release |
+| 5 | 11/11/2026 | [`5a7018e`](https://github.com/Veshy25/trade-analytics/commit/5a7018e) | 19 points; about 620 figures re-derived with 6 mismatches, all rounding or wording | [#4](https://github.com/Veshy25/trade-analytics/pull/4) and [#5](https://github.com/Veshy25/trade-analytics/pull/5) |
 
 I worked through every point raised, re-derived each data claim before changing it, and closed it in the repository itself.
 

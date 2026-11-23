@@ -6,6 +6,31 @@ corrections that changed a published claim are also in the findings, under
 [Corrections kept visible](insights/key_findings.md#corrections-kept-visible).
 Commit history has the rest.
 
+## 21/11/2026 — dashboard points from the fifth cold audit
+
+- **Sectors page.** The table gains a "Tonnage estimated (2023)" column: the
+  share of each sector's 2023 net weight that Comtrade estimated rather than
+  took from the filing. It reads 95.3% for petroleum, 90.8% for engineering,
+  57.1% for textiles and 100.0% for pharmaceuticals, and is masked for gems, like
+  that sector's other volume figures. The column replaces the caveat's typed-in
+  range for petroleum (95.3–99.7%). The caveat now also says that engineering's
+  unit value rose mostly through a shift towards phones: +11.3% without them.
+  Its HHI line is shorter, to fit; the "Product spread" column still shows which
+  sectors sit in a single chapter.
+- **Sector × Market page.** The concentration chart's subtitle now names
+  petroleum, whose top-three market share also rose (50.6% to 55.1%): "Up in
+  engineering, textiles and petroleum; down in pharma and gems".
+- **Markets page.** The HHI chart's axis ends at 2,000, previously 3,000. The
+  upper bound of the possible range peaks at 1,889, in 2022.
+- **Data model.** Thirteen measures that no visual used are removed, among them
+  a sector HHI band built on the 2010 merger bands, which the Sectors caveat says
+  are not applied. Ten loaded tables that fed no visual are removed too. The two
+  measures left on query tables move to the country dimension, so every measure
+  now sits on a dimension table. This is meant to end an intermittent "cyclic
+  reference" error on refresh. No figure on any page changes.
+- **Screenshots.** The Sectors, Markets and Sector × Market screenshots are
+  regenerated.
+
 ## 11/11/2026 — points from the fifth cold audit
 
 - **Finding 1.** Retitled "slowest of the three economies with a full decade of

@@ -1,10 +1,6 @@
 table 'Dim Year'
 	lineageTag: dim-year
 
-	measure 'Selected Year' = SELECTEDVALUE('Dim Year'[Year], BLANK())
-		displayFolder: Utility
-		lineageTag: m-selected-year
-
 	column Year
 		lineageTag: f078b06d-33ba-484f-8db3-86e8358c677b
 		summarizeBy: none

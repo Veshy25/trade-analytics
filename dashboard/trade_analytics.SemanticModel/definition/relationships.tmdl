@@ -2,20 +2,12 @@ relationship b0f0a0b9-b10f-9892-0e60-e2b7a4056d5f
 	fromColumn: 'A CAGR'.reporter_desc
 	toColumn: 'Dim Country'.Country
 
-relationship 1a3ec066-ea2d-a78a-477a-be1f1392bc7b
-	fromColumn: 'A Country Year Totals'.reporter_desc
-	toColumn: 'Dim Country'.'Country Display'
-
 relationship 565aed5c-d83b-350d-83cc-20a2e32b434e
 	fromColumn: 'A Indexed Series'.reporter_desc
 	toColumn: 'Dim Country'.Country
 
 relationship 6fd91af8-b01c-82ec-f808-d3cd265bbfe3
 	fromColumn: 'A Top10 Chapters'.reporter_desc
-	toColumn: 'Dim Country'.Country
-
-relationship ffcc57fd-d421-2f5f-d147-6f309bdff14f
-	fromColumn: 'A Reporting Basis'.reporter_desc
 	toColumn: 'Dim Country'.Country
 
 relationship 3734db10-db81-a559-8c78-c276a07ca89d
@@ -38,14 +30,6 @@ relationship 878d80e0-4741-8755-f7a6-fe09a3042ec5
 	fromColumn: 'D Sector Partner Shift'.partner_desc
 	toColumn: 'Dim Partner'.Partner
 
-relationship 290a4cab-0fa3-5957-1f37-5dbc43abc209
-	fromColumn: 'D Sector Partner CAGR'.partner_desc
-	toColumn: 'Dim Partner'.Partner
-
-relationship 675025e6-84f8-ef44-8bb3-e2ae0373f4a3
-	fromColumn: 'D Top Products By Market'.partner_desc
-	toColumn: 'Dim Partner'.Partner
-
 relationship d9d7875f-df44-6b72-a013-271552d0793a
 	fromColumn: 'E India Partner Balance'.partner_desc
 	toColumn: 'Dim Partner'.Partner
@@ -66,10 +50,6 @@ relationship a47c2ab9-c116-b4cb-1f3b-5227ee85bceb
 	fromColumn: 'B Volume Coverage'.sector
 	toColumn: 'Dim Sector'.Sector
 
-relationship f085d0ae-86b3-34c0-2192-c483ce8134c5
-	fromColumn: 'B Cross Track Reconciliation'.sector
-	toColumn: 'Dim Sector'.Sector
-
 relationship 0ff2052c-829f-8277-f18c-65c7a79c5c3a
 	fromColumn: 'D Sector Partner Matrix 2023'.sector
 	toColumn: 'Dim Sector'.Sector
@@ -78,28 +58,12 @@ relationship b2209585-fd17-c5c8-01b1-24ef5318a322
 	fromColumn: 'D Sector Partner Shift'.sector
 	toColumn: 'Dim Sector'.Sector
 
-relationship 83c950ef-c6fb-2e93-28b9-5b44fada57dd
-	fromColumn: 'D Sector Partner CAGR'.sector
-	toColumn: 'Dim Sector'.Sector
-
 relationship ec330174-dcb9-877e-5abf-9ccfe37d5df0
 	fromColumn: 'D Sector Market Concentration'.sector
 	toColumn: 'Dim Sector'.Sector
 
-relationship 03494ae4-1cc4-396c-4a53-645c4c24baa7
-	fromColumn: 'D Top Products By Market'.sector
-	toColumn: 'Dim Sector'.Sector
-
-relationship 4322b5dc-ae0d-a440-3943-1b5b529bfc4a
-	fromColumn: 'A Country Year Totals'.ref_year
-	toColumn: 'Dim Year'.Year
-
 relationship b67a737d-c637-9359-0b47-9f93e933db5f
 	fromColumn: 'A Indexed Series'.ref_year
-	toColumn: 'Dim Year'.Year
-
-relationship eb096f10-7624-3714-e648-52e7750dac70
-	fromColumn: 'A Reporting Basis'.ref_year
 	toColumn: 'Dim Year'.Year
 
 relationship ab8f96ee-3e1f-5a43-dd7e-66da18556d37
@@ -108,14 +72,6 @@ relationship ab8f96ee-3e1f-5a43-dd7e-66da18556d37
 
 relationship 9549fe4c-9538-edb5-6d62-478c45c7f6e2
 	fromColumn: 'B Volume Coverage'.ref_year
-	toColumn: 'Dim Year'.Year
-
-relationship 82f0811a-bca9-24dd-b47c-b8a7e5bc9302
-	fromColumn: 'B Cross Track Reconciliation'.ref_year
-	toColumn: 'Dim Year'.Year
-
-relationship d12c6fbe-4338-805f-361d-0d1443f49505
-	fromColumn: 'B Petroleum Volume Series'.ref_year
 	toColumn: 'Dim Year'.Year
 
 relationship f3b8ddd2-6988-65cc-151d-dbf3f9dd5256

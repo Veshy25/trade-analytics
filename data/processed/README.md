@@ -96,11 +96,11 @@ a figure as text. If a CSV changes, re-check these against it.
 |---|---|---|
 | Benchmark | "26 chapters fell by USD 25.2bn; net growth was USD 113.9bn" | `track_a_india_chapter_contribution_2014_2023.csv` |
 | Benchmark | "Its 8.08% CAGR" (Bangladesh) | `track_a_cagr.csv` |
-| Sectors | "Comtrade derived 95.3–99.7% of petroleum tonnage" | `track_b_volume_coverage.csv` |
+| Sectors | "Engineering's unit value rose mostly via phones: +11.3% without them" | `track_b_engineering_unit_value_mix.csv` |
 | Markets | "Top five (highlighted) take 59.0% of panel"; "covering 63.1%"; "the other 36.9%" | `track_c_partner_concentration.csv` |
 | Sector × Market | "covers 57.0–70.2% of the sector's 2023 world exports" | `track_d_panel_coverage.csv` |
 | Sector × Market | "agrees with India's partner totals within 1% in 2014 and 2023" | `sql/06` V3 (every gap above 1% is in 2022) |
-| Sector × Market | "Up in engineering and textiles; down in pharma and gems" | `track_d_sector_market_concentration.csv` |
+| Sector × Market | "Up in engineering, textiles and petroleum; down in pharma and gems" | `track_d_sector_market_concentration.csv` |
 | Trade Balance | "China's deficit widened most (−60.9)" | `track_e_india_partner_balance.csv` |
 | Trade Balance | "Mineral fuels alone (−131.3) is over half the −240.7 total deficit" | `track_e_india_chapter_balance_2023.csv`, `track_e_country_trade_balance.csv` |
 | Trade Balance | "India's 2023 imports match WITS (USD 672,140mn)" | `supporting_figures.csv` (07 S12) |

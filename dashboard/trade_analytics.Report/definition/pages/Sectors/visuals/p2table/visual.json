@@ -83,6 +83,21 @@
                       "Entity": "Dim Sector"
                     }
                   },
+                  "Property": "Weight Estimated 2023 Display"
+                }
+              },
+              "queryRef": "Dim Sector.Weight Estimated 2023 Display",
+              "nativeQueryRef": "Weight Estimated 2023 Display",
+              "displayName": "Tonnage estimated (2023)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim Sector"
+                    }
+                  },
                   "Property": "Unit Value Change Display"
                 }
               },
@@ -142,6 +157,120 @@
       }
     },
     "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "170D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Sector Display"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "90D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Sector Value 2023 bn"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "80D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Sector Value CAGR pct"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "125D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Volume CAGR Display"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "125D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Weight Estimated 2023 Display"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "125D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Unit Value Change Display"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "65D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Sector HHI 2023"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "140D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Dim Sector.Sector Concentration Note"
+          }
+        }
+      ],
       "total": [
         {
           "properties": {
@@ -181,7 +310,39 @@
             }
           },
           "selector": {
+            "metadata": "Dim Sector.Weight Estimated 2023 Display"
+          }
+        },
+        {
+          "properties": {
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Right'"
+                }
+              }
+            }
+          },
+          "selector": {
             "metadata": "Dim Sector.Unit Value Change Display"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {}
+        }
+      ],
+      "grid": [
+        {
+          "properties": {
+            "rowPadding": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            }
           }
         }
       ]

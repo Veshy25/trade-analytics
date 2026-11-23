@@ -1,24 +1,6 @@
 table 'A CAGR'
 	lineageTag: a-cagr
 
-	measure 'CAGR pct' = SELECTEDVALUE('A CAGR'[cagr_pct])
-		formatString: #,##0.00
-		displayFolder: Benchmark
-		lineageTag: m-cagr-pct
-
-	measure 'CAGR Label' =
-			VAR C = SELECTEDVALUE ( 'A CAGR'[cagr_pct] )
-			VAR F = SELECTEDVALUE ( 'A CAGR'[first_year] )
-			VAR L = SELECTEDVALUE ( 'A CAGR'[last_year] )
-			RETURN
-				IF (
-					ISBLANK ( C ),
-					BLANK (),
-					FORMAT ( C, "0.00" ) & "% (" & FORMAT ( F, "0" ) & "–" & FORMAT ( L, "0" ) & ")"
-				)
-		displayFolder: Benchmark
-		lineageTag: m-cagr-label
-
 	column reporter_desc
 		dataType: string
 		lineageTag: a-cagr-reporter

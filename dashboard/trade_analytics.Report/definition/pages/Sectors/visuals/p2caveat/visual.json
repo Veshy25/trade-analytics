@@ -47,7 +47,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "· Volume is net weight; Comtrade derived 95.3–99.7% of petroleum tonnage.",
+                    "value": "· Volume is net weight, mostly Comtrade's estimate (see Tonnage estimated).",
                     "textStyle": {
                       "fontSize": "9pt"
                     }
@@ -57,7 +57,17 @@
               {
                 "textRuns": [
                   {
-                    "value": "· HHI measures product concentration. A single-chapter sector scores high by construction; no merger-guideline verdict is applied.",
+                    "value": "· Engineering's unit value rose mostly via phones: +11.3% without them.",
+                    "textStyle": {
+                      "fontSize": "9pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "· HHI measures product concentration; no merger-guideline verdict is applied.",
                     "textStyle": {
                       "fontSize": "9pt"
                     }

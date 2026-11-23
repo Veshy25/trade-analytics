@@ -23,32 +23,6 @@
         },
         {
           "location": {
-            "x": 3351.5359886266797,
-            "y": 1101.427730547804
-          },
-          "nodeIndex": "A Chapter Change 2022 2023",
-          "nodeLineageTag": "a-chg",
-          "size": {
-            "height": 248,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 680.91935410589349,
-            "y": 740.29555805935752
-          },
-          "nodeIndex": "A Country Year Totals",
-          "nodeLineageTag": "a-cyt",
-          "size": {
-            "height": 224,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
             "x": 337.91411791285049,
             "y": 1015.3584717798572
           },
@@ -75,19 +49,6 @@
         },
         {
           "location": {
-            "x": 493.058949345569,
-            "y": -50
-          },
-          "nodeIndex": "A Reporting Basis",
-          "nodeLineageTag": "a-rb",
-          "size": {
-            "height": 300,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
             "x": 50,
             "y": 744.84297017630706
           },
@@ -95,45 +56,6 @@
           "nodeLineageTag": "a-top10",
           "size": {
             "height": 296,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 1469.1184393825358,
-            "y": 1195.2036840893611
-          },
-          "nodeIndex": "B Cross Track Reconciliation",
-          "nodeLineageTag": "b-ctr",
-          "size": {
-            "height": 200,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 3919.5359886266797,
-            "y": 1089.427730547804
-          },
-          "nodeIndex": "B Engineering Unit Value Mix",
-          "nodeLineageTag": "b-euvm",
-          "size": {
-            "height": 272,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 1038.3946478845792,
-            "y": 1931.5246796741649
-          },
-          "nodeIndex": "B Petroleum Volume Series",
-          "nodeLineageTag": "b-pvs",
-          "size": {
-            "height": 248,
             "width": 234
           },
           "zIndex": 0
@@ -244,19 +166,6 @@
         },
         {
           "location": {
-            "x": 2484.7623305669595,
-            "y": 1888.3627964489742
-          },
-          "nodeIndex": "D Sector Partner CAGR",
-          "nodeLineageTag": "d-spc",
-          "size": {
-            "height": 200,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
             "x": 2294.669188889241,
             "y": 1633.7753042919392
           },
@@ -277,19 +186,6 @@
           "nodeLineageTag": "d-sps",
           "size": {
             "height": 200,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 2582.5240269797023,
-            "y": 1370.1485318111984
-          },
-          "nodeIndex": "D Top Products By Market",
-          "nodeLineageTag": "d-tpbm",
-          "size": {
-            "height": 272,
             "width": 234
           },
           "zIndex": 0
@@ -374,37 +270,11 @@
         },
         {
           "location": {
-            "x": 4487.53598862668,
-            "y": 1101.427730547804
-          },
-          "nodeIndex": "E India Import Mix",
-          "nodeLineageTag": "e-iim",
-          "size": {
-            "height": 248,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
             "x": 2982.1435803113668,
             "y": 1418.2062121700067
           },
           "nodeIndex": "E India Partner Balance",
           "nodeLineageTag": "e-ipb",
-          "size": {
-            "height": 224,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 4771.53598862668,
-            "y": 1113.427730547804
-          },
-          "nodeIndex": "E Panel Import Coverage 2023",
-          "nodeLineageTag": "e-pic",
           "size": {
             "height": 224,
             "width": 234

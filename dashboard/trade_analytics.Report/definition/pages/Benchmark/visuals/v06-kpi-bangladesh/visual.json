@@ -20,13 +20,13 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "A CAGR"
+                      "Entity": "Dim Country"
                     }
                   },
                   "Property": "CAGR Label"
                 }
               },
-              "queryRef": "A CAGR.CAGR Label",
+              "queryRef": "Dim Country.CAGR Label",
               "nativeQueryRef": "CAGR Label"
             }
           ]
