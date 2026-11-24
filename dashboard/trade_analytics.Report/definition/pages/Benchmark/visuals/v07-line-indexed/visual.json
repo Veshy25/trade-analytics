@@ -57,13 +57,13 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "A Indexed Series"
+                      "Entity": "Dim Country"
                     }
                   },
                   "Property": "Export Index"
                 }
               },
-              "queryRef": "A Indexed Series.Export Index",
+              "queryRef": "Dim Country.Export Index",
               "nativeQueryRef": "Export Index"
             }
           ]

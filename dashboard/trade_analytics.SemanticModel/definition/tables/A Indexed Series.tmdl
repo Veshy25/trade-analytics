@@ -1,11 +1,6 @@
 table 'A Indexed Series'
 	lineageTag: a-idx
 
-	measure 'Export Index' = SELECTEDVALUE('A Indexed Series'[index_base_100])
-		formatString: #,##0.0
-		displayFolder: Benchmark
-		lineageTag: m-export-index
-
 	column reporter_desc
 		dataType: string
 		lineageTag: a-idx-reporter

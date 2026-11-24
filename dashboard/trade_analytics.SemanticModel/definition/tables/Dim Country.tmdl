@@ -1,10 +1,6 @@
 table 'Dim Country'
 	lineageTag: dim-country
 
-	measure 'Selected Country' = SELECTEDVALUE('Dim Country'[Country Display], "All countries")
-		displayFolder: Utility
-		lineageTag: m-selected-country
-
 	measure 'Selected Country Key' = SELECTEDVALUE('Dim Country'[Country], BLANK())
 		displayFolder: Utility
 		lineageTag: m-selected-country-key
@@ -170,6 +166,24 @@ table 'Dim Country'
 		formatString: +0.0;-0.0;0.0
 		displayFolder: Trade Balance
 		lineageTag: m-india-balance-pct-of-trade-2023
+
+	measure 'CAGR Label' =
+			VAR C = SELECTEDVALUE ( 'A CAGR'[cagr_pct] )
+			VAR F = SELECTEDVALUE ( 'A CAGR'[first_year] )
+			VAR L = SELECTEDVALUE ( 'A CAGR'[last_year] )
+			RETURN
+				IF (
+					ISBLANK ( C ),
+					BLANK (),
+					FORMAT ( C, "0.00" ) & "% (" & FORMAT ( F, "0" ) & "–" & FORMAT ( L, "0" ) & ")"
+				)
+		displayFolder: Benchmark
+		lineageTag: m-cagr-label
+
+	measure 'Export Index' = SELECTEDVALUE('A Indexed Series'[index_base_100])
+		formatString: #,##0.0
+		displayFolder: Benchmark
+		lineageTag: m-export-index
 
 	column Country
 		lineageTag: 085ab8ec-577f-45c6-b973-ea7572d34f95

@@ -1,10 +1,6 @@
 table 'Dim Partner'
 	lineageTag: dim-partner
 
-	measure 'Selected Partner' = SELECTEDVALUE('Dim Partner'[Partner Display], "All partners")
-		displayFolder: Utility
-		lineageTag: m-selected-partner
-
 	measure 'Partner Value 2023 bn' = SUM ( 'C Partner Totals'[value_2023_bn] )
 		formatString: #,##0.0
 		displayFolder: Markets
@@ -44,11 +40,6 @@ table 'Dim Partner'
 		formatString: +0;-0;0
 		displayFolder: Markets
 		lineageTag: m-rank-improvement
-
-	measure 'Partner Value 2014 bn' = SUM ( 'C Partner Rank Moves'[value_2014_bn] )
-		formatString: #,##0.0
-		displayFolder: Markets
-		lineageTag: m-partner-value-2014-bn
 
 	measure 'Partner Value Change bn' = SUM ( 'C Partner Rank Moves'[value_2023_bn] ) - SUM ( 'C Partner Rank Moves'[value_2014_bn] )
 		formatString: +#,##0.0;-#,##0.0;0.0

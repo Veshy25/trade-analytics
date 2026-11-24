@@ -200,7 +200,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Up in engineering and textiles; down in pharma and gems'"
+                  "Value": "'Up in engineering, textiles and petroleum; down in pharma and gems'"
                 }
               }
             }
