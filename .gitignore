@@ -25,7 +25,3 @@ dashboard/*.pdf
 
 # Raw UN Comtrade extracts — not redistributed (see data/raw/README.md).
 data/raw/*.csv
-
-# Local tooling and private project notes — never published
-.claude/
-*_memory.md
