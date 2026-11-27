@@ -1,12 +1,14 @@
 # International Trade Analytics: India's Export Profile (2014–2023)
 
-A SQL-driven analysis of India's merchandise trade over the past decade — exports benchmarked against three comparator economies (China, Bangladesh, Vietnam), then where each sector's exports go, imports and trade balance, and volume against value — sourced directly from the UN Comtrade API. Built as a portfolio project in PostgreSQL, with Python for the charts and a Power BI dashboard.
+- **Question:** how does India's export growth compare with China, Vietnam and Bangladesh?
+- **Answer:** slowest of the three with a full decade of data: 3.46% a year to USD 431.4 billion in 2023, against 4.16% for China and 9.96% for Vietnam (nominal USD). Bangladesh has 2015–2018 only, so it has no decade rate.
+- **Data:** UN Comtrade API, 2014–2023 (Bangladesh 2015–2018 only), 284,752 records; HS2 for all four countries, HS6 for India's five focus sectors.
+- **Built with:** PostgreSQL (analysis, 18 built-in assertions), Python (charts), Power BI (five-page dashboard).
+- **Read next:** [twenty findings, with caveats](insights/key_findings.md)
+
+![Power BI dashboard, Benchmark page: India's export growth against China, Vietnam and Bangladesh](dashboard/screenshots/dashboard_page_1_benchmark.png)
 
 > **Raw data not included.** The seven raw CSVs are not redistributed: at 284,752 records they exceed UN Comtrade's 100,000-record free limit. To get them, repeat the pull from [UN Comtrade](https://comtradeplus.un.org) with the parameters documented here. Everything else is here: the SQL, the 31 result tables in `data/processed/`, the findings, the charts and the Power BI dashboard, none of which need the raw files to read or open; re-running the SQL and its eighteen assertions does. The exact pull parameters are in [`data/raw/README.md`](data/raw/README.md).
-
-**→ [Read the findings](insights/key_findings.md)** — twenty findings with the numbers, caveats attached.
-
-![Indexed export trend, four countries](insights/indexed_export_trend.png)
 
 > Over 2014–2023 India's exports compounded at **3.46% a year** to **USD 431.4bn**. Vietnam, a smaller exporter than India in 2014, compounded at **9.96%**. A fifth of India's basket is mineral fuels (20.7% of 2023 exports), which ties much of its value to world energy prices and makes its path the most volatile of the four; but its decade growth came more from machinery and electronics (34.3% of the USD 113.9bn added) than from petroleum (23.7%).
 
